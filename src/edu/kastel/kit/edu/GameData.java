@@ -3,6 +3,7 @@ package edu.kastel.kit.edu;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ public class GameData {
 
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     public static final String REGEX_EQUALS = "=";
+
+    static List<String> mandatoryArgs = Arrays.asList("seed", "deck", "verbosity", "units")
 
     public static String playerUnitSymbol = " x ";
     public static String enemyUnitSymbol = " y ";
@@ -72,6 +75,10 @@ public class GameData {
             argInfo.put(keyValue[0], keyValue[1]);
         }
 
+        if (!containsMandatoryKeys(argInfo)) {
+            System.err.println("ERROR: Mandatory arguments missing!");
+        }
+
         for (String key : argInfo.keySet()) {
             parseKeyValue(key);
         }
@@ -95,6 +102,21 @@ public class GameData {
             System.err.println(ERROR_IO_EXCEPTION);
         }
         return lines;
+    }
+
+    static boolean containsMandatoryKeys(Map<String, String> argInfo) {
+        for (String key : mandatoryArgs) {
+            if (key == "deck") {
+                if (!argInfo.containsKey("deck") || !argInfo.containsKey("deck1") || !argInfo.containsKey("deck2")) {
+                    return false;
+                }
+                continue;
+            }
+            if (!argInfo.containsKey(key)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     //    public static void main(String[] args) {
