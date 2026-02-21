@@ -1,0 +1,108 @@
+package edu.kastel.kit.edu;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class GameData {
+
+    static String[] path = "seed=-4022738 deck=input/decks/default.txt verbosity=compact units=input/units/default.txt".split(" ");
+
+    private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
+    public static final String REGEX_EQUALS = "=";
+
+    public static String playerUnitSymbol = " x ";
+    public static String enemyUnitSymbol = " y ";
+    public static String playerKingSymbol = " X ";
+    public static String enemyKingSymbol = " Y ";
+
+    static int seed;
+    static String boardData;
+    static List<String> unitData;
+    static List<String> deck1Data;
+    static List<String> deck2Data;
+    public static String verbosity;
+    static String team1Name;
+    static String team2Name;
+
+    static Map<String, String> argInfo;
+
+    public static void parseKeyValue(String key) {
+        switch (key) {
+            case "seed":
+                seed = Integer.parseInt(argInfo.get(key));
+                break;
+            case "board":
+                boardData = extractBoardKeySet(argInfo.get(key));
+                break;
+            case "units":
+                unitData = extractFilePath(argInfo.get(key));
+                break;
+            case "deck":
+                deck1Data = extractFilePath(argInfo.get(key));
+                deck2Data = extractFilePath(argInfo.get(key));
+                break;
+            case "deck1":
+                deck1Data = extractFilePath(argInfo.get(key));
+                break;
+            case "deck2":
+                deck2Data = extractFilePath(argInfo.get(key));
+                break;
+            case "team1":
+                team1Name = argInfo.get(key);
+                break;
+            case "team2":
+                team2Name = argInfo.get(key);
+                break;
+            case "verbosity":
+                verbosity = argInfo.get(key);
+                break;
+            default:
+                System.err.println("Repeat");
+        }
+    }
+
+    public static void extractArgumentInfo(String[] args) {
+        argInfo = new HashMap<>();
+        for (String arg : args) {
+            String[] keyValue = arg.split(REGEX_EQUALS);
+            argInfo.put(keyValue[0], keyValue[1]);
+        }
+
+        for (String key : argInfo.keySet()) {
+            parseKeyValue(key);
+        }
+    }
+
+    public static String extractBoardKeySet(String filePath) {
+        String keySet = null;
+        try {
+            keySet = Files.readString(Path.of(filePath));
+        } catch (IOException e) {
+            System.err.println(ERROR_IO_EXCEPTION);
+        }
+        return keySet;
+    }
+
+    public static List<String> extractFilePath(String filePath) {
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(Path.of(filePath));
+        } catch (IOException e) {
+            System.err.println(ERROR_IO_EXCEPTION);
+        }
+        return lines;
+    }
+
+    //    public static void main(String[] args) {
+//        extractArgumentInfo(path);
+//        System.out.println(seed);
+//        System.out.println(deckFilePath);
+//        System.out.println(unitFilePath);
+//        System.out.println(verbosity);
+//    }
+
+}
