@@ -28,8 +28,8 @@ public class GameData {
     static List<String> deck1Data;
     static List<String> deck2Data;
     public static String verbosity;
-    static String team1Name;
-    static String team2Name;
+    public static String team1Name;
+    public static String team2Name;
 
     static Map<String, String> argInfo;
 

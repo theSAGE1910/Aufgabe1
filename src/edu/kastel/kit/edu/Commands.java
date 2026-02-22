@@ -3,8 +3,8 @@ package edu.kastel.kit.edu;
 public class Commands {
     public static final String REGEX_SPACE = " ";
     public static boolean isRunning = true;
-
     static String currentSquare;
+    static int[] boardCoordinates;
 
     public static void processCommands(String input) {
         String key = input;
@@ -12,6 +12,11 @@ public class Commands {
         if (words.length == 2) {
             key = words[0];
             currentSquare = words[1];
+            if (words[1].length() == 2) {
+                boardCoordinates = new int[2];
+                boardCoordinates[0] = Character.getNumericValue(currentSquare.charAt(1));
+                boardCoordinates[1] = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
+            }
         }
 
         switch (key.toLowerCase()) {
@@ -38,6 +43,9 @@ public class Commands {
             case "place":
                 break;
             case "show":
+                if (GameBoard.gameBoard[boardCoordinates[0]][boardCoordinates[1]].equals("   ")) {
+
+                }
                 break;
             case "yield":
                 break;

@@ -49,8 +49,8 @@ public class Initialiser {
     }
 
     public static void initialiseTeams() {
-        team1 = new Team(deck1, new Hand(), player1DrawPile);
-        team2 = new Team(deck2, new Hand(), player2DrawPile);
+        team1 = new Team(GameData.team1Name, deck1, new Hand(), player1DrawPile);
+        team2 = new Team(GameData.team2Name, deck2, new Hand(), player2DrawPile);
     }
 
     public static void initialiseHands(Team team) {

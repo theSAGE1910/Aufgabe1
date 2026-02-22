@@ -139,12 +139,12 @@ public class Test {
         return chars.charAt(isHighlighted ? 24 : 9);
     }
 
-    public static void main(String[] args) {
-        initialiseGameBoard();
-        System.out.println("--- STANDARD KEYSET ---");
-        showAllGameBoardFinal(2, 'G', standardKeySet);
-
-        System.out.println("\n--- DEBUG KEYSET ---");
-        showAllGameBoardFinal(2, 'G', debugKeySet);
-    }
+//    public static void main(String[] args) {
+//        initialiseGameBoard();
+//        System.out.println("--- STANDARD KEYSET ---");
+//        showAllGameBoardFinal(2, 'G', standardKeySet);
+//
+//        System.out.println("\n--- DEBUG KEYSET ---");
+//        showAllGameBoardFinal(2, 'G', debugKeySet);
+//    }
 }

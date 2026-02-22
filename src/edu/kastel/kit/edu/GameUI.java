@@ -8,7 +8,7 @@ public class GameUI {
     private static final String HELPING_TEXT = "Use one of the following commands: select, board, move, flip, block, hand, place, show, yield, state, quit.";
 
     public static String getInput() {
-        String input;
+        String input = "";
         try {
             System.out.println(HELPING_TEXT);
             scanner = new Scanner(System.in);
