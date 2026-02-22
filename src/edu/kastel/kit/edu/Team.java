@@ -5,9 +5,9 @@ import java.util.List;
 public class Team {
     public static final int INITIAL_HP = 8000;
 
-    String name;
-    int teamHP;
-    Deck deck;
+    private String name;
+    private int teamHP;
+    private Deck deck;
     Hand hand;
     List<Unit> shuffledDeck;
 
@@ -18,5 +18,10 @@ public class Team {
         this.hand = hand;
         this.shuffledDeck = shuffledDeck;
     }
+
+    public String getName() {
+        return this.name;
+    }
+
 
 }

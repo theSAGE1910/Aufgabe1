@@ -41,9 +41,9 @@ public class Output {
         System.out.println(team + " wins!");
     }
 
-    public static void printPlayerUnitStat(Unit unit, int atk, int def) {
-        System.out.println("ATK: " + atk);
-        System.out.println("DEF: " + def);
+    public static void printPlayerUnitStat(Unit unit) {
+        System.out.println("ATK: " + unit.atk);
+        System.out.println("DEF: " + unit.def);
     }
 
     public static void printPlayerTurn() {
@@ -54,4 +54,23 @@ public class Output {
         System.out.println("It is Enemy's turn!");
     }
 
+    public static void printUnitName(Unit unit) {
+        System.out.print(unit.role + " " + unit.qualifier);
+    }
+
+    public static void printTeamName(String name) {
+        System.out.print("(" + name + ")");
+    }
+
+    public static void printHand(Hand team) {
+        int numbering = 1;
+        for (Unit unit : team.hand) {
+            System.out.print("[" + numbering + "]" + " " + unit.getUnitName() + " ");
+            printStat(unit.atk, unit.def);
+        }
+    }
+
+    public static void printStat(int atk, int def) {
+        System.out.println("(" + atk + "/" + def + ")");
+    }
 }

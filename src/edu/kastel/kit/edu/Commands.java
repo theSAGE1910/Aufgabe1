@@ -43,10 +43,13 @@ public class Commands {
             case "place":
                 break;
             case "show":
-                for (Unit unit : Unit.unitList) {
-                    if (unit.row == row && unit.column == column) {
-
-                    }
+                Unit unit = GameBoard.getUnitAt(row, column);
+                if (unit != null) {
+                    Output.printUnitName(unit);
+                    System.out.print(" ");
+                    Output.printTeamName(unit.getTeamName());
+                    System.out.println();
+                    Output.printPlayerUnitStat(unit);
                 }
                 break;
             case "yield":

@@ -15,22 +15,24 @@ public class Unit {
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     private static final String ERROR_INCOMPATIBLE = "ERROR: Incompatible to merge!";
 
-    private final String qualifier;
-    private final String role;
-    private final int atk;
-    private final int def;
+    public final String qualifier;
+    public final String role;
+    public final int atk;
+    public final int def;
     private final int weight;
     public int row;
     public int column;
+    private Team team;
 
     public static List<Unit> unitList;
 
-    public Unit(String qualifier, String role, int atk, int def) {
+    public Unit(String qualifier, String role, int atk, int def, Team team) {
         this.qualifier = qualifier;
         this.role = role;
         this.atk = atk;
         this.def = def;
         this.weight = atk + def;
+        this.team = team;
     }
 
     public void displayUnit(Unit unit) {
@@ -136,5 +138,13 @@ public class Unit {
     public void assignCoordinate(Unit unit, int row, int column) {
         unit.row = row;
         unit.column = column;
+    }
+
+    public String getUnitName() {
+        return this.qualifier + " " + this.role;
+    }
+
+    public String getTeamName() {
+        return this.team.getName();
     }
 }

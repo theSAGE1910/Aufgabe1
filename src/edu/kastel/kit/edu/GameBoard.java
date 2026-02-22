@@ -12,6 +12,10 @@ public class GameBoard {
                 || gameBoard[row][column - 1] == null;
     }
 
+    public static Unit getUnitAt(int row, int col) {
+        return gameBoard[row][col];
+    }
+
     public static void showGameBoard(char selCol, int selRow) {
         int selectedRow = DIMENSION - selRow;
         int selectedCol = selCol - 'A';
