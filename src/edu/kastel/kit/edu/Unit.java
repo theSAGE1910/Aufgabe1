@@ -20,6 +20,8 @@ public class Unit {
     private final int atk;
     private final int def;
     private final int weight;
+    public int row;
+    public int column;
 
     public static List<Unit> unitList;
 
@@ -129,5 +131,10 @@ public class Unit {
             }
             return true;
         }
+    }
+
+    public void assignCoordinate(Unit unit, int row, int column) {
+        unit.row = row;
+        unit.column = column;
     }
 }

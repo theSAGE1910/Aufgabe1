@@ -4,7 +4,8 @@ public class Commands {
     public static final String REGEX_SPACE = " ";
     public static boolean isRunning = true;
     static String currentSquare;
-    static int[] boardCoordinates;
+    static int row;
+    static int column;
 
     public static void processCommands(String input) {
         String key = input;
@@ -13,9 +14,8 @@ public class Commands {
             key = words[0];
             currentSquare = words[1];
             if (words[1].length() == 2) {
-                boardCoordinates = new int[2];
-                boardCoordinates[0] = Character.getNumericValue(currentSquare.charAt(1));
-                boardCoordinates[1] = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
+                row = Character.getNumericValue(currentSquare.charAt(1)) - 7;
+                column = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
             }
         }
 
@@ -43,8 +43,13 @@ public class Commands {
             case "place":
                 break;
             case "show":
-                if (GameBoard.gameBoard[boardCoordinates[0]][boardCoordinates[1]].equals("   ")) {
+//                if (GameBoard.gameBoard[row][column].equals("   ")) {
+//
+//                }
+                for (Unit unit : Unit.unitList) {
+                    if (unit.row == row && unit.column == column) {
 
+                    }
                 }
                 break;
             case "yield":

@@ -2,12 +2,22 @@ package edu.kastel.kit.edu;
 
 public class GameBoard {
     private static final int DIMENSION = 7;
-
+    public static final String EMPTY = "   ";
     public static String[][] gameBoard = new String[DIMENSION][DIMENSION];
 
 //    static String standardCharSet = "++++++++-|+############=N####";
 //    static String alphabetCharSet = "abcdefghijklmnopqrstuvwxyzäöü";
 //    static String customCharSet = "─│┼┌┬┐┤┘┴└├━┃┏┓┗┛┡┢┩┪┱┲┹┺╃╄╆╅";
+
+    public static boolean checkEmptySpace(int row, int column) {
+        if (gameBoard[row + 1][column].equals(EMPTY)
+                || gameBoard[row - 1][column].equals(EMPTY)
+                || gameBoard[row][column + 1].equals(EMPTY)
+                || gameBoard[row][column - 1].equals(EMPTY)) {
+            return true;
+        }
+        return false;
+    }
 
     public static void showGameBoard(char selCol, int selRow) {
         int selectedRow = DIMENSION - selRow;
