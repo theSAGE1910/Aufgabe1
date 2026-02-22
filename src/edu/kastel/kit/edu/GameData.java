@@ -15,7 +15,7 @@ public class GameData {
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     public static final String REGEX_EQUALS = "=";
 
-    static List<String> mandatoryArgs = Arrays.asList("seed", "deck", "verbosity", "units")
+    static List<String> mandatoryArgs = Arrays.asList("seed", "deck", "verbosity", "units");
 
     public static String playerUnitSymbol = " x ";
     public static String enemyUnitSymbol = " y ";
@@ -112,6 +112,9 @@ public class GameData {
                 }
                 continue;
             }
+            if (!argInfo.containsKey("verbosity")) {
+                verbosity = "all";
+            }
             if (!argInfo.containsKey(key)) {
                 return false;
             }
@@ -119,7 +122,7 @@ public class GameData {
         return true;
     }
 
-    //    public static void main(String[] args) {
+//        public static void main(String[] args) {
 //        extractArgumentInfo(path);
 //        System.out.println(seed);
 //        System.out.println(deckFilePath);

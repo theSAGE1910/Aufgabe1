@@ -6,6 +6,8 @@ public class Initialiser {
 
     public static Deck deck1;
     public static Deck deck2;
+    public static Team team1;
+    public static Team team2;
 
     public static List<Unit> player1DrawPile;
     public static List<Unit> player2DrawPile;
@@ -38,7 +40,7 @@ public class Initialiser {
         deck2.assignDeck();
 
         player1DrawPile = deck1.generatePlayableDeck();
-        player2DrawPile = deck2.generatePlayableDeck()
+        player2DrawPile = deck2.generatePlayableDeck();
 
         RandomGenerator.shuffleDeck(player1DrawPile);
         RandomGenerator.shuffleDeck(player2DrawPile);
