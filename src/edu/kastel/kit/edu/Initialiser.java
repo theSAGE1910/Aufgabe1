@@ -16,6 +16,8 @@ public class Initialiser {
         initialiseGameBoard();
         initialiseUnits();
         initialiseDecks();
+        initialiseHands(team1);
+        initialiseHands(team2);
         initialiseKings();
     }
 

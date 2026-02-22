@@ -7,21 +7,18 @@ public class GameUI {
 
     private static final String HELPING_TEXT = "Use one of the following commands: select, board, move, flip, block, hand, place, show, yield, state, quit.";
 
-    public static void processInput() {
-        System.out.println(HELPING_TEXT);
-        while (Commands.isRunning) {
-            Commands.processCommands(getInput());
-        }
-    }
-
-    private static String getInput() {
+    public static String getInput() {
         String input;
         try {
+            System.out.println(HELPING_TEXT);
             scanner = new Scanner(System.in);
-            System.out.print("> ");
-            input = scanner.nextLine();
+            while (Commands.isRunning) {
+                System.out.print("> ");
+                input = scanner.nextLine();
+            }
         } finally {
             scanner.close();
+            Commands.processCommands(scanner.nextLine());
         }
         return input;
     }
