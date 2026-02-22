@@ -38,45 +38,45 @@ public class BoardTheme {
     public static char selInnerBottomLeft;
     public static char selInnerBottomRight;
 
-    public BoardTheme() {
+    public static void initialiseTheme() {
         String keySet = GameData.boardData;
         if (keySet == null || keySet.length() < 29) {
             keySet = STANDARD_CHARSET;
         }
-        this.cornerTopLeft = keySet.charAt(0);
-        this.cornerTopRight = keySet.charAt(1);
-        this.cornerBottomLeft = keySet.charAt(2);
-        this.cornerBottomRight = keySet.charAt(3);
+        cornerTopLeft = keySet.charAt(0);
+        cornerTopRight = keySet.charAt(1);
+        cornerBottomLeft = keySet.charAt(2);
+        cornerBottomRight = keySet.charAt(3);
 
-        this.edgeTop = keySet.charAt(4);
-        this.edgeRight = keySet.charAt(5);
-        this.edgeBottom = keySet.charAt(6);
-        this.edgeLeft = keySet.charAt(7);
+        edgeTop = keySet.charAt(4);
+        edgeRight = keySet.charAt(5);
+        edgeBottom = keySet.charAt(6);
+        edgeLeft = keySet.charAt(7);
 
-        this.horizontal = keySet.charAt(8);
-        this.vertical = keySet.charAt(9);
-        this.cross = keySet.charAt(10);
+        horizontal = keySet.charAt(8);
+        vertical = keySet.charAt(9);
+        cross = keySet.charAt(10);
 
-        this.selCornerTopLeft = keySet.charAt(11);
-        this.selCornerTopRight = keySet.charAt(12);
-        this.selCornerBottomLeft = keySet.charAt(13);
-        this.selCornerBottomRight = keySet.charAt(14);
+        selCornerTopLeft = keySet.charAt(11);
+        selCornerTopRight = keySet.charAt(12);
+        selCornerBottomLeft = keySet.charAt(13);
+        selCornerBottomRight = keySet.charAt(14);
 
-        this.selEdgeTopLeft = keySet.charAt(15);
-        this.selEdgeTopRight = keySet.charAt(16);
-        this.selEdgeRightTop = keySet.charAt(17);
-        this.selEdgeRightBottom = keySet.charAt(18);
-        this.selEdgeBottomLeft = keySet.charAt(19);
-        this.selEdgeBottomRight = keySet.charAt(20);
-        this.selEdgeLeftTop = keySet.charAt(21);
-        this.selEdgeLeftBottom = keySet.charAt(22);
+        selEdgeTopLeft = keySet.charAt(15);
+        selEdgeTopRight = keySet.charAt(16);
+        selEdgeRightTop = keySet.charAt(17);
+        selEdgeRightBottom = keySet.charAt(18);
+        selEdgeBottomLeft = keySet.charAt(19);
+        selEdgeBottomRight = keySet.charAt(20);
+        selEdgeLeftTop = keySet.charAt(21);
+        selEdgeLeftBottom = keySet.charAt(22);
 
-        this.selHorizontal = keySet.charAt(23);
-        this.selVertical = keySet.charAt(24);
+        selHorizontal = keySet.charAt(23);
+        selVertical = keySet.charAt(24);
 
-        this.selInnerTopLeft = keySet.charAt(25);
-        this.selInnerTopRight = keySet.charAt(26);
-        this.selInnerBottomLeft = keySet.charAt(27);
-        this.selInnerBottomRight = keySet.charAt(28);
+        selInnerTopLeft = keySet.charAt(25);
+        selInnerTopRight = keySet.charAt(26);
+        selInnerBottomLeft = keySet.charAt(27);
+        selInnerBottomRight = keySet.charAt(28);
     }
 }

@@ -1,7 +1,5 @@
 package edu.kastel.kit.edu;
 
-import java.nio.file.Files;
-
 public class Commands {
     public static final String REGEX_SPACE = " ";
     public static boolean isRunning = true;
@@ -77,10 +75,10 @@ public class Commands {
                 }
 
                 Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
-                boolean isMoverKing = movingUnit.getQualifier().equals("Farmer") && targetUnit.getRole().equals("King");
+                boolean isMoverKing = movingUnit.getQualifier().equals("Farmer") && movingUnit.getRole().equals("King");
 
                 if (targetUnit != null) {
-                    boolean isTargetKing = targetUnit.getQualifier().equals("Farmer") && movingUnit.getRole().equals("King");
+                    boolean isTargetKing = targetUnit.getQualifier().equals("Farmer") && targetUnit.getRole().equals("King");
                     boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
 
                     if (isMoverKing && !isSameTeam) {

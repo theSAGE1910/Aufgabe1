@@ -15,6 +15,7 @@ public class Initialiser {
 
     public static void initialise() {
         initialiseGameBoard();
+        BoardTheme.initialiseTheme();
         initialiseUnits();
         initialiseDecks();
         initialiseTeams();

@@ -8,6 +8,7 @@ public class GameEngine {
 
     public static void run(String[] args) {
         if (GameData.extractArgumentInfo(args)) {
+            //System.out.println(GameData.boardData);
             Initialiser.initialise();
             GameUI.getInput();
         }

@@ -130,13 +130,9 @@ public class GameData {
 
         return true;
     }
-
+//
 //        public static void main(String[] args) {
-//        extractArgumentInfo(path);
-//        System.out.println(seed);
-//        System.out.println(deckFilePath);
-//        System.out.println(unitFilePath);
-//        System.out.println(verbosity);
+//        GameBoard.showGameBoard('D', 1);
 //    }
 
 }

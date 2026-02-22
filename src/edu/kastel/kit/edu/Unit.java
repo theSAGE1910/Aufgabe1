@@ -166,6 +166,7 @@ public class Unit {
         unit.column = column;
     }
 
+    @Override
     public String toString() {
         if (this.role.equals("King")) {
             if (this.team.getName().equals(GameData.team1Name)) {
@@ -173,17 +174,17 @@ public class Unit {
             } else {
                 return GameData.enemyKingSymbol;
             }
+        }
 
-            if (this.isFaceUp) {
-                if (this.team.getName().equals(GameData.team1Name)) {
-                    return GameData.playerUnitSymbol;
-                } else {
-                    return GameData.enemyUnitSymbol;
-                }
+        if (this.isFaceUp) {
+            if (this.team.getName().equals(GameData.team1Name)) {
+                return GameData.playerUnitSymbol;
             } else {
-                return " ? ";
+                return GameData.enemyUnitSymbol;
             }
         }
+
+        return " ? ";
     }
 
     public String getUnitName() {
