@@ -6,8 +6,6 @@ public class Initialiser {
 
     public static Deck deck1;
     public static Deck deck2;
-    public static Team team1;
-    public static Team team2;
 
     public static List<Unit> player1DrawPile;
     public static List<Unit> player2DrawPile;
@@ -19,8 +17,11 @@ public class Initialiser {
         initialiseGameBoard();
         initialiseUnits();
         initialiseDecks();
-        initialiseHands(team1);
-        initialiseHands(team2);
+        initialiseHands(GameEngine.team1);
+        initialiseHands(GameEngine.team2);
+
+        GameEngine.activeTeam = GameEngine.team1;
+
         initialiseKings();
     }
 
@@ -52,8 +53,8 @@ public class Initialiser {
     }
 
     public static void initialiseTeams() {
-        team1 = new Team(GameData.team1Name, deck1, new Hand(), player1DrawPile);
-        team2 = new Team(GameData.team2Name, deck2, new Hand(), player2DrawPile);
+        GameEngine.team1 = new Team(GameData.team1Name, deck1, new Hand(), player1DrawPile);
+        GameEngine.team2 = new Team(GameData.team2Name, deck2, new Hand(), player2DrawPile);
     }
 
     public static void initialiseHands(Team team) {

@@ -21,7 +21,7 @@ public class Output {
         System.out.println(name + " was eliminated!");
     }
 
-    public static void printDamage(char team, int damage) {
+    public static void printDamage(String team, int damage) {
         System.out.println(team + " takes " + damage + "!");
     }
 
@@ -33,17 +33,17 @@ public class Output {
         System.out.println("Union failed. " + name + " was eliminated.");
     }
 
-    public static void printZeroPoints(char team) {
+    public static void printZeroPoints(String team) {
         System.out.println(team + "'s life points dropped to 0!");
     }
 
-    public static void printWin(char team) {
+    public static void printWin(String team) {
         System.out.println(team + " wins!");
     }
 
     public static void printPlayerUnitStat(Unit unit) {
-        System.out.println("ATK: " + unit.atk);
-        System.out.println("DEF: " + unit.def);
+        System.out.println("ATK: " + unit.getAtk());
+        System.out.println("DEF: " + unit.getDef());
     }
 
     public static void printPlayerTurn() {
@@ -55,7 +55,7 @@ public class Output {
     }
 
     public static void printUnitName(Unit unit) {
-        System.out.print(unit.role + " " + unit.qualifier);
+        System.out.print(unit.getRole() + " " + unit.getQualifier());
     }
 
     public static void printTeamName(String name) {
@@ -66,7 +66,7 @@ public class Output {
         int numbering = 1;
         for (Unit unit : team.hand) {
             System.out.print("[" + numbering + "]" + " " + unit.getUnitName() + " ");
-            printStat(unit.atk, unit.def);
+            printStat(unit.getAtk(), unit.getDef());
         }
     }
 
@@ -76,12 +76,12 @@ public class Output {
 
     // Scenario B: Farmer King output
     public static void printFarmerKing(Unit unit) {
-        System.out.println(unit.getTeam().name + "'s Farmer King");
+        System.out.println(unit.getTeam().getName() + "'s Farmer King");
     }
 
     // Scenario C: Hidden enemy unit output
     public static void printHiddenUnit(Unit unit) {
-        System.out.println("??? (Team " + unit.getTeam().name + ")");
+        System.out.println("??? (Team " + unit.getTeam().getName() + ")");
         System.out.println("ATK: ???");
         System.out.println("DEF: ???");
     }
@@ -89,7 +89,7 @@ public class Output {
     // Scenario D: Standard visible unit output
     public static void printVisibleUnit(Unit unit) {
         // Print the combined name and team
-        System.out.println(unit.getQualifier() + " " + unit.getRole() + " (Team " + unit.getTeam().name + ")");
+        System.out.println(unit.getQualifier() + " " + unit.getRole() + " (Team " + unit.getTeam().getName() + ")");
         // Print the stats
         System.out.println("ATK: " + unit.getAtk());
         System.out.println("DEF: " + unit.getDef());

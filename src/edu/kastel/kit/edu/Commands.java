@@ -1,31 +1,38 @@
 package edu.kastel.kit.edu;
 
+import java.nio.file.Files;
+
 public class Commands {
     public static final String REGEX_SPACE = " ";
     public static boolean isRunning = true;
     static String currentSquare;
-    static String prevSquare;
+    static String selectedSquare = null;
     static int row;
     static int column;
+    static int selectedRow;
+    static int selectedColumn;
 
     public static void processCommands(String input) {
         String key = input;
+        String argument = null;
         String[] words = input.split(REGEX_SPACE);
+
         if (words.length == 2) {
             key = words[0];
-            currentSquare = words[1];
-            if (words[1].length() == 2) {
-                row = getCoordinates(currentSquare)[0];
-                column = getCoordinates(currentSquare)[1];
-            }
+            argument = words[1];
         }
 
         switch (key.toLowerCase()) {
             case "select":
-                processCommands("board");
-                processCommands("show");
-                prevSquare = currentSquare;
-                //display details of the unit on the selected field.
+                if (argument != null && argument.length() == 2) {
+                    selectedSquare = argument;
+                    selectedRow = getCoordinates(currentSquare)[0];
+                    selectedColumn = getCoordinates(currentSquare)[1];
+                    processCommands("board");
+                    processCommands("show");
+                } else {
+                    System.err.println("ERROR: Invalid square selected.");
+                }
                 break;
             case "board":
                 if (words[1].length() == 2) {
@@ -34,8 +41,171 @@ public class Commands {
                 }
                 break;
             case "move":
-                if (GameBoard.checkEmptySpace(row, column)) {
+                if (selectedSquare == null) {
+                    System.err.println("ERROR: No square selected.");
+                    break;
+                }
+                if (argument == null || argument.length() != 2) {
+                    System.err.println("ERROR: Invalid target square.");
+                    break;
+                }
 
+                int targetRow = getCoordinates(argument)[0];
+                int targetCol = getCoordinates(argument)[1];
+
+                Unit movingUnit = GameBoard.getUnitAt(selectedRow, selectedColumn);
+
+                if (movingUnit == null) {
+                    System.err.println("ERROR: No unit on the selected square.");
+                    break;
+                }
+
+                if (movingUnit.hasMovedThisTurn()) {
+                    System.err.println("ERROR: Unit has already moved this turn.");
+                    break;
+                }
+
+                int rowDiff = Math.abs(targetRow - selectedRow);
+                int colDiff = Math.abs(targetCol - selectedColumn);
+
+                if (rowDiff + colDiff > 1) {
+                    System.err.println("ERROR: Move must be exactly 1 square orthogonally or en place.");
+                    break;
+                }
+
+                Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
+                boolean isMoverKing = movingUnit.getQualifier().equals("Farmer") && targetUnit.getRole().equals("King");
+
+                if (targetUnit != null) {
+                    boolean isTargetKing = targetUnit.getQualifier().equals("Farmer") && movingUnit.getRole().equals("King");
+                    boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
+
+                    if (isMoverKing && !isSameTeam) {
+                        System.err.println("ERROR: Farmer King cannot move onto an enemy unit.");
+                    }
+
+                    if (!isMoverKing && isTargetKing && isSameTeam) {
+                        System.err.println("ERROR: Unit cannot move onto its own Farmer King.");
+                        break;
+                    }
+                }
+
+                if (targetUnit == null) {
+                    GameBoard.setUnitAt(selectedRow, selectedColumn, null);
+                    GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
+                    movingUnit.setHasMovedThisTurn(true);
+                    Output.printMovement(movingUnit.getUnitName(), argument);
+
+                    selectedSquare = argument;
+                    selectedRow = targetRow;
+                    selectedColumn = targetCol;
+                    processCommands("board");
+                    processCommands("show");
+
+                } else if (!movingUnit.getTeam().equals(targetUnit.getTeam())) {
+
+                    if (movingUnit.isBlocking()) {
+                        movingUnit.setBlocking(false);
+                        Output.printNoBlock(movingUnit.getUnitName());
+                    }
+
+                    Output.printAtkMove(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(),
+                            targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
+
+                    if (!movingUnit.isFaceUp()) {
+                        movingUnit.setFaceUp(true);
+                        Output.printFlip(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(), selectedSquare);
+                    }
+                    if (!targetUnit.isFaceUp()) {
+                        targetUnit.setFaceUp(true);
+                        Output.printFlip(targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
+                    }
+
+                    boolean attackerMovesToTargetSquare = false;
+
+                    if (targetUnit.getQualifier().equals("Farmer") && targetUnit.getRole().equals("King")) {
+                        targetUnit.getTeam().takeDamage(movingUnit.getAtk());
+                        Output.printDamage(targetUnit.getTeam().getName(), movingUnit.getAtk());
+                    } else if (targetUnit.isBlocking()) {
+                        if (movingUnit.getAtk() > targetUnit.getDef()) {
+                            GameBoard.setUnitAt(targetRow, targetCol, null);
+                            Output.printElimination(targetUnit.getUnitName());
+                            attackerMovesToTargetSquare = true;
+                        } else if (movingUnit.getAtk() < targetUnit.getDef()) {
+                            int damage = targetUnit.getDef() - movingUnit.getAtk();
+                            movingUnit.getTeam().takeDamage(damage);
+                            Output.printDamage(movingUnit.getTeam().getName(), damage);
+                        }
+                    } else {
+                        if (movingUnit.getAtk() > targetUnit.getAtk()) {
+                            int damage = movingUnit.getAtk() - targetUnit.getAtk();
+                            targetUnit.getTeam().takeDamage(damage);
+                            GameBoard.setUnitAt(targetRow, targetCol, null);
+                            Output.printElimination(targetUnit.getUnitName());
+                            Output.printDamage(targetUnit.getTeam().getName(), damage);
+                            attackerMovesToTargetSquare = true;
+                        } else if (movingUnit.getAtk() < targetUnit.getAtk()) {
+                            int damage = targetUnit.getAtk() - movingUnit.getAtk();
+                            movingUnit.getTeam().takeDamage(damage);
+                            Output.printElimination(movingUnit.getUnitName());
+                            Output.printDamage(movingUnit.getTeam().getName(), damage);
+                        } else {
+                            GameBoard.setUnitAt(selectedRow, selectedColumn, null);
+                            GameBoard.setUnitAt(targetRow, targetCol, null);
+                            Output.printElimination(targetUnit.getUnitName());
+                            Output.printElimination(movingUnit.getUnitName());
+                        }
+                    }
+
+                    if (attackerMovesToTargetSquare) {
+                        GameBoard.setUnitAt(selectedRow, selectedColumn, null);
+                        GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
+                        Output.printMovement(movingUnit.getUnitName(), argument);
+
+                        selectedSquare = argument;
+                        selectedRow = targetRow;
+                        selectedColumn = targetCol;
+                    }
+
+                    movingUnit.setHasMovedThisTurn(true);
+
+                    if (GameEngine.team1.getTeamHP() <= 0) {
+                        Output.printZeroPoints(GameEngine.team1.getName());
+                        Output.printWin(GameEngine.team2.getName());
+                        isRunning = false;
+                    } else if (GameEngine.team2.getTeamHP() <= 0) {
+                        Output.printZeroPoints(GameEngine.team2.getName());
+                        Output.printWin(GameEngine.team1.getName());
+                        isRunning = false;
+                    }
+
+                    if (isRunning) {
+                        processCommands("board");
+                        processCommands("show");
+                    }
+
+                } else {
+                    Output.printMovement(movingUnit.getUnitName(), argument);
+                    Output.printMerge(movingUnit.getUnitName(), targetUnit.getUnitName(), argument);
+
+                    Unit mergedUnit = movingUnit.mergeUnits(movingUnit, targetUnit);
+
+                    if (mergedUnit != null) {
+                        GameBoard.setUnitAt(selectedRow, selectedColumn, null);
+                        GameBoard.setUnitAt(targetRow, targetCol, mergedUnit);
+                        mergedUnit.setHasMovedThisTurn(true);
+                    } else {
+                        GameBoard.setUnitAt(selectedRow, selectedColumn, null);
+                        GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
+                        movingUnit.setHasMovedThisTurn(true);
+                        Output.printMergeFail(movingUnit.getUnitName());
+                    }
+
+                    selectedSquare = argument;
+                    selectedRow = targetRow;
+                    selectedColumn = targetCol;
+                    processCommands("board");
+                    processCommands("show");
                 }
                 break;
             case "flip":
@@ -52,23 +222,18 @@ public class Commands {
                     break;
                 }
 
-                Unit unit = GameBoard.getUnitAt(row, column);
+                Unit unitToShow = GameBoard.getUnitAt(selectedRow, selectedColumn);
 
-                if (unit == null) {
+                if (unitToShow == null) {
                     System.out.println();
                 } else {
-                    if (unit.getQualifier().equals("Farmer") && unit.getRole().equals("King")) {
-                        Output.printFarmerKing(unit);
-                    } else if (!unit.isFaceUp() && !unit.getTeam().equals(GameEngine.activeTeam)) {
-                        Output.printHiddenUnit(unit);
+                    if (unitToShow.getQualifier().equals("Farmer") && unitToShow.getRole().equals("King")) {
+                        Output.printFarmerKing(unitToShow);
+                    } else if (!unitToShow.isFaceUp() && !unitToShow.getTeam().equals(GameEngine.activeTeam)) {
+                        Output.printHiddenUnit(unitToShow);
                     } else {
-                        Output.printVisibleUnit(unit);
+                        Output.printVisibleUnit(unitToShow);
                     }
-//                    Output.printUnitName(unit);
-//                    System.out.print(" ");
-//                    Output.printTeamName(unit.getTeamName());
-//                    System.out.println();
-//                    Output.printPlayerUnitStat(unit);
                 }
                 break;
             case "yield":

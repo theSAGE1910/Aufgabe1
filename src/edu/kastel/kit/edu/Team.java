@@ -19,6 +19,14 @@ public class Team {
         this.shuffledDeck = shuffledDeck;
     }
 
+    public void takeDamage(int amount) {
+        this.teamHP = Math.max(0, this.teamHP - amount);
+    }
+
+    public int getTeamHP() {
+        return this.teamHP;
+    }
+
     public String getName() {
         return this.name;
     }

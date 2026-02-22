@@ -3,7 +3,7 @@ package edu.kastel.kit.edu;
 public class GameBoard {
     private static final int DIMENSION = 7;
     public static final String EMPTY = "   ";
-    public static Unit[][] gameBoard = new Unit[][][DIMENSION][DIMENSION];
+    public static Unit[][] gameBoard = new Unit[DIMENSION][DIMENSION];
 
     public static boolean checkEmptySpace(int row, int column) {
         return gameBoard[row + 1][column] == null
@@ -120,5 +120,9 @@ public class GameBoard {
     private static char getVerticalChar(int row, int col, int selectedRow, int selectedCol) {
         boolean isHighlighted = (row == selectedRow) && (col == selectedCol || col == selectedCol + 1);
         return (isHighlighted ? BoardTheme.selVertical : BoardTheme.vertical);
+    }
+
+    public static void setUnitAt(int row, int col, Unit unit) {
+        gameBoard[row][col] = unit;
     }
 }

@@ -15,15 +15,17 @@ public class Unit {
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     private static final String ERROR_INCOMPATIBLE = "ERROR: Incompatible to merge!";
 
-    public final String qualifier;
-    public final String role;
-    public final int atk;
-    public final int def;
+    private final String qualifier;
+    private final String role;
+    private final int atk;
+    private final int def;
     private final int weight;
     public int row;
     public int column;
     private Team team;
     private boolean isFaceUp;
+    private boolean hasMovedThisTurn = false;
+    private boolean isBlocking = false;
 
     public static List<Unit> unitList;
 
@@ -69,14 +71,32 @@ public class Unit {
 
     public Unit mergeUnits(Unit moverUnit, Unit targetUnit) {
         int[] mergedAtkDef = compatibilityCheck(moverUnit, targetUnit);
+
+        if (mergedAtkDef == null) {
+            return null;
+        }
+
         int newAtk = mergedAtkDef[0];
         int newDef = mergedAtkDef[1];
-        return new Unit(targetUnit.qualifier + moverUnit.qualifier,
-                moverUnit.role + targetUnit.role, newAtk, newDef);
+
+        String newQualifier = targetUnit.getQualifier() + " " + moverUnit.getQualifier();
+        String newRole = targetUnit.getRole() + " " + moverUnit.getRole();
+
+        Unit mergedUnit = new Unit(newQualifier, newRole, newAtk, newDef, moverUnit.getTeam());
+
+        mergedUnit.setFaceUp(moverUnit.isFaceUp && targetUnit.isFaceUp);
+
+        return mergedUnit;
     }
 
     private int[] compatibilityCheck(Unit moverUnit, Unit targetUnit) {
         int[] mergedAtkDef = new int[2];
+
+        if (moverUnit.getUnitName().equals(targetUnit.getUnitName())) {
+            System.err.println(ERROR_INCOMPATIBLE);
+            return null;
+        }
+
         if (checkSymbioticCondition(moverUnit, targetUnit)) {
             mergedAtkDef[0] = moverUnit.atk;
             mergedAtkDef[1] = targetUnit.def;
@@ -90,6 +110,7 @@ public class Unit {
                 mergedAtkDef[1] = moverUnit.def + targetUnit.def;
             }  else {
                 System.err.println(ERROR_INCOMPATIBLE);
+                return null;
             }
         }
         return mergedAtkDef;
@@ -149,10 +170,6 @@ public class Unit {
         return this.qualifier + " " + this.role;
     }
 
-    public String getTeamName() {
-        return this.team.getName();
-    }
-
     public String getQualifier() {
         return qualifier;
     }
@@ -180,4 +197,21 @@ public class Unit {
     public void setFaceUp(boolean faceUp) {
         this.isFaceUp = faceUp;
     }
+
+    public boolean hasMovedThisTurn() {
+        return hasMovedThisTurn;
+    }
+
+    public void setHasMovedThisTurn(boolean hasMovedThisTurn) {
+        this.hasMovedThisTurn = hasMovedThisTurn;
+    }
+
+    public boolean isBlocking() {
+        return isBlocking;
+    }
+
+    public void setBlocking(boolean isBlocking) {
+        this.isBlocking = isBlocking;
+    }
+
 }
