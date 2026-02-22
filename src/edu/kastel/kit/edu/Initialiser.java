@@ -46,6 +46,15 @@ public class Initialiser {
         RandomGenerator.shuffleDeck(player2DrawPile);
     }
 
+    public static void initialiseTeams() {
+        team1 = new Team(deck1, new Hand(), player1DrawPile);
+        team2 = new Team(deck2, new Hand(), player2DrawPile);
+    }
+
+    public static void initialiseHands(Team team) {
+        team.hand.handLoader(team.shuffledDeck);
+    }
+
     public static void initialiseKings() {
         GameBoard.gameBoard[6][3] = GameData.enemyKingSymbol;
         GameBoard.gameBoard[0][3] = GameData.playerKingSymbol;
