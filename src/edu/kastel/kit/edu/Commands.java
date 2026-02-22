@@ -13,7 +13,7 @@ public class Commands {
     static int selectedColumn;
 
     public static void processCommands(String input) {
-        String key = input;
+        String key = input.toUpperCase();
         String argument = null;
         String[] words = input.split(REGEX_SPACE);
 

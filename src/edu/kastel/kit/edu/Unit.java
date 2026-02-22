@@ -166,6 +166,26 @@ public class Unit {
         unit.column = column;
     }
 
+    public String toString() {
+        if (this.role.equals("King")) {
+            if (this.team.getName().equals(GameData.team1Name)) {
+                return GameData.playerKingSymbol;
+            } else {
+                return GameData.enemyKingSymbol;
+            }
+
+            if (this.isFaceUp) {
+                if (this.team.getName().equals(GameData.team1Name)) {
+                    return GameData.playerUnitSymbol;
+                } else {
+                    return GameData.enemyUnitSymbol;
+                }
+            } else {
+                return " ? ";
+            }
+        }
+    }
+
     public String getUnitName() {
         return this.qualifier + " " + this.role;
     }

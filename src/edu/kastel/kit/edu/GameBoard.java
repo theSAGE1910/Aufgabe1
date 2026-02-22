@@ -39,7 +39,11 @@ public class GameBoard {
                 for (int col = 0; col <= DIMENSION; col++) {
                     System.out.print(getVerticalChar(row, col, selectedRow, selectedCol));
                     if (col < DIMENSION) {
-                        System.out.print(gameBoard[row][col]);
+                        if (gameBoard[row][col] == null) {
+                            System.out.print(EMPTY);
+                        } else {
+                            System.out.print(gameBoard[row][col].toString());
+                        }
                     }
                 }
                 System.out.println();
