@@ -64,11 +64,11 @@ public class Commands {
                     } else {
                         Output.printVisibleUnit(unit);
                     }
-                    Output.printUnitName(unit);
-                    System.out.print(" ");
-                    Output.printTeamName(unit.getTeamName());
-                    System.out.println();
-                    Output.printPlayerUnitStat(unit);
+//                    Output.printUnitName(unit);
+//                    System.out.print(" ");
+//                    Output.printTeamName(unit.getTeamName());
+//                    System.out.println();
+//                    Output.printPlayerUnitStat(unit);
                 }
                 break;
             case "yield":
@@ -84,12 +84,12 @@ public class Commands {
     }
 
     private static int[] getCoordinates(String coordinate) {
-        int[] coordinate = new int[2];
+        int[] coords = new int[2];
 
-        coordinate[0] = 7 - Character.getNumericValue(currentSquare.charAt(1));
-        coordinate[1] = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
+        coords[0] = 7 - Character.getNumericValue(currentSquare.charAt(1));
+        coords[1] = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
 
-        return coordinate;
+        return coords;
     }
 
 

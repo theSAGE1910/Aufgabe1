@@ -27,6 +27,14 @@ public class Unit {
 
     public static List<Unit> unitList;
 
+    public Unit(String qualifier, String role, int atk, int def) {
+        this.qualifier = qualifier;
+        this.role = role;
+        this.atk = atk;
+        this.def = def;
+        this.weight = atk + def;
+    }
+
     public Unit(String qualifier, String role, int atk, int def, Team team) {
         this.qualifier = qualifier;
         this.role = role;
@@ -49,15 +57,11 @@ public class Unit {
         Pattern pattern = Pattern.compile(REGEX);
         for (String unit : unitData) {
             Matcher matcher = pattern.matcher(unit);
-//                String[] infoParts = line.split(REGEX);
-//                if (infoParts.length == 4) {
-//                    unitList.add(new Unit(infoParts[0], infoParts[1], Integer.parseInt(infoParts[2]), Integer.parseInt(infoParts[3])));
-//                }
             if (matcher.find()) {
                 unitList.add(new Unit(matcher.group(1),
                         matcher.group(2),
                         Integer.parseInt(matcher.group(3)),
-                        Integer.parseInt(matcher.group(4))));
+                        Integer.parseInt(matcher.group(4)), null));
             }
         }
         return unitList;
@@ -167,6 +171,10 @@ public class Unit {
 
     public Team getTeam() {
         return team;
+    }
+
+    public boolean isFaceUp() {
+        return isFaceUp;
     }
 
     public void setFaceUp(boolean faceUp) {
