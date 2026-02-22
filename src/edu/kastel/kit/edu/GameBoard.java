@@ -3,20 +3,13 @@ package edu.kastel.kit.edu;
 public class GameBoard {
     private static final int DIMENSION = 7;
     public static final String EMPTY = "   ";
-    public static String[][] gameBoard = new String[DIMENSION][DIMENSION];
-
-//    static String standardCharSet = "++++++++-|+############=N####";
-//    static String alphabetCharSet = "abcdefghijklmnopqrstuvwxyzäöü";
-//    static String customCharSet = "─│┼┌┬┐┤┘┴└├━┃┏┓┗┛┡┢┩┪┱┲┹┺╃╄╆╅";
+    public static Unit[][] gameBoard = new Unit[][][DIMENSION][DIMENSION];
 
     public static boolean checkEmptySpace(int row, int column) {
-        if (gameBoard[row + 1][column].equals(EMPTY)
-                || gameBoard[row - 1][column].equals(EMPTY)
-                || gameBoard[row][column + 1].equals(EMPTY)
-                || gameBoard[row][column - 1].equals(EMPTY)) {
-            return true;
-        }
-        return false;
+        return gameBoard[row + 1][column] == null
+                || gameBoard[row - 1][column] == null
+                || gameBoard[row][column + 1] == null
+                || gameBoard[row][column - 1] == null;
     }
 
     public static void showGameBoard(char selCol, int selRow) {
@@ -122,33 +115,4 @@ public class GameBoard {
         boolean isHighlighted = (row == selectedRow) && (col == selectedCol || col == selectedCol + 1);
         return (isHighlighted ? BoardTheme.selVertical : BoardTheme.vertical);
     }
-
-//    public static void showCompactGameBoard(int selRow, char selCol) {
-//        int highlightRow = selRow;
-//        int highlightCol = selCol - 'A' + 1;
-//
-//        for (int row = DIMENSION; row >= 1; row--) {
-//            System.out.print(row + " ");
-//            for (int col = 1; col <= DIMENSION; col++) {
-//                boolean highlightBorder = (row == highlightRow && (col == highlightCol || col == highlightCol + 1));
-//                System.out.print((highlightBorder ? "N" : "|"));
-//                System.out.print(gameBoard[DIMENSION - row][col - 1]);
-//            }
-//            boolean finalVertical = (row == highlightRow && highlightCol == DIMENSION);
-//            System.out.println(finalVertical ? "N" : "|");
-//        }
-//        System.out.print("    ");
-//        for (char ch = 'A'; ch <= 'G'; ch++) {
-//            System.out.print(ch + "   ");
-//        }
-//        System.out.println();
-//    }
-//    public static void main(String[] args) {
-//        initialiseGameBoard();
-//        System.out.println("--- STANDARD KEYSET ---");
-//        showGameBoard(2, 'G', standardCharSet);
-//
-//        System.out.println("\n--- DEBUG KEYSET ---");
-//        showGameBoard(3, 'D', customCharSet);
-//    }
 }

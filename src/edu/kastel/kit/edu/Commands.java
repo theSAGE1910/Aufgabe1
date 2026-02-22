@@ -43,9 +43,6 @@ public class Commands {
             case "place":
                 break;
             case "show":
-//                if (GameBoard.gameBoard[row][column].equals("   ")) {
-//
-//                }
                 for (Unit unit : Unit.unitList) {
                     if (unit.row == row && unit.column == column) {
 

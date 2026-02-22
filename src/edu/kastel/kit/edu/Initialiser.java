@@ -12,6 +12,9 @@ public class Initialiser {
     public static List<Unit> player1DrawPile;
     public static List<Unit> player2DrawPile;
 
+    static Unit team1King = new Unit("Farmer", "King", 0, 0);
+    static Unit team2King = new Unit("Farmer", "King", 0, 0);
+
     public static void initialise() {
         initialiseGameBoard();
         initialiseUnits();
@@ -24,7 +27,7 @@ public class Initialiser {
     private static void initialiseGameBoard() {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
-                GameBoard.gameBoard[i][j] = "   ";
+                GameBoard.gameBoard[i][j] = null;
             }
         }
     }
@@ -58,7 +61,7 @@ public class Initialiser {
     }
 
     public static void initialiseKings() {
-        GameBoard.gameBoard[6][3] = GameData.enemyKingSymbol;
-        GameBoard.gameBoard[0][3] = GameData.playerKingSymbol;
+        GameBoard.gameBoard[6][3] = team1King;
+        GameBoard.gameBoard[0][3] = team2King;
     }
 }
