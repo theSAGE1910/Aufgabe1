@@ -109,7 +109,7 @@ public class GameData {
     }
 
     static boolean containsMandatoryKeys(Map<String, String> argInfo) {
-        if (!argInfo.containsKey("seed") || !argInfo.containsKey("units") || !argInfo.containsKey("deck2")) {
+        if (!argInfo.containsKey("seed") || !argInfo.containsKey("units")) {
             return false;
         }
 

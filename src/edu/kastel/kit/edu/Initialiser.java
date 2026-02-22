@@ -17,6 +17,7 @@ public class Initialiser {
         initialiseGameBoard();
         initialiseUnits();
         initialiseDecks();
+        initialiseTeams();
         initialiseHands(GameEngine.team1);
         initialiseHands(GameEngine.team2);
 
