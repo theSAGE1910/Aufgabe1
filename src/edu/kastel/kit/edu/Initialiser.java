@@ -10,8 +10,8 @@ public class Initialiser {
     public static List<Unit> player1DrawPile;
     public static List<Unit> player2DrawPile;
 
-    static Unit team1King = new Unit("Farmer", "King", 0, 0);
-    static Unit team2King = new Unit("Farmer", "King", 0, 0);
+    static Unit team1King;
+    static Unit team2King;
 
     public static void initialise() {
         initialiseGameBoard();
@@ -63,6 +63,9 @@ public class Initialiser {
     }
 
     public static void initialiseKings() {
+        team1King = new Unit("Farmer", "King", 0, 0, GameEngine.team1);
+        team2King = new Unit("Farmer", "King", 0, 0, GameEngine.team2);
+
         GameBoard.gameBoard[6][3] = team1King;
         GameBoard.gameBoard[0][3] = team2King;
     }

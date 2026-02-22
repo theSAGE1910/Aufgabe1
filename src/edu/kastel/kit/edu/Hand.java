@@ -12,12 +12,9 @@ public class Hand {
     }
 
     public void handLoader(List<Unit> deck) {
-        for (Unit unit : deck) {
-            if (this.hand.size() == 5) {
-                break;
-            }
-            this.hand.add(unit);
-            deck.remove(unit);
+        while (this.hand.size() < 5 && !deck.isEmpty()) {
+            Unit drawnCard = deck.removeFirst();
+            this.hand.add(drawnCard);
         }
     }
 

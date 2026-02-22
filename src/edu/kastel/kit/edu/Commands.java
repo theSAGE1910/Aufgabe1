@@ -26,8 +26,11 @@ public class Commands {
             case "select":
                 if (argument != null && argument.length() == 2) {
                     selectedSquare = argument;
-                    selectedRow = getCoordinates(currentSquare)[0];
-                    selectedColumn = getCoordinates(currentSquare)[1];
+                    currentSquare = argument;
+
+                    selectedRow = getCoordinates(argument)[0];
+                    selectedColumn = getCoordinates(argument)[1];
+
                     processCommands("board");
                     processCommands("show");
                 } else {
@@ -35,7 +38,7 @@ public class Commands {
                 }
                 break;
             case "board":
-                if (words[1].length() == 2) {
+                if (currentSquare != null && currentSquare.length() == 2) {
                     GameBoard.showGameBoard(currentSquare.charAt(0),
                             Character.getNumericValue(currentSquare.charAt(1)));
                 }
@@ -251,8 +254,8 @@ public class Commands {
     private static int[] getCoordinates(String coordinate) {
         int[] coords = new int[2];
 
-        coords[0] = 7 - Character.getNumericValue(currentSquare.charAt(1));
-        coords[1] = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
+        coords[0] = 7 - Character.getNumericValue(coordinate.charAt(1));
+        coords[1] = Character.getNumericValue(coordinate.toUpperCase().charAt(0)) - 10;
 
         return coords;
     }

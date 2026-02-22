@@ -9,16 +9,16 @@ public class GameUI {
 
     public static String getInput() {
         String input = "";
+        System.out.println(HELPING_TEXT);
         try {
-            System.out.println(HELPING_TEXT);
             scanner = new Scanner(System.in);
             while (Commands.isRunning) {
                 System.out.print("> ");
                 input = scanner.nextLine();
+                Commands.processCommands(input);
             }
         } finally {
             scanner.close();
-            Commands.processCommands(scanner.nextLine());
         }
         return input;
     }
