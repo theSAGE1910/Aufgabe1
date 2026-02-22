@@ -1,7 +1,7 @@
 package edu.kastel.kit.edu;
 
 public class GameBoard {
-    private static final int DIMENSION = 7;
+    public static final int DIMENSION = 7;
     public static final String EMPTY = "   ";
     public static Unit[][] gameBoard = new Unit[DIMENSION][DIMENSION];
 

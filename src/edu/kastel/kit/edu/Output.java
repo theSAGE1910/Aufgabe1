@@ -5,6 +5,10 @@ public class Output {
         System.out.println(name + " no longer blocks.");
     }
 
+    public static void printBlock(String name, String field) {
+        System.out.println(name + " (" + field + ") blocks!");
+    }
+
     public static void printMovement(String name, String field) {
         System.out.println(name + " moves to " + field);
     }
@@ -67,11 +71,17 @@ public class Output {
         for (Unit unit : team.hand) {
             System.out.print("[" + numbering + "]" + " " + unit.getUnitName() + " ");
             printStat(unit.getAtk(), unit.getDef());
+            numbering++;
         }
     }
 
+    public static void printDiscard(String team, Unit unit) {
+        System.out.print(team + " discarded " + unit.getUnitName() + " ");
+        printStat(unit.getAtk(), unit.getDef());
+    }
+
     public static void printStat(int atk, int def) {
-        System.out.println("(" + atk + "/" + def + ")");
+        System.out.println("(" + atk + "/" + def + ").");
     }
 
     // Scenario B: Farmer King output
@@ -93,5 +103,26 @@ public class Output {
         // Print the stats
         System.out.println("ATK: " + unit.getAtk());
         System.out.println("DEF: " + unit.getDef());
+    }
+
+    public static void printState(Team team1, Team team2) {
+        System.out.printf(" %-14s%15s%n", team1.getName(), team2.getName());
+        System.out.printf(" %-14s%15s%n", team1.getTeamHP() + "/" + Team.INITIAL_HP + " LP", team2.getTeamHP() + "/" + Team.INITIAL_HP + " LP");
+        System.out.printf(" %-14s%15s%n", "DC: " + team1.shuffledDeck.size() + "/" + team1.getInitialDeckSize(),
+                team2.shuffledDeck.size() + "/" + team2.getInitialDeckSize());
+        System.out.printf(" %-14s%15s%n", "BC: " + getBoardCount(team1) + "/5", "BC:" + getBoardCount(team2) + "/5");
+    }
+
+    private static int getBoardCount(Team team) {
+        int count = 0;
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit boardUnit = GameBoard.getUnitAt(row, col);
+                if (boardUnit != null && boardUnit.getTeam().equals(team) && !boardUnit.getRole().equals("King")) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

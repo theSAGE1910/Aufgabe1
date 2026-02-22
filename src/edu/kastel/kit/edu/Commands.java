@@ -210,12 +210,117 @@ public class Commands {
                 }
                 break;
             case "flip":
+                if (selectedSquare == null) {
+                    System.err.println("ERROR: No square selected.");
+                    break;
+                }
+
+                Unit unitToFlip = GameBoard.getUnitAt(selectedRow, selectedColumn);
+
+                if (unitToFlip == null) {
+                    System.err.println("ERROR: No unit on the selected square.");
+                    break;
+                }
+
+                if (!unitToFlip.getTeam().equals(GameEngine.activeTeam)) {
+                    System.err.println("ERROR: You can only flip your own units.");
+                    break;
+                }
+
+                if (unitToFlip.isFaceUp()) {
+                    System.err.println("ERROR: Unit is already face up.");
+                    break;
+                }
+
+                if (unitToFlip.hasMovedThisTurn()) {
+                    System.err.println("ERROR: Unit has already moved this turn.");
+                    break;
+                }
+
+                unitToFlip.setFaceUp(true);
+                unitToFlip.setHasMovedThisTurn(true);
+                Output.printFlip(unitToFlip.getUnitName(), unitToFlip.getAtk(), unitToFlip.getDef(), selectedSquare);
+                processCommands("board");
+                processCommands("show");
+
                 break;
             case "block":
+                if (selectedSquare == null) {
+                    System.err.println("ERROR: No square selected.");
+                    break;
+                }
+
+                Unit unitToBlock = GameBoard.getUnitAt(selectedRow, selectedColumn);
+
+                if (unitToBlock == null) {
+                    System.err.println("ERROR: No unit on the selected square.");
+                    break;
+                }
+
+                if (!unitToBlock.getTeam().equals(GameEngine.activeTeam)) {
+                    System.err.println("ERROR: You can only block your own units.");
+                    break;
+                }
+
+                if (unitToBlock.hasMovedThisTurn()) {
+                    System.err.println("ERROR: Unit has already moved this turn.");
+                    break;
+                }
+
+                if (unitToFlip.isBlocking()) {
+                    System.err.println("ERROR: Unit is already blocking.");
+                    break;
+                }
+
+                unitToFlip.setBlocking(true);
+                unitToFlip.setHasMovedThisTurn(true);
+                Output.printBlock(unitToFlip.getUnitName(), selectedSquare);
+
+                processCommands("board");
+                processCommands("show");
                 break;
             case "hand":
+                Output.printHand(GameEngine.activeTeam.hand);
                 break;
             case "place":
+                if (selectedSquare == null) {
+                    System.err.println("ERROR: No square selected.");
+                    break;
+                }
+
+                if (GameBoard.getUnitAt(selectedRow, selectedColumn) != null) {
+                    System.err.println("ERROR: Square already occupied.");
+                    break;
+                }
+
+                if (argument == null) {
+                    System.err.println("ERROR: No card index provided.");
+                }
+
+                int handIndex;
+                try {
+                    handIndex = Integer.parseInt(argument);
+                } catch (NumberFormatException e) {
+                    System.err.println("ERROR: Invalid card index.");
+                    break;
+                }
+
+                Hand currentHand = GameEngine.activeTeam.hand;
+
+                if (handIndex < 1 || handIndex > currentHand.hand.size()) {
+                    System.err.println("ERROR: Invalid card index.");
+                    break;
+                }
+
+                Unit unitToPlace = currentHand.hand.get(handIndex - 1);
+
+                unitToPlace.setTeam(GameEngine.activeTeam);
+                unitToPlace.setHasMovedThisTurn(true);
+                GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
+                currentHand.removeUnitFromHand(unitToPlace);
+
+                processCommands("board");
+                processCommands("show");
                 break;
             case "show":
                 if (currentSquare == null) {
@@ -238,8 +343,54 @@ public class Commands {
                 }
                 break;
             case "yield":
+                if (argument != null) {
+                    int discardIndex;
+                    try {
+                        discardIndex = Integer.parseInt(argument);
+                    } catch (NumberFormatException e) {
+                        System.err.println("ERROR: Invalid card index.");
+                        break;
+                    }
+
+                    Hand currentHand = GameEngine.activeTeam.hand;
+
+                    if (discardIndex < 1 || discardIndex > currentHand.hand.size()) {
+                        System.err.println("ERROR: Invalid card index.");
+                        break;
+                    }
+
+                    Unit unitToDiscard = currentHand.hand.get(discardIndex - 1);
+
+                    currentHand.removeUnitFromHand(unitToDiscard);
+                    Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
+                }
+
+                GameEngine.activeTeam.hand.handLoader(GameEngine.activeTeam.shuffledDeck);
+
+                for (int row = 0; row < GameBoard.DIMENSION; row++) {
+                    for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                        Unit boardUnit = GameBoard.getUnitAt(row, col);
+                        if (boardUnit != null && boardUnit.getTeam().equals(GameEngine.activeTeam)) {
+                            boardUnit.setHasMovedThisTurn(false);
+                        }
+                    }
+                }
+
+                GameEngine.switchTurn();
+
+                if (GameEngine.activeTeam.equals(GameEngine.team1)) {
+                    Output.printPlayerTurn();
+                } else {
+                    Output.printEnemyTurn();
+                }
+
+                processCommands("board");
+                processCommands("show");
                 break;
             case "state":
+                Output.printState(GameEngine.team1, GameEngine.team2);
+                processCommands("board");
+                processCommands("show");
                 break;
             case "quit":
                 isRunning = false;

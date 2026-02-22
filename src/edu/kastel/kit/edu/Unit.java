@@ -207,6 +207,10 @@ public class Unit {
         return def;
     }
 
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     public Team getTeam() {
         return team;
     }

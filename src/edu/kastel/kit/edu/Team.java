@@ -5,6 +5,7 @@ import java.util.List;
 public class Team {
     public static final int INITIAL_HP = 8000;
 
+    private int initialDeckSize;
     private String name;
     private int teamHP;
     private Deck deck;
@@ -29,6 +30,10 @@ public class Team {
 
     public String getName() {
         return this.name;
+    }
+
+    public int getInitialDeckSize() {
+        return this.initialDeckSize;
     }
 
 }
