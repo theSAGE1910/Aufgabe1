@@ -4,6 +4,7 @@ public class Commands {
     public static final String REGEX_SPACE = " ";
     public static boolean isRunning = true;
     static String currentSquare;
+    static String prevSquare;
     static int row;
     static int column;
 
@@ -14,8 +15,8 @@ public class Commands {
             key = words[0];
             currentSquare = words[1];
             if (words[1].length() == 2) {
-                row = Character.getNumericValue(currentSquare.charAt(1)) - 7;
-                column = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
+                row = getCoordinates(currentSquare)[0];
+                column = getCoordinates(currentSquare)[1];
             }
         }
 
@@ -23,6 +24,7 @@ public class Commands {
             case "select":
                 processCommands("board");
                 processCommands("show");
+                prevSquare = currentSquare;
                 //display details of the unit on the selected field.
                 break;
             case "board":
@@ -32,7 +34,9 @@ public class Commands {
                 }
                 break;
             case "move":
+                if (GameBoard.checkEmptySpace(row, column)) {
 
+                }
                 break;
             case "flip":
                 break;
@@ -43,8 +47,23 @@ public class Commands {
             case "place":
                 break;
             case "show":
+                if (currentSquare == null) {
+                    System.out.println("ERROR: No square selected.");
+                    break;
+                }
+
                 Unit unit = GameBoard.getUnitAt(row, column);
-                if (unit != null) {
+
+                if (unit == null) {
+                    System.out.println();
+                } else {
+                    if (unit.getQualifier().equals("Farmer") && unit.getRole().equals("King")) {
+                        Output.printFarmerKing(unit);
+                    } else if (!unit.isFaceUp() && !unit.getTeam().equals(GameEngine.activeTeam)) {
+                        Output.printHiddenUnit(unit);
+                    } else {
+                        Output.printVisibleUnit(unit);
+                    }
                     Output.printUnitName(unit);
                     System.out.print(" ");
                     Output.printTeamName(unit.getTeamName());
@@ -62,6 +81,15 @@ public class Commands {
             default:
                 break;
         }
+    }
+
+    private static int[] getCoordinates(String coordinate) {
+        int[] coordinate = new int[2];
+
+        coordinate[0] = 7 - Character.getNumericValue(currentSquare.charAt(1));
+        coordinate[1] = Character.getNumericValue(currentSquare.toUpperCase().charAt(0)) - 10;
+
+        return coordinate;
     }
 
 

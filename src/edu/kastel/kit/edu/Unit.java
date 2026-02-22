@@ -23,6 +23,7 @@ public class Unit {
     public int row;
     public int column;
     private Team team;
+    private boolean isFaceUp;
 
     public static List<Unit> unitList;
 
@@ -146,5 +147,29 @@ public class Unit {
 
     public String getTeamName() {
         return this.team.getName();
+    }
+
+    public String getQualifier() {
+        return qualifier;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public int getAtk() {
+        return atk;
+    }
+
+    public int getDef() {
+        return def;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setFaceUp(boolean faceUp) {
+        this.isFaceUp = faceUp;
     }
 }

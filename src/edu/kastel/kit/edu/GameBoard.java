@@ -12,6 +12,8 @@ public class GameBoard {
                 || gameBoard[row][column - 1] == null;
     }
 
+    public static boolean checkEnemy
+
     public static Unit getUnitAt(int row, int col) {
         return gameBoard[row][col];
     }

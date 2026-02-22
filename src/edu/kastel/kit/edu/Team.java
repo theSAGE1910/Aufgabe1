@@ -23,5 +23,4 @@ public class Team {
         return this.name;
     }
 
-
 }
