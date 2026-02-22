@@ -1,9 +1,14 @@
 package edu.kastel.kit.edu;
 
+import java.util.List;
+
 public class Initialiser {
 
     public static Deck deck1;
     public static Deck deck2;
+
+    public static List<Unit> player1DrawPile;
+    public static List<Unit> player2DrawPile;
 
     public static void initialise() {
         initialiseGameBoard();
@@ -31,8 +36,12 @@ public class Initialiser {
         deck2.extractDeckSize(GameData.deck2Data);
         deck1.assignDeck();
         deck2.assignDeck();
-        RandomGenerator.shuffleDeck(deck1.generatePlayableDeck());
-        RandomGenerator.shuffleDeck(deck2.generatePlayableDeck());
+
+        player1DrawPile = deck1.generatePlayableDeck();
+        player2DrawPile = deck2.generatePlayableDeck()
+
+        RandomGenerator.shuffleDeck(player1DrawPile);
+        RandomGenerator.shuffleDeck(player2DrawPile);
     }
 
     public static void initialiseKings() {
