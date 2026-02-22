@@ -7,9 +7,10 @@ public class GameEngine {
     public static Team activeTeam;
 
     public static void run(String[] args) {
-        GameData.extractArgumentInfo(args);
-        Initialiser.initialise();
-        GameUI.getInput();
+        if (GameData.extractArgumentInfo(args)) {
+            Initialiser.initialise();
+            GameUI.getInput();
+        }
     }
 
     public static void switchTurn() {

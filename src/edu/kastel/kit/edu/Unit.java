@@ -27,7 +27,7 @@ public class Unit {
     private boolean hasMovedThisTurn = false;
     private boolean isBlocking = false;
 
-    public static List<Unit> unitList;
+    public static List<Unit> unitList = new ArrayList<>();
 
     public Unit(String qualifier, String role, int atk, int def) {
         this.qualifier = qualifier;

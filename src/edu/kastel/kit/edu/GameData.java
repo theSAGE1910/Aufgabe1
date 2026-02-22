@@ -68,20 +68,24 @@ public class GameData {
         }
     }
 
-    public static void extractArgumentInfo(String[] args) {
+    public static boolean extractArgumentInfo(String[] args) {
         argInfo = new HashMap<>();
         for (String arg : args) {
             String[] keyValue = arg.split(REGEX_EQUALS);
-            argInfo.put(keyValue[0], keyValue[1]);
+            if (keyValue.length == 2) {
+                argInfo.put(keyValue[0], keyValue[1]);
+            }
         }
 
         if (!containsMandatoryKeys(argInfo)) {
-            System.err.println("ERROR: Mandatory arguments missing!");
+            System.err.println("ERROR: Mandatory arguments missing or invalid!");
+            return false;
         }
 
         for (String key : argInfo.keySet()) {
             parseKeyValue(key);
         }
+        return true;
     }
 
     public static String extractBoardKeySet(String filePath) {
@@ -105,20 +109,24 @@ public class GameData {
     }
 
     static boolean containsMandatoryKeys(Map<String, String> argInfo) {
-        for (String key : mandatoryArgs) {
-            if (key == "deck") {
-                if (!argInfo.containsKey("deck") || !argInfo.containsKey("deck1") || !argInfo.containsKey("deck2")) {
-                    return false;
-                }
-                continue;
-            }
-            if (!argInfo.containsKey("verbosity")) {
-                verbosity = "all";
-            }
-            if (!argInfo.containsKey(key)) {
-                return false;
-            }
+        if (!argInfo.containsKey("seed") || !argInfo.containsKey("units") || !argInfo.containsKey("deck2")) {
+            return false;
         }
+
+        boolean hasDeck = argInfo.containsKey("deck");
+        boolean hasDeck1And2 = argInfo.containsKey("deck1") && argInfo.containsKey("deck2");
+
+        if (hasDeck && hasDeck1And2) {
+            return false;
+        }
+        if (!hasDeck && !hasDeck1And2) {
+            return false;
+        }
+
+        if (!argInfo.containsKey("verbosity")) {
+            verbosity = "all";
+        }
+
         return true;
     }
 
