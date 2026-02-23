@@ -84,23 +84,18 @@ public class Output {
         System.out.println("(" + atk + "/" + def + ").");
     }
 
-    // Scenario B: Farmer King output
     public static void printFarmerKing(Unit unit) {
         System.out.println(unit.getTeam().getName() + "'s Farmer King");
     }
 
-    // Scenario C: Hidden enemy unit output
     public static void printHiddenUnit(Unit unit) {
         System.out.println("??? (Team " + unit.getTeam().getName() + ")");
         System.out.println("ATK: ???");
         System.out.println("DEF: ???");
     }
 
-    // Scenario D: Standard visible unit output
     public static void printVisibleUnit(Unit unit) {
-        // Print the combined name and team
         System.out.println(unit.getQualifier() + " " + unit.getRole() + " (Team " + unit.getTeam().getName() + ")");
-        // Print the stats
         System.out.println("ATK: " + unit.getAtk());
         System.out.println("DEF: " + unit.getDef());
     }

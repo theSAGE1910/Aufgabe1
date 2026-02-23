@@ -32,13 +32,12 @@ public class Commands {
                 break;
             case "flip":
                 handleFlip();
-
                 break;
             case "block":
                 handleBlock();
                 break;
             case "hand":
-                Output.printHand(GameEngine.activeTeam.hand);
+                handleHand();
                 break;
             case "place":
                 handlePlace(argument);
@@ -56,193 +55,29 @@ public class Commands {
                 isRunning = false;
                 break;
             default:
+                System.err.println("ERROR: Invalid command.");
                 break;
         }
     }
 
-    private static void handleState() {
-        Output.printState(GameEngine.team1, GameEngine.team2);
-        processCommands("board");
-        processCommands("show");
-    }
+    private static void handleSelect(String argument) {
+        if (argument != null && argument.length() == 2) {
+            selectedSquare = argument;
+            currentSquare = argument;
 
-    private static void handleYield(String argument) {
-        if (argument != null) {
-            int discardIndex;
-            try {
-                discardIndex = Integer.parseInt(argument);
-            } catch (NumberFormatException e) {
-                System.err.println("ERROR: Invalid card index.");
-                return;
-            }
-
-            Hand currentHand = GameEngine.activeTeam.hand;
-
-            if (discardIndex < 1 || discardIndex > currentHand.hand.size()) {
-                System.err.println("ERROR: Invalid card index.");
-                return;
-            }
-
-            Unit unitToDiscard = currentHand.hand.get(discardIndex - 1);
-
-            currentHand.removeUnitFromHand(unitToDiscard);
-            Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
-        }
-
-        GameEngine.activeTeam.hand.handLoader(GameEngine.activeTeam.shuffledDeck);
-
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
-                Unit boardUnit = GameBoard.getUnitAt(row, col);
-                if (boardUnit != null && boardUnit.getTeam().equals(GameEngine.activeTeam)) {
-                    boardUnit.setHasMovedThisTurn(false);
-                }
-            }
-        }
-
-        GameEngine.switchTurn();
-
-        if (GameEngine.activeTeam.equals(GameEngine.team1)) {
-            Output.printPlayerTurn();
+            selectedRow = getCoordinates(argument)[0];
+            selectedColumn = getCoordinates(argument)[1];
+            updateDisplay();
         } else {
-            Output.printEnemyTurn();
-        }
-
-        processCommands("board");
-        processCommands("show");
-    }
-
-    private static void handleShow() {
-        if (currentSquare == null) {
-            System.out.println("ERROR: No square selected.");
-            return;
-        }
-
-        Unit unitToShow = GameBoard.getUnitAt(selectedRow, selectedColumn);
-
-        if (unitToShow == null) {
-            System.out.println();
-        } else {
-            if (unitToShow.getQualifier().equals("Farmer") && unitToShow.getRole().equals("King")) {
-                Output.printFarmerKing(unitToShow);
-            } else if (!unitToShow.isFaceUp() && !unitToShow.getTeam().equals(GameEngine.activeTeam)) {
-                Output.printHiddenUnit(unitToShow);
-            } else {
-                Output.printVisibleUnit(unitToShow);
-            }
+            System.err.println("ERROR: Invalid square selected.");
         }
     }
 
-    private static void handlePlace(String argument) {
-        if (selectedSquare == null) {
-            System.err.println("ERROR: No square selected.");
-            return;
+    private static void handleBoard() {
+        if (currentSquare != null && currentSquare.length() == 2) {
+            GameBoard.showGameBoard(currentSquare.charAt(0),
+                    Character.getNumericValue(currentSquare.charAt(1)));
         }
-
-        if (GameBoard.getUnitAt(selectedRow, selectedColumn) != null) {
-            System.err.println("ERROR: Square already occupied.");
-            return;
-        }
-
-        if (argument == null) {
-            System.err.println("ERROR: No card index provided.");
-        }
-
-        int handIndex;
-        try {
-            handIndex = Integer.parseInt(argument);
-        } catch (NumberFormatException e) {
-            System.err.println("ERROR: Invalid card index.");
-            return;
-        }
-
-        Hand currentHand = GameEngine.activeTeam.hand;
-
-        if (handIndex < 1 || handIndex > currentHand.hand.size()) {
-            System.err.println("ERROR: Invalid card index.");
-            return;
-        }
-
-        Unit unitToPlace = currentHand.hand.get(handIndex - 1);
-
-        unitToPlace.setTeam(GameEngine.activeTeam);
-        unitToPlace.setHasMovedThisTurn(true);
-        GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
-        currentHand.removeUnitFromHand(unitToPlace);
-
-        processCommands("board");
-        processCommands("show");
-    }
-
-    private static void handleBlock() {
-        if (selectedSquare == null) {
-            System.err.println("ERROR: No square selected.");
-            return;
-        }
-
-        Unit unitToBlock = GameBoard.getUnitAt(selectedRow, selectedColumn);
-
-        if (unitToBlock == null) {
-            System.err.println("ERROR: No unit on the selected square.");
-            return;
-        }
-
-        if (!unitToBlock.getTeam().equals(GameEngine.activeTeam)) {
-            System.err.println("ERROR: You can only block your own units.");
-            return;
-        }
-
-        if (unitToBlock.hasMovedThisTurn()) {
-            System.err.println("ERROR: Unit has already moved this turn.");
-            return;
-        }
-
-        if (unitToBlock.isBlocking()) {
-            System.err.println("ERROR: Unit is already blocking.");
-            return;
-        }
-
-        unitToBlock.setBlocking(true);
-        unitToBlock.setHasMovedThisTurn(true);
-        Output.printBlock(unitToBlock.getUnitName(), selectedSquare);
-
-        processCommands("board");
-        processCommands("show");
-    }
-
-    private static void handleFlip() {
-        if (selectedSquare == null) {
-            System.err.println("ERROR: No square selected.");
-            return;
-        }
-
-        Unit unitToFlip = GameBoard.getUnitAt(selectedRow, selectedColumn);
-
-        if (unitToFlip == null) {
-            System.err.println("ERROR: No unit on the selected square.");
-            return;
-        }
-
-        if (!unitToFlip.getTeam().equals(GameEngine.activeTeam)) {
-            System.err.println("ERROR: You can only flip your own units.");
-            return;
-        }
-
-        if (unitToFlip.isFaceUp()) {
-            System.err.println("ERROR: Unit is already face up.");
-            return;
-        }
-
-        if (unitToFlip.hasMovedThisTurn()) {
-            System.err.println("ERROR: Unit has already moved this turn.");
-            return;
-        }
-
-        unitToFlip.setFaceUp(true);
-        unitToFlip.setHasMovedThisTurn(true);
-        Output.printFlip(unitToFlip.getUnitName(), unitToFlip.getAtk(), unitToFlip.getDef(), selectedSquare);
-        processCommands("board");
-        processCommands("show");
     }
 
     private static void handleMove(String argument) {
@@ -279,10 +114,10 @@ public class Commands {
         }
 
         Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
-        boolean isMoverKing = movingUnit.getQualifier().equals("Farmer") && movingUnit.getRole().equals("King");
+        boolean isMoverKing = isKing(movingUnit);
 
         if (targetUnit != null) {
-            boolean isTargetKing = targetUnit.getQualifier().equals("Farmer") && targetUnit.getRole().equals("King");
+            boolean isTargetKing = isKing(targetUnit);
             boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
 
             if (isMoverKing && !isSameTeam) {
@@ -304,8 +139,7 @@ public class Commands {
             selectedSquare = argument;
             selectedRow = targetRow;
             selectedColumn = targetCol;
-            processCommands("board");
-            processCommands("show");
+            updateDisplay();
 
         } else if (!movingUnit.getTeam().equals(targetUnit.getTeam())) {
 
@@ -328,7 +162,7 @@ public class Commands {
 
             boolean attackerMovesToTargetSquare = false;
 
-            if (targetUnit.getQualifier().equals("Farmer") && targetUnit.getRole().equals("King")) {
+            if (isKing(targetUnit)) {
                 targetUnit.getTeam().takeDamage(movingUnit.getAtk());
                 Output.printDamage(targetUnit.getTeam().getName(), movingUnit.getAtk());
             } else if (targetUnit.isBlocking()) {
@@ -385,8 +219,7 @@ public class Commands {
             }
 
             if (isRunning) {
-                processCommands("board");
-                processCommands("show");
+                updateDisplay();
             }
 
         } else {
@@ -409,31 +242,193 @@ public class Commands {
             selectedSquare = argument;
             selectedRow = targetRow;
             selectedColumn = targetCol;
-            processCommands("board");
-            processCommands("show");
+            updateDisplay();
         }
     }
 
-    private static void handleBoard() {
-        if (currentSquare != null && currentSquare.length() == 2) {
-            GameBoard.showGameBoard(currentSquare.charAt(0),
-                    Character.getNumericValue(currentSquare.charAt(1)));
+    private static void handleFlip() {
+        if (selectedSquare == null) {
+            System.err.println("ERROR: No square selected.");
+            return;
         }
+
+        Unit unitToFlip = GameBoard.getUnitAt(selectedRow, selectedColumn);
+
+        if (unitToFlip == null) {
+            System.err.println("ERROR: No unit on the selected square.");
+            return;
+        }
+
+        if (!unitToFlip.getTeam().equals(GameEngine.activeTeam)) {
+            System.err.println("ERROR: You can only flip your own units.");
+            return;
+        }
+
+        if (unitToFlip.isFaceUp()) {
+            System.err.println("ERROR: Unit is already face up.");
+            return;
+        }
+
+        if (unitToFlip.hasMovedThisTurn()) {
+            System.err.println("ERROR: Unit has already moved this turn.");
+            return;
+        }
+
+        unitToFlip.setFaceUp(true);
+        unitToFlip.setHasMovedThisTurn(true);
+        Output.printFlip(unitToFlip.getUnitName(), unitToFlip.getAtk(), unitToFlip.getDef(), selectedSquare);
+        updateDisplay();
     }
 
-    private static void handleSelect(String argument) {
-        if (argument != null && argument.length() == 2) {
-            selectedSquare = argument;
-            currentSquare = argument;
+    private static void handleBlock() {
+        if (selectedSquare == null) {
+            System.err.println("ERROR: No square selected.");
+            return;
+        }
 
-            selectedRow = getCoordinates(argument)[0];
-            selectedColumn = getCoordinates(argument)[1];
+        Unit unitToBlock = GameBoard.getUnitAt(selectedRow, selectedColumn);
 
-            processCommands("board");
-            processCommands("show");
+        if (unitToBlock == null) {
+            System.err.println("ERROR: No unit on the selected square.");
+            return;
+        }
+
+        if (!unitToBlock.getTeam().equals(GameEngine.activeTeam)) {
+            System.err.println("ERROR: You can only block your own units.");
+            return;
+        }
+
+        if (unitToBlock.hasMovedThisTurn()) {
+            System.err.println("ERROR: Unit has already moved this turn.");
+            return;
+        }
+
+        if (unitToBlock.isBlocking()) {
+            System.err.println("ERROR: Unit is already blocking.");
+            return;
+        }
+
+        unitToBlock.setBlocking(true);
+        unitToBlock.setHasMovedThisTurn(true);
+        Output.printBlock(unitToBlock.getUnitName(), selectedSquare);
+        updateDisplay();
+    }
+
+    private static void handleHand() {
+        Output.printHand(GameEngine.activeTeam.hand);
+    }
+
+    private static void handlePlace(String argument) {
+        if (selectedSquare == null) {
+            System.err.println("ERROR: No square selected.");
+            return;
+        }
+
+        if (GameBoard.getUnitAt(selectedRow, selectedColumn) != null) {
+            System.err.println("ERROR: Square already occupied.");
+            return;
+        }
+
+        Hand currentHand = GameEngine.activeTeam.hand;
+
+        int handIndex = parseHandIndex(argument, currentHand);
+        if (handIndex == -1) {
+            return;
+        }
+
+        Unit unitToPlace = currentHand.hand.get(handIndex - 1);
+
+        unitToPlace.setTeam(GameEngine.activeTeam);
+        unitToPlace.setHasMovedThisTurn(true);
+        GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
+        currentHand.removeUnitFromHand(unitToPlace);
+        updateDisplay();
+    }
+
+    private static void handleShow() {
+        if (currentSquare == null) {
+            System.out.println("ERROR: No square selected.");
+            return;
+        }
+
+        Unit unitToShow = GameBoard.getUnitAt(selectedRow, selectedColumn);
+
+        if (unitToShow == null) {
+            System.out.println();
         } else {
-            System.err.println("ERROR: Invalid square selected.");
+            if (isKing(unitToShow)) {
+                Output.printFarmerKing(unitToShow);
+            } else if (!unitToShow.isFaceUp() && !unitToShow.getTeam().equals(GameEngine.activeTeam)) {
+                Output.printHiddenUnit(unitToShow);
+            } else {
+                Output.printVisibleUnit(unitToShow);
+            }
         }
+    }
+
+    private static void handleYield(String argument) {
+        Hand currentHand = GameEngine.activeTeam.hand;
+
+        int discardIndex = parseHandIndex(argument, currentHand);
+
+        Unit unitToDiscard = currentHand.hand.get(discardIndex - 1);
+
+        currentHand.removeUnitFromHand(unitToDiscard);
+        Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
+
+        GameEngine.activeTeam.hand.handLoader(GameEngine.activeTeam.shuffledDeck);
+
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit boardUnit = GameBoard.getUnitAt(row, col);
+                if (boardUnit != null && boardUnit.getTeam().equals(GameEngine.activeTeam)) {
+                    boardUnit.setHasMovedThisTurn(false);
+                }
+            }
+        }
+
+        GameEngine.switchTurn();
+
+        if (GameEngine.activeTeam.equals(GameEngine.team1)) {
+            Output.printPlayerTurn();
+        } else {
+            Output.printEnemyTurn();
+        }
+
+        updateDisplay();
+    }
+
+    private static void handleState() {
+        Output.printState(GameEngine.team1, GameEngine.team2);
+        updateDisplay();
+    }
+
+    private static void updateDisplay() {
+        processCommands("board");
+        processCommands("show");
+    }
+
+    private static int parseHandIndex(String argument, Hand currentHand) {
+        if (argument == null) {
+            System.err.println("ERROR: No card index provided.");
+            return -1;
+        }
+
+        try {
+            int index = Integer.parseInt(argument);
+            if (index < 1 || index > currentHand.hand.size()) {
+                System.err.println("ERROR: Invalid card index.");
+                return -1;
+            }
+            return index - 1;
+        } catch (NumberFormatException e) {
+            System.err.println("ERROR: Invalid card index.");
+            return -1;
+        }
+    }
+
+    private static boolean isKing(Unit unitToShow) {
+        return unitToShow.getQualifier().equals("Farmer") && unitToShow.getRole().equals("King");
     }
 
     private static int[] getCoordinates(String coordinate) {
@@ -444,6 +439,4 @@ public class Commands {
 
         return coords;
     }
-
-
 }
