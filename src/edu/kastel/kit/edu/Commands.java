@@ -28,7 +28,7 @@ public class Commands {
                 handleBoard();
                 break;
             case "move":
-                handleMove(argument);
+                MovementController.handleMove(argument);
                 break;
             case "flip":
                 handleFlip();
@@ -80,182 +80,9 @@ public class Commands {
         }
     }
 
-    private static void handleMove(String argument) {
-        if (selectedSquare == null) {
-            System.err.println("ERROR: No square selected.");
-            return;
-        }
-        if (argument == null || argument.length() != 2) {
-            System.err.println("ERROR: Invalid target square.");
-            return;
-        }
-
-        int targetRow = getCoordinates(argument)[0];
-        int targetCol = getCoordinates(argument)[1];
-
-        Unit movingUnit = GameBoard.getUnitAt(selectedRow, selectedColumn);
-
-        if (movingUnit == null) {
-            System.err.println("ERROR: No unit on the selected square.");
-            return;
-        }
-
-        if (movingUnit.hasMovedThisTurn()) {
-            System.err.println("ERROR: Unit has already moved this turn.");
-            return;
-        }
-
-        int rowDiff = Math.abs(targetRow - selectedRow);
-        int colDiff = Math.abs(targetCol - selectedColumn);
-
-        if (rowDiff + colDiff > 1) {
-            System.err.println("ERROR: Move must be exactly 1 square orthogonally or en place.");
-            return;
-        }
-
-        Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
-        boolean isMoverKing = isKing(movingUnit);
-
-        if (targetUnit != null) {
-            boolean isTargetKing = isKing(targetUnit);
-            boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
-
-            if (isMoverKing && !isSameTeam) {
-                System.err.println("ERROR: Farmer King cannot move onto an enemy unit.");
-            }
-
-            if (!isMoverKing && isTargetKing && isSameTeam) {
-                System.err.println("ERROR: Unit cannot move onto its own Farmer King.");
-                return;
-            }
-        }
-
-        if (targetUnit == null) {
-            GameBoard.setUnitAt(selectedRow, selectedColumn, null);
-            GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
-            movingUnit.setHasMovedThisTurn(true);
-            Output.printMovement(movingUnit.getUnitName(), argument);
-
-            selectedSquare = argument;
-            selectedRow = targetRow;
-            selectedColumn = targetCol;
-            updateDisplay();
-
-        } else if (!movingUnit.getTeam().equals(targetUnit.getTeam())) {
-
-            if (movingUnit.isBlocking()) {
-                movingUnit.setBlocking(false);
-                Output.printNoBlock(movingUnit.getUnitName());
-            }
-
-            Output.printAtkMove(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(),
-                    targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
-
-            if (!movingUnit.isFaceUp()) {
-                movingUnit.setFaceUp(true);
-                Output.printFlip(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(), selectedSquare);
-            }
-            if (!targetUnit.isFaceUp()) {
-                targetUnit.setFaceUp(true);
-                Output.printFlip(targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
-            }
-
-            boolean attackerMovesToTargetSquare = false;
-
-            if (isKing(targetUnit)) {
-                targetUnit.getTeam().takeDamage(movingUnit.getAtk());
-                Output.printDamage(targetUnit.getTeam().getName(), movingUnit.getAtk());
-            } else if (targetUnit.isBlocking()) {
-                if (movingUnit.getAtk() > targetUnit.getDef()) {
-                    GameBoard.setUnitAt(targetRow, targetCol, null);
-                    Output.printElimination(targetUnit.getUnitName());
-                    attackerMovesToTargetSquare = true;
-                } else if (movingUnit.getAtk() < targetUnit.getDef()) {
-                    int damage = targetUnit.getDef() - movingUnit.getAtk();
-                    movingUnit.getTeam().takeDamage(damage);
-                    Output.printDamage(movingUnit.getTeam().getName(), damage);
-                }
-            } else {
-                if (movingUnit.getAtk() > targetUnit.getAtk()) {
-                    int damage = movingUnit.getAtk() - targetUnit.getAtk();
-                    targetUnit.getTeam().takeDamage(damage);
-                    GameBoard.setUnitAt(targetRow, targetCol, null);
-                    Output.printElimination(targetUnit.getUnitName());
-                    Output.printDamage(targetUnit.getTeam().getName(), damage);
-                    attackerMovesToTargetSquare = true;
-                } else if (movingUnit.getAtk() < targetUnit.getAtk()) {
-                    int damage = targetUnit.getAtk() - movingUnit.getAtk();
-                    movingUnit.getTeam().takeDamage(damage);
-                    Output.printElimination(movingUnit.getUnitName());
-                    Output.printDamage(movingUnit.getTeam().getName(), damage);
-                } else {
-                    GameBoard.setUnitAt(selectedRow, selectedColumn, null);
-                    GameBoard.setUnitAt(targetRow, targetCol, null);
-                    Output.printElimination(targetUnit.getUnitName());
-                    Output.printElimination(movingUnit.getUnitName());
-                }
-            }
-
-            if (attackerMovesToTargetSquare) {
-                GameBoard.setUnitAt(selectedRow, selectedColumn, null);
-                GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
-                Output.printMovement(movingUnit.getUnitName(), argument);
-
-                selectedSquare = argument;
-                selectedRow = targetRow;
-                selectedColumn = targetCol;
-            }
-
-            movingUnit.setHasMovedThisTurn(true);
-
-            if (GameEngine.team1.getTeamHP() <= 0) {
-                Output.printZeroPoints(GameEngine.team1.getName());
-                Output.printWin(GameEngine.team2.getName());
-                isRunning = false;
-            } else if (GameEngine.team2.getTeamHP() <= 0) {
-                Output.printZeroPoints(GameEngine.team2.getName());
-                Output.printWin(GameEngine.team1.getName());
-                isRunning = false;
-            }
-
-            if (isRunning) {
-                updateDisplay();
-            }
-
-        } else {
-            Output.printMovement(movingUnit.getUnitName(), argument);
-            Output.printMerge(movingUnit.getUnitName(), targetUnit.getUnitName(), argument);
-
-            Unit mergedUnit = movingUnit.mergeUnits(movingUnit, targetUnit);
-
-            if (mergedUnit != null) {
-                GameBoard.setUnitAt(selectedRow, selectedColumn, null);
-                GameBoard.setUnitAt(targetRow, targetCol, mergedUnit);
-                mergedUnit.setHasMovedThisTurn(true);
-            } else {
-                GameBoard.setUnitAt(selectedRow, selectedColumn, null);
-                GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
-                movingUnit.setHasMovedThisTurn(true);
-                Output.printMergeFail(movingUnit.getUnitName());
-            }
-
-            selectedSquare = argument;
-            selectedRow = targetRow;
-            selectedColumn = targetCol;
-            updateDisplay();
-        }
-    }
-
     private static void handleFlip() {
-        if (selectedSquare == null) {
-            System.err.println("ERROR: No square selected.");
-            return;
-        }
-
-        Unit unitToFlip = GameBoard.getUnitAt(selectedRow, selectedColumn);
-
+        Unit unitToFlip = getValidatedActiveUnit();
         if (unitToFlip == null) {
-            System.err.println("ERROR: No unit on the selected square.");
             return;
         }
 
@@ -269,11 +96,6 @@ public class Commands {
             return;
         }
 
-        if (unitToFlip.hasMovedThisTurn()) {
-            System.err.println("ERROR: Unit has already moved this turn.");
-            return;
-        }
-
         unitToFlip.setFaceUp(true);
         unitToFlip.setHasMovedThisTurn(true);
         Output.printFlip(unitToFlip.getUnitName(), unitToFlip.getAtk(), unitToFlip.getDef(), selectedSquare);
@@ -281,25 +103,13 @@ public class Commands {
     }
 
     private static void handleBlock() {
-        if (selectedSquare == null) {
-            System.err.println("ERROR: No square selected.");
-            return;
-        }
-
-        Unit unitToBlock = GameBoard.getUnitAt(selectedRow, selectedColumn);
-
+        Unit unitToBlock = getValidatedActiveUnit();
         if (unitToBlock == null) {
-            System.err.println("ERROR: No unit on the selected square.");
             return;
         }
 
         if (!unitToBlock.getTeam().equals(GameEngine.activeTeam)) {
             System.err.println("ERROR: You can only block your own units.");
-            return;
-        }
-
-        if (unitToBlock.hasMovedThisTurn()) {
-            System.err.println("ERROR: Unit has already moved this turn.");
             return;
         }
 
@@ -336,7 +146,7 @@ public class Commands {
             return;
         }
 
-        Unit unitToPlace = currentHand.hand.get(handIndex - 1);
+        Unit unitToPlace = currentHand.hand.get(handIndex);
 
         unitToPlace.setTeam(GameEngine.activeTeam);
         unitToPlace.setHasMovedThisTurn(true);
@@ -369,9 +179,15 @@ public class Commands {
     private static void handleYield(String argument) {
         Hand currentHand = GameEngine.activeTeam.hand;
 
-        int discardIndex = parseHandIndex(argument, currentHand);
+        int discardIndex = 0;
+        if (argument != null) {
+            discardIndex = parseHandIndex(argument, currentHand);
+            if (discardIndex == -1) {
+                return;
+            }
+        }
 
-        Unit unitToDiscard = currentHand.hand.get(discardIndex - 1);
+        Unit unitToDiscard = currentHand.hand.get(discardIndex);
 
         currentHand.removeUnitFromHand(unitToDiscard);
         Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
@@ -403,9 +219,29 @@ public class Commands {
         updateDisplay();
     }
 
-    private static void updateDisplay() {
+    public static void updateDisplay() {
         processCommands("board");
         processCommands("show");
+    }
+
+    public static Unit getValidatedActiveUnit() {
+        if (selectedSquare == null) {
+            System.err.println("ERROR: No square selected.");
+            return null;
+        }
+
+        Unit unit = GameBoard.getUnitAt(selectedRow, selectedColumn);
+        if (unit == null) {
+            System.err.println("ERROR: No unit on the selected square.");
+            return null;
+        }
+
+        if (unit.hasMovedThisTurn()) {
+            System.err.println("ERROR: Unit has already moved this turn.");
+            return null;
+        }
+
+        return unit;
     }
 
     private static int parseHandIndex(String argument, Hand currentHand) {
@@ -427,11 +263,11 @@ public class Commands {
         }
     }
 
-    private static boolean isKing(Unit unitToShow) {
+    public static boolean isKing(Unit unitToShow) {
         return unitToShow.getQualifier().equals("Farmer") && unitToShow.getRole().equals("King");
     }
 
-    private static int[] getCoordinates(String coordinate) {
+    public static int[] getCoordinates(String coordinate) {
         int[] coords = new int[2];
 
         coords[0] = 7 - Character.getNumericValue(coordinate.charAt(1));
