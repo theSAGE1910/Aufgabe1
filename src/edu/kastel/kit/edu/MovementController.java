@@ -71,7 +71,11 @@ public class MovementController {
     }
 
     private static void executeMove(String argument, Unit targetUnit, int targetRow, int targetCol, Unit movingUnit) {
-        if (targetUnit == null) {
+        if (movingUnit == targetUnit) {
+            movingUnit.setHasMovedThisTurn(true);
+            Output.printMovement(movingUnit.getUnitName(), argument);
+            Commands.updateDisplay();
+        } else if (targetUnit == null) {
             moveToEmptySquare(argument, targetRow, targetCol, movingUnit);
         } else if (!movingUnit.getTeam().equals(targetUnit.getTeam())) {
             initiateCombat(argument, movingUnit, targetUnit, targetRow, targetCol);

@@ -1,14 +1,16 @@
 package edu.kastel.kit.edu;
 
+import edu.kastel.kit.edu.AI.GameLogicAI;
+
 public class Commands {
     public static final String REGEX_SPACE = " ";
     public static boolean isRunning = true;
     static String currentSquare;
-    static String selectedSquare = null;
+    public static String selectedSquare = null;
     static int row;
     static int column;
-    static int selectedRow;
-    static int selectedColumn;
+    public static int selectedRow;
+    public static int selectedColumn;
 
     public static void processCommands(String input) {
         String key = input.toUpperCase();
@@ -209,6 +211,10 @@ public class Commands {
             Output.printPlayerTurn();
         } else {
             Output.printEnemyTurn();
+            GameLogicAI.executeTurn();
+            GameEngine.activeTeam.hand.handLoader(GameEngine.activeTeam.shuffledDeck);
+            GameEngine.switchTurn();
+            Output.printPlayerTurn();
         }
 
         updateDisplay();

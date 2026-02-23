@@ -3,7 +3,6 @@ package edu.kastel.kit.edu;
 import java.util.List;
 
 public class Initialiser {
-
     public static Deck deck1;
     public static Deck deck2;
 
@@ -14,6 +13,7 @@ public class Initialiser {
     static Unit team2King;
 
     public static void initialise() {
+        RandomGenerator.initialise(GameData.seed);
         initialiseGameBoard();
         BoardTheme.initialiseTheme();
         initialiseUnits();

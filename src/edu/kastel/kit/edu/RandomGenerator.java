@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomGenerator {
-    static Random random = new Random(GameData.seed);
+    static Random random;
+
+    public static void initialise(int seed) {
+        random = new Random(seed);
+    }
 
     public static void shuffleDeck(List<Unit> playableDeck) {
         Collections.shuffle(playableDeck, random);

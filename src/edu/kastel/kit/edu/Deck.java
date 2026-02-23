@@ -1,10 +1,6 @@
 package edu.kastel.kit.edu;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Deck {
 
@@ -14,12 +10,8 @@ public class Deck {
     private int[] allUnitCount;
 
     public Deck() {
-        this.deckInfo = new HashMap<>();
+        this.deckInfo = new LinkedHashMap<>();
     }
-
-//    public void setUnitList(List<Unit> unitList) {
-//        this.unitList = unitList;
-//    }
 
     public int[] extractDeckSize(List<String> deckData) {
         this.allUnitCount = new int[deckData.size()];
