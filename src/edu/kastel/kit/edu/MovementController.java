@@ -4,8 +4,7 @@ package edu.kastel.kit.edu;
 public class MovementController {
 
     public static void handleMove(String argument) {
-        if (argument == null || argument.length() != 2) {
-            System.err.println("ERROR: Invalid target square.");
+        if (!isArgumentValid(argument)) {
             return;
         }
 
@@ -17,31 +16,61 @@ public class MovementController {
         int targetRow = Commands.getCoordinates(argument)[0];
         int targetCol = Commands.getCoordinates(argument)[1];
 
+        if (!isDistanceValid(targetRow, targetCol)) {
+            return;
+        }
+
+        Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
+
+        if (!isValidKingInteraction(movingUnit, targetUnit)) {
+            return;
+        }
+
+        executeMove(argument, targetUnit, targetRow, targetCol, movingUnit);
+    }
+
+    private static boolean isValidKingInteraction(Unit movingUnit, Unit targetUnit) {
+        if (targetUnit == null) {
+            return true;
+        }
+
+        boolean isMoverKing = Commands.isKing(movingUnit);
+        boolean isTargetKing = Commands.isKing(targetUnit);
+        boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
+
+        if (isMoverKing && !isSameTeam) {
+            System.err.println("ERROR: Farmer King cannot move onto an enemy unit.");
+            return false;
+        }
+
+        if (!isMoverKing && isTargetKing && isSameTeam) {
+            System.err.println("ERROR: Unit cannot move onto its own Farmer King.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean isArgumentValid(String argument) {
+        if (argument == null || argument.length() != 2) {
+            System.err.println("ERROR: Invalid target square.");
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean isDistanceValid(int targetRow, int targetCol) {
         int rowDiff = Math.abs(targetRow - Commands.selectedRow);
         int colDiff = Math.abs(targetCol - Commands.selectedColumn);
 
         if (rowDiff + colDiff > 1) {
             System.err.println("ERROR: Move must be exactly 1 square orthogonally or en place.");
-            return;
+            return false;
         }
+        return true;
+    }
 
-        Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
-        boolean isMoverKing = Commands.isKing(movingUnit);
-
-        if (targetUnit != null) {
-            boolean isTargetKing = Commands.isKing(targetUnit);
-            boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
-
-            if (isMoverKing && !isSameTeam) {
-                System.err.println("ERROR: Farmer King cannot move onto an enemy unit.");
-            }
-
-            if (!isMoverKing && isTargetKing && isSameTeam) {
-                System.err.println("ERROR: Unit cannot move onto its own Farmer King.");
-                return;
-            }
-        }
-
+    private static void executeMove(String argument, Unit targetUnit, int targetRow, int targetCol, Unit movingUnit) {
         if (targetUnit == null) {
             moveToEmptySquare(argument, targetRow, targetCol, movingUnit);
         } else if (!movingUnit.getTeam().equals(targetUnit.getTeam())) {
