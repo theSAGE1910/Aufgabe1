@@ -108,7 +108,7 @@ public class Output {
         System.out.printf(" %-14s%15s%n", "BC: " + getBoardCount(team1) + "/5", "BC:" + getBoardCount(team2) + "/5");
     }
 
-    private static int getBoardCount(Team team) {
+    public static int getBoardCount(Team team) {
         int count = 0;
         for (int row = 0; row < GameBoard.DIMENSION; row++) {
             for (int col = 0; col < GameBoard.DIMENSION; col++) {

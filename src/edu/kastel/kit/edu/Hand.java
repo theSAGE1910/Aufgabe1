@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Hand {
-    List<Unit> hand;
+    public List<Unit> hand;
     List<Unit> deck;
 
     public Hand() {

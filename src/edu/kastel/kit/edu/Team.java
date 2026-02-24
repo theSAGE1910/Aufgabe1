@@ -9,7 +9,7 @@ public class Team {
     private String name;
     private int teamHP;
     private Deck deck;
-    Hand hand;
+    public Hand hand;
     List<Unit> shuffledDeck;
 
     public Team(String name, Deck deck, Hand hand, List<Unit> shuffledDeck) {

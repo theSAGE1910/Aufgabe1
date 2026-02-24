@@ -1,6 +1,6 @@
 package edu.kastel.kit.edu;
 
-import edu.kastel.kit.edu.AI.GameLogicAI;
+import edu.kastel.kit.edu.ai.GameLogicAI;
 
 public class Commands {
     public static final String REGEX_SPACE = " ";

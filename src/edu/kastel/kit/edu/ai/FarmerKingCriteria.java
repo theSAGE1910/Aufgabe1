@@ -1,4 +1,4 @@
-package edu.kastel.kit.edu.AI;
+package edu.kastel.kit.edu.ai;
 
 public class FarmerKingCriteria {
     int distance;
