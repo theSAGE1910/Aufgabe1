@@ -129,4 +129,52 @@ public class GameBoard {
     public static void setUnitAt(int row, int col, Unit unit) {
         gameBoard[row][col] = unit;
     }
+
+    public static int[] getEnemyKingPosition() {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit unit = GameBoard.getUnitAt(row, col);
+                if (unit != null && unit.getTeam().equals(GameEngine.team2) && unit.getRole().equals("King")) {
+                    return new int[]{row, col};
+                }
+            }
+        }
+        return null;
+    }
+
+    public static int[] getPlayerKingPosition() {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit unit = GameBoard.getUnitAt(row, col);
+                if (unit != null && unit.getTeam().equals(GameEngine.team1) && unit.getRole().equals("King")) {
+                    return new int[]{row, col};
+                }
+            }
+        }
+        return null;
+    }
+
+    public static int getUnitRow(Unit unit) {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                if (GameBoard.getUnitAt(row, col) == unit) {
+                    return row;
+                }
+            }
+        }
+        return -1;
+    }
+
+    //try to make these two methods into one, by passing key row and col hehe:)
+
+    public static int getUnitCol(Unit unit) {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                if (GameBoard.getUnitAt(row, col) == unit) {
+                    return col;
+                }
+            }
+        }
+        return -1;
+    }
 }

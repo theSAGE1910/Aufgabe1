@@ -1,0 +1,198 @@
+package edu.kastel.kit.edu.ai;
+
+import edu.kastel.kit.edu.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class AIMovement {
+    public static void moveFarmerKing() {
+        int[] enemyKingPos = getEnemyKingPosition();
+        if (enemyKingPos == null) {
+            return;
+        }
+
+        int enemyKingRow = enemyKingPos[0];
+        int enemyKingCol = enemyKingPos[1];
+        Unit king = GameBoard.getUnitAt(enemyKingRow, enemyKingCol);
+
+        List<GameLogicAI.TargetSquare> validTargets = new ArrayList<>();
+        int maxScore = Integer.MIN_VALUE;
+
+        for (int i = 0; i < DIRECTIONS.length; i++) {
+            int targetRow = enemyKingRow + DIRECTIONS[i][0];
+            int targetCol = enemyKingCol + DIRECTIONS[i][1];
+
+            if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
+                continue;
+            }
+
+            Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
+
+            if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team1)) {
+                continue;
+            }
+
+            int distance = (i == 4) ? 0 : 1;
+            int enemies = 0;
+            int fellows = 0;
+            int fellowsPresent = 0;
+
+            if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team2) && targetUnit != king) {
+                fellowsPresent = 1;
+            }
+
+            for (int row = -1; row <= 1; row++) {
+                for (int col = -1; col <= 1; col++) {
+                    if (row == 0 && col == 0) {
+                        continue;
+                    }
+                    int adjRow = targetRow + row;
+                    int adjCol = targetCol + col;
+
+                    if (adjRow >= 0 && adjRow <= 6 && adjCol >= 0 && adjCol <= 6) {
+                        Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
+                        if (adjUnit != null) {
+                            if (adjUnit.getTeam().equals(GameEngine.team1)) {
+                                enemies++;
+                            } else if (adjUnit.getTeam().equals(GameEngine.team2) && adjUnit != king) {
+                                fellows++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            int score = -fellows - 2 * enemies - distance - 3 * fellowsPresent;
+            if (score > maxScore) {
+                maxScore = score;
+                validTargets.clear();
+                validTargets.add(new GameLogicAI.TargetSquare(targetRow, targetCol));
+            } else if (score == maxScore) {
+                validTargets.add(new GameLogicAI.TargetSquare(targetRow, targetCol));
+            }
+        }
+
+        GameLogicAI.TargetSquare targetSquare = null;
+        if (validTargets.size() == 1) {
+            targetSquare = validTargets.get(0);
+        } else if (validTargets.size() > 1) {
+            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
+            targetSquare = validTargets.get(draw - 1);
+        }
+
+        if (targetSquare != null) {
+            String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
+            String targetCoord = getCoordinateString(targetSquare.row, targetSquare.col);
+
+            Commands.selectedSquare = startCoord;
+            Commands.selectedRow = enemyKingRow;
+            Commands.selectedColumn = enemyKingCol;
+
+            MovementController.handleMove(targetCoord);
+        }
+    }
+
+    public static void moveUnits() {
+        while (Commands.isRunning) {
+            List<Unit> movableUnits = new ArrayList<>();
+            for (int row = 0; row < GameBoard.DIMENSION; row++) {
+                for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                    Unit unit = GameBoard.getUnitAt(row, col);
+                    if (unit != null && unit.getTeam().equals(GameEngine.team2) && !unit.getRole().equals("King") && !unit.hasMovedThisTurn()) {
+                        movableUnits.add(unit);
+                    }
+                }
+            }
+
+            if (movableUnits.isEmpty()) {
+                break;
+            }
+
+            Unit bestUnit = null;
+            int maxScore = Integer.MIN_VALUE;
+            List<Integer> bestUnitScores = null;
+
+            for (Unit unit : movableUnits) {
+                int row = getUnitRow(unit);
+                int col = getUnitCol(unit);
+
+                List<Integer> scores = new ArrayList<>();
+                int totalScore = 0;
+
+                scores.add(getDirectionalScore(unit, row, col, -1, 0));
+                scores.add(getDirectionalScore(unit, row, col, 0, 1));
+                scores.add(getDirectionalScore(unit, row, col, 1, 0));
+                scores.add(getDirectionalScore(unit, row, col, 0, -1));
+                scores.add(getBlockScore(unit, row, col));
+                scores.add(getEnPlaceScore(unit, row, col));
+
+                for (int score : scores) {
+                    if (score > -999999) {
+                        totalScore += score;
+                    }
+                }
+
+                if (bestUnit == null || totalScore > maxScore) {
+                    maxScore = totalScore;
+                    bestUnit = unit;
+                    bestUnitScores = scores;
+                }
+            }
+
+            if (bestUnit == null) {
+                break;
+            }
+
+            int selectedActionIndex = -1;
+            int totalWeight = 0;
+            List<Integer> validWeights = new ArrayList<>();
+
+            for (int score : bestUnitScores) {
+                int weight = Math.max(0, score);
+                if (score <= -999999) {
+                    weight = 0;
+                }
+                validWeights.add(weight);
+                totalWeight += weight;
+            }
+
+            if (totalWeight == 0) {
+                selectedActionIndex = 4;
+            } else {
+                int randomWeight = RandomGenerator.randomIntegerPick(1, totalWeight + 1);
+                int runningSum = 0;
+                for (int i = 0; i < validWeights.size(); i++) {
+                    runningSum += validWeights.get(i);
+                    if (randomWeight <= runningSum && validWeights.get(i) > 0) {
+                        selectedActionIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            int bestUnitRow = getUnitRow(bestUnit);
+            int bestUnitCol = getUnitCol(bestUnit);
+            String startCoord = getCoordinateString(bestUnitRow, bestUnitCol);
+
+            Commands.selectedSquare = startCoord;
+            Commands.selectedRow = bestUnitRow;
+            Commands.selectedColumn = bestUnitCol;
+
+            if (selectedActionIndex >=0 && selectedActionIndex <= 3) {
+                int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+                int targetRow = bestUnitRow + dirs[selectedActionIndex][0];
+                int targetCol = bestUnitCol + dirs[selectedActionIndex][1];
+                String targetCoord = getCoordinateString(targetRow, targetCol);
+                MovementController.handleMove(targetCoord);
+            } else if (selectedActionIndex == 4) {
+                bestUnit.setBlocking(true);
+                bestUnit.setHasMovedThisTurn(true);
+                Output.printBlock(bestUnit.getUnitName(), startCoord);
+                Commands.updateDisplay();
+            } else if (selectedActionIndex == 5) {
+                MovementController.handleMove(startCoord);
+            }
+        }
+    }
+}
