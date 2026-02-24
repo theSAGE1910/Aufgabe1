@@ -6,7 +6,7 @@ import edu.kastel.kit.edu.GameEngine;
 import edu.kastel.kit.edu.Unit;
 
 public class AIScoreCalculator {
-    private static int getDirectionalScore(Unit unit, int row, int col, int rowDir, int colDir) {
+    static int getDirectionalScore(Unit unit, int row, int col, int rowDir, int colDir) {
         int targetRow = row + rowDir;
         int targetCol = col + colDir;
         if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
@@ -34,7 +34,7 @@ public class AIScoreCalculator {
                 }
             }
         } else {
-            int[] playerKing = getPlayerKingPosition();
+            int[] playerKing = GameBoard.getPlayerKingPosition();
             if (playerKing == null) {
                 return 0;
             }
@@ -57,12 +57,12 @@ public class AIScoreCalculator {
         return 0;
     }
 
-    private static int getBlockScore(Unit unit, int row, int col) {
+    static int getBlockScore(Unit unit, int row, int col) {
         int maxEnemyAtk = getHighestEnemyAtkInLine(unit, row, col);
         return Math.max(1, (unit.getDef() - maxEnemyAtk) / 100);
     }
 
-    private static int getEnPlaceScore(Unit unit, int row, int col) {
+    static int getEnPlaceScore(Unit unit, int row, int col) {
         int maxEnemyAtk = getHighestEnemyAtkInLine(unit, row, col);
         return Math.max(0, (unit.getAtk() - maxEnemyAtk) / 100);
     }

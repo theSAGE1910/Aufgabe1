@@ -13,7 +13,7 @@ public class GameData {
     static String[] path = "seed=-4022738 deck=input/decks/default.txt verbosity=compact units=input/units/default.txt".split(" ");
 
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
-    public static final String REGEX_EQUALS = "=";
+    private static final String REGEX_EQUALS = "=";
 
     static List<String> mandatoryArgs = Arrays.asList("seed", "deck", "verbosity", "units");
 
@@ -130,9 +130,4 @@ public class GameData {
 
         return true;
     }
-//
-//        public static void main(String[] args) {
-//        GameBoard.showGameBoard('D', 1);
-//    }
-
 }

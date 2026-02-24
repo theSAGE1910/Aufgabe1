@@ -9,13 +9,13 @@ import static edu.kastel.kit.edu.Output.getBoardCount;
 
 public class AIPlacement {
     public static void placeUnit() {
-        int[] aiKingPos = getEnemyKingPosition();
-        int[] playerKingPos = getPlayerKingPosition();
+        int[] aiKingPos = GameBoard.getEnemyKingPosition();
+        int[] playerKingPos = GameBoard.getPlayerKingPosition();
 
         int[][] clockDirs = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}};
         int[][] orthDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
-        List<GameLogicAI.TargetSquare> validTargets = new ArrayList<>();
+        List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
         for (int[] dir : clockDirs) {
@@ -54,16 +54,16 @@ public class AIPlacement {
             if (score > maxScore) {
                 maxScore = score;
                 validTargets.clear();
-                validTargets.add(new GameLogicAI.TargetSquare(targetRow, targetCol));
+                validTargets.add(new TargetSquare(targetRow, targetCol));
             } else if (score == maxScore) {
-                validTargets.add(new GameLogicAI.TargetSquare(targetRow, targetCol));
+                validTargets.add(new TargetSquare(targetRow, targetCol));
             }
         }
         if (validTargets.isEmpty()) {
             return;
         }
 
-        GameLogicAI.TargetSquare targetSquare = null;
+        TargetSquare targetSquare = null;
         if (validTargets.size() == 1) {
             targetSquare = validTargets.get(0);
         } else if (validTargets.size() > 1) {
@@ -100,7 +100,7 @@ public class AIPlacement {
         }
 
         Unit unitToPlace = hand.get(selectedCardIndex);
-        String coord = getCoordinateString(targetSquare.row, targetSquare.col);
+        String coord = GameLogicAI.getCoordinateString(targetSquare.row, targetSquare.col);
 
         System.out.println(GameEngine.team2.getName() + " places " + unitToPlace.getUnitName() + " to " + coord + ".");
 

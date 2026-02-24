@@ -3,7 +3,7 @@ package edu.kastel.kit.edu.ai;
 import edu.kastel.kit.edu.*;
 
 public class GameLogicAI {
-    private static int[][] DIRECTIONS = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {0, 0}};
+    static final int[][] DIRECTIONS = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {0, 0}};
 
     public static void executeTurn() {
         if (!Commands.isRunning) {
@@ -27,7 +27,7 @@ public class GameLogicAI {
         AIDiscard.discardCard();
     }
 
-    private static String getCoordinateString(int row, int col) {
+    static String getCoordinateString(int row, int col) {
         char colChar = (char) ('A' + col);
         int rowNum = 7 - row;
 

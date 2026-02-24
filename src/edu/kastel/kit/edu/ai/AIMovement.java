@@ -7,7 +7,7 @@ import java.util.List;
 
 public class AIMovement {
     public static void moveFarmerKing() {
-        int[] enemyKingPos = getEnemyKingPosition();
+        int[] enemyKingPos = GameBoard.getEnemyKingPosition();
         if (enemyKingPos == null) {
             return;
         }
@@ -16,12 +16,12 @@ public class AIMovement {
         int enemyKingCol = enemyKingPos[1];
         Unit king = GameBoard.getUnitAt(enemyKingRow, enemyKingCol);
 
-        List<GameLogicAI.TargetSquare> validTargets = new ArrayList<>();
+        List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
-        for (int i = 0; i < DIRECTIONS.length; i++) {
-            int targetRow = enemyKingRow + DIRECTIONS[i][0];
-            int targetCol = enemyKingCol + DIRECTIONS[i][1];
+        for (int i = 0; i < GameLogicAI.DIRECTIONS.length; i++) {
+            int targetRow = enemyKingRow + GameLogicAI.DIRECTIONS[i][0];
+            int targetCol = enemyKingCol + GameLogicAI.DIRECTIONS[i][1];
 
             if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
                 continue;
@@ -67,23 +67,23 @@ public class AIMovement {
             if (score > maxScore) {
                 maxScore = score;
                 validTargets.clear();
-                validTargets.add(new GameLogicAI.TargetSquare(targetRow, targetCol));
+                validTargets.add(new TargetSquare(targetRow, targetCol));
             } else if (score == maxScore) {
-                validTargets.add(new GameLogicAI.TargetSquare(targetRow, targetCol));
+                validTargets.add(new TargetSquare(targetRow, targetCol));
             }
         }
 
-        GameLogicAI.TargetSquare targetSquare = null;
+        TargetSquare targetSquare = null;
         if (validTargets.size() == 1) {
-            targetSquare = validTargets.get(0);
+            targetSquare = validTargets.getFirst();
         } else if (validTargets.size() > 1) {
             int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
             targetSquare = validTargets.get(draw - 1);
         }
 
         if (targetSquare != null) {
-            String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
-            String targetCoord = getCoordinateString(targetSquare.row, targetSquare.col);
+            String startCoord = GameLogicAI.getCoordinateString(enemyKingRow, enemyKingCol);
+            String targetCoord = GameLogicAI.getCoordinateString(targetSquare.row, targetSquare.col);
 
             Commands.selectedSquare = startCoord;
             Commands.selectedRow = enemyKingRow;
@@ -114,18 +114,18 @@ public class AIMovement {
             List<Integer> bestUnitScores = null;
 
             for (Unit unit : movableUnits) {
-                int row = getUnitRow(unit);
-                int col = getUnitCol(unit);
+                int row = GameBoard.getUnitRow(unit);
+                int col = GameBoard.getUnitCol(unit);
 
                 List<Integer> scores = new ArrayList<>();
                 int totalScore = 0;
 
-                scores.add(getDirectionalScore(unit, row, col, -1, 0));
-                scores.add(getDirectionalScore(unit, row, col, 0, 1));
-                scores.add(getDirectionalScore(unit, row, col, 1, 0));
-                scores.add(getDirectionalScore(unit, row, col, 0, -1));
-                scores.add(getBlockScore(unit, row, col));
-                scores.add(getEnPlaceScore(unit, row, col));
+                scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, -1, 0));
+                scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, 0, 1));
+                scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, 1, 0));
+                scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, 0, -1));
+                scores.add(AIScoreCalculator.getBlockScore(unit, row, col));
+                scores.add(AIScoreCalculator.getEnPlaceScore(unit, row, col));
 
                 for (int score : scores) {
                     if (score > -999999) {
@@ -171,19 +171,19 @@ public class AIMovement {
                 }
             }
 
-            int bestUnitRow = getUnitRow(bestUnit);
-            int bestUnitCol = getUnitCol(bestUnit);
-            String startCoord = getCoordinateString(bestUnitRow, bestUnitCol);
+            int bestUnitRow = GameBoard.getUnitRow(bestUnit);
+            int bestUnitCol = GameBoard.getUnitCol(bestUnit);
+            String startCoord = GameLogicAI.getCoordinateString(bestUnitRow, bestUnitCol);
 
             Commands.selectedSquare = startCoord;
             Commands.selectedRow = bestUnitRow;
             Commands.selectedColumn = bestUnitCol;
 
-            if (selectedActionIndex >=0 && selectedActionIndex <= 3) {
+            if (selectedActionIndex >= 0 && selectedActionIndex <= 3) {
                 int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
                 int targetRow = bestUnitRow + dirs[selectedActionIndex][0];
                 int targetCol = bestUnitCol + dirs[selectedActionIndex][1];
-                String targetCoord = getCoordinateString(targetRow, targetCol);
+                String targetCoord = GameLogicAI.getCoordinateString(targetRow, targetCol);
                 MovementController.handleMove(targetCoord);
             } else if (selectedActionIndex == 4) {
                 bestUnit.setBlocking(true);
