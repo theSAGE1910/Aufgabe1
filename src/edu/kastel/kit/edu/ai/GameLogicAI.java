@@ -26,11 +26,4 @@ public class GameLogicAI {
         }
         AIDiscard.discardCard();
     }
-
-    static String getCoordinateString(int row, int col) {
-        char colChar = (char) ('A' + col);
-        int rowNum = 7 - row;
-
-        return "" + colChar + rowNum;
-    }
 }

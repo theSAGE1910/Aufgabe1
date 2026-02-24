@@ -27,8 +27,8 @@ public class AIMovement {
         }
 
         if (targetSquare != null) {
-            String startCoord = GameLogicAI.getCoordinateString(enemyKingRow, enemyKingCol);
-            String targetCoord = GameLogicAI.getCoordinateString(targetSquare.row, targetSquare.col);
+            String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
+            String targetCoord = getCoordinateString(targetSquare.row, targetSquare.col);
 
             Commands.selectedSquare = startCoord;
             Commands.selectedRow = enemyKingRow;
@@ -79,7 +79,7 @@ public class AIMovement {
 
             int bestUnitRow = GameBoard.getUnitRow(bestUnit);
             int bestUnitCol = GameBoard.getUnitCol(bestUnit);
-            String startCoord = GameLogicAI.getCoordinateString(bestUnitRow, bestUnitCol);
+            String startCoord = getCoordinateString(bestUnitRow, bestUnitCol);
 
             Commands.selectedSquare = startCoord;
             Commands.selectedRow = bestUnitRow;
@@ -174,12 +174,19 @@ public class AIMovement {
         return movableUnits;
     }
 
+    static String getCoordinateString(int row, int col) {
+        char colChar = (char) ('A' + col);
+        int rowNum = 7 - row;
+
+        return "" + colChar + rowNum;
+    }
+
     private static void executeUnitAction(int selectedActionIndex, int bestUnitRow, int bestUnitCol, Unit bestUnit, String startCoord) {
         if (selectedActionIndex >= 0 && selectedActionIndex <= 3) {
             int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
             int targetRow = bestUnitRow + dirs[selectedActionIndex][0];
             int targetCol = bestUnitCol + dirs[selectedActionIndex][1];
-            String targetCoord = GameLogicAI.getCoordinateString(targetRow, targetCol);
+            String targetCoord = getCoordinateString(targetRow, targetCol);
             MovementController.handleMove(targetCoord);
         } else if (selectedActionIndex == 4) {
             bestUnit.setBlocking(true);

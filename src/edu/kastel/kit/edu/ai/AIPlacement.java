@@ -33,7 +33,7 @@ public class AIPlacement {
         }
 
         Unit unitToPlace = selectCardToPlace(hand);
-        String coord = GameLogicAI.getCoordinateString(targetSquare.row, targetSquare.col);
+        String coord = AIMovement.getCoordinateString(targetSquare.row, targetSquare.col);
 
         System.out.println(GameEngine.team2.getName() + " places " + unitToPlace.getUnitName() + " to " + coord + ".");
 
