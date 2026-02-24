@@ -342,7 +342,7 @@ public class GameLogicAI {
         }
 
         int maxWeight = Integer.MIN_VALUE;
-        List<Integer> originalWeights = new ArrayList<>()
+        List<Integer> originalWeights = new ArrayList<>();
         for (Unit unit : hand) {
             int weight = unit.getAtk() + unit.getDef();
             originalWeights.add(weight);
@@ -477,10 +477,10 @@ public class GameLogicAI {
                         enemies++;
                     }
                 }
-
                 return (10 * steps) - enemies;
             }
         }
+        return 0;
     }
 
     private static int getBlockScore(Unit unit, int row, int col) {
