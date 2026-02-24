@@ -82,7 +82,6 @@ public class AIPlacement {
 
     private static List<TargetSquare> getBestPlacementSquares(int[] aiKingPos, int[] playerKingPos) {
         int[][] clockDirs = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}};
-        int[][] orthDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
@@ -99,24 +98,10 @@ public class AIPlacement {
             }
 
             int steps = Math.abs(targetRow - playerKingPos[0]) + Math.abs(targetCol - playerKingPos[1]);
-            int enemies = 0;
-            int fellows = 0;
 
-            for (int[] orthDir : orthDirs) {
-                int adjRow = targetRow + orthDir[0];
-                int adjCol = targetCol + orthDir[1];
-
-                if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
-                    Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                    if (adjUnit != null) {
-                        if (adjUnit.getTeam().equals(GameEngine.team1)) {
-                            enemies++;
-                        } else if (adjUnit.getTeam().equals(GameEngine.team2)) {
-                            fellows++;
-                        }
-                    }
-                }
-            }
+            int[] counts = countAdjacentUnits(targetRow, targetCol);
+            int enemies = counts[0];
+            int fellows = counts[1];
 
             int score = -steps + (2 * enemies) - fellows;
 
@@ -129,5 +114,28 @@ public class AIPlacement {
             }
         }
         return validTargets;
+    }
+
+    private static int[] countAdjacentUnits(int row, int col) {
+        int enemies = 0;
+        int fellows = 0;
+
+        int[][] orthDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        for (int[] dir : orthDirs) {
+            int adjRow = row + dir[0];
+            int adjCol = col + dir[1];
+
+            if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
+                Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
+                if (adjacentUnit != null) {
+                    if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
+                        enemies++;
+                    } else if (adjacentUnit.getTeam().equals(GameEngine.team2)) {
+                        fellows++;
+                    }
+                }
+            }
+        }
+        return new int[]{enemies, fellows};
     }
 }
