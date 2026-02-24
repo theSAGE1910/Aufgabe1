@@ -33,37 +33,7 @@ public class AIMovement {
                 continue;
             }
 
-            int distance = (i == 4) ? 0 : 1;
-            int enemies = 0;
-            int fellows = 0;
-            int fellowsPresent = 0;
-
-            if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team2) && targetUnit != king) {
-                fellowsPresent = 1;
-            }
-
-            for (int row = -1; row <= 1; row++) {
-                for (int col = -1; col <= 1; col++) {
-                    if (row == 0 && col == 0) {
-                        continue;
-                    }
-                    int adjRow = targetRow + row;
-                    int adjCol = targetCol + col;
-
-                    if (adjRow >= 0 && adjRow <= 6 && adjCol >= 0 && adjCol <= 6) {
-                        Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                        if (adjUnit != null) {
-                            if (adjUnit.getTeam().equals(GameEngine.team1)) {
-                                enemies++;
-                            } else if (adjUnit.getTeam().equals(GameEngine.team2) && adjUnit != king) {
-                                fellows++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            int score = -fellows - 2 * enemies - distance - 3 * fellowsPresent;
+            int score = getKingScore(i, targetUnit, king, targetRow, targetCol);
             if (score > maxScore) {
                 maxScore = score;
                 validTargets.clear();
@@ -95,15 +65,7 @@ public class AIMovement {
 
     public static void moveUnits() {
         while (Commands.isRunning) {
-            List<Unit> movableUnits = new ArrayList<>();
-            for (int row = 0; row < GameBoard.DIMENSION; row++) {
-                for (int col = 0; col < GameBoard.DIMENSION; col++) {
-                    Unit unit = GameBoard.getUnitAt(row, col);
-                    if (unit != null && unit.getTeam().equals(GameEngine.team2) && !unit.getRole().equals("King") && !unit.hasMovedThisTurn()) {
-                        movableUnits.add(unit);
-                    }
-                }
-            }
+            List<Unit> movableUnits = getMovableUnits();
 
             if (movableUnits.isEmpty()) {
                 break;
@@ -179,20 +141,71 @@ public class AIMovement {
             Commands.selectedRow = bestUnitRow;
             Commands.selectedColumn = bestUnitCol;
 
-            if (selectedActionIndex >= 0 && selectedActionIndex <= 3) {
-                int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-                int targetRow = bestUnitRow + dirs[selectedActionIndex][0];
-                int targetCol = bestUnitCol + dirs[selectedActionIndex][1];
-                String targetCoord = GameLogicAI.getCoordinateString(targetRow, targetCol);
-                MovementController.handleMove(targetCoord);
-            } else if (selectedActionIndex == 4) {
-                bestUnit.setBlocking(true);
-                bestUnit.setHasMovedThisTurn(true);
-                Output.printBlock(bestUnit.getUnitName(), startCoord);
-                Commands.updateDisplay();
-            } else if (selectedActionIndex == 5) {
-                MovementController.handleMove(startCoord);
+            executeUnitAction(selectedActionIndex, bestUnitRow, bestUnitCol, bestUnit, startCoord);
+        }
+    }
+
+    private static void executeUnitAction(int selectedActionIndex, int bestUnitRow, int bestUnitCol, Unit bestUnit, String startCoord) {
+        if (selectedActionIndex >= 0 && selectedActionIndex <= 3) {
+            int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+            int targetRow = bestUnitRow + dirs[selectedActionIndex][0];
+            int targetCol = bestUnitCol + dirs[selectedActionIndex][1];
+            String targetCoord = GameLogicAI.getCoordinateString(targetRow, targetCol);
+            MovementController.handleMove(targetCoord);
+        } else if (selectedActionIndex == 4) {
+            bestUnit.setBlocking(true);
+            bestUnit.setHasMovedThisTurn(true);
+            Output.printBlock(bestUnit.getUnitName(), startCoord);
+            Commands.updateDisplay();
+        } else if (selectedActionIndex == 5) {
+            MovementController.handleMove(startCoord);
+        }
+    }
+
+    private static List<Unit> getMovableUnits() {
+        List<Unit> movableUnits = new ArrayList<>();
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit unit = GameBoard.getUnitAt(row, col);
+                if (unit != null && unit.getTeam().equals(GameEngine.team2) && !unit.getRole().equals("King") && !unit.hasMovedThisTurn()) {
+                    movableUnits.add(unit);
+                }
             }
         }
+        return movableUnits;
+    }
+
+    private static int getKingScore(int dirIndex, Unit targetUnit, Unit king, int targetRow, int targetCol) {
+        int distance = (dirIndex == 4) ? 0 : 1;
+        int enemies = 0;
+        int fellows = 0;
+        int fellowsPresent = 0;
+
+        if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team2) && targetUnit != king) {
+            fellowsPresent = 1;
+        }
+
+        for (int row = -1; row <= 1; row++) {
+            for (int col = -1; col <= 1; col++) {
+                if (row == 0 && col == 0) {
+                    continue;
+                }
+                int adjRow = targetRow + row;
+                int adjCol = targetCol + col;
+
+                if (adjRow >= 0 && adjRow <= 6 && adjCol >= 0 && adjCol <= 6) {
+                    Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
+                    if (adjUnit != null) {
+                        if (adjUnit.getTeam().equals(GameEngine.team1)) {
+                            enemies++;
+                        } else if (adjUnit.getTeam().equals(GameEngine.team2) && adjUnit != king) {
+                            fellows++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return -fellows - 2 * enemies - distance - 3 * fellowsPresent;
     }
 }

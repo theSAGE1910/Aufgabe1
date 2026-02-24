@@ -12,6 +12,75 @@ public class AIPlacement {
         int[] aiKingPos = GameBoard.getEnemyKingPosition();
         int[] playerKingPos = GameBoard.getPlayerKingPosition();
 
+        if (aiKingPos == null || playerKingPos == null) {
+            return;
+        }
+
+        List<TargetSquare> validTargets = getBestPlacementSquares(aiKingPos, playerKingPos);
+        if (validTargets.isEmpty()) {
+            return;
+        }
+
+        TargetSquare targetSquare = validTargets.getFirst();
+        if (validTargets.size() > 1) {
+            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
+            targetSquare = validTargets.get(draw - 1);
+        }
+
+        List<Unit> hand = GameEngine.team2.hand.hand;
+        if (hand.isEmpty()) {
+            return;
+        }
+
+        Unit unitToPlace = selectCardToPlace(hand);
+        String coord = GameLogicAI.getCoordinateString(targetSquare.row, targetSquare.col);
+
+        System.out.println(GameEngine.team2.getName() + " places " + unitToPlace.getUnitName() + " to " + coord + ".");
+
+        unitToPlace.setTeam(GameEngine.team2);
+        unitToPlace.setHasMovedThisTurn(true);
+        hand.remove(unitToPlace);
+
+        int boardCount = getBoardCount(GameEngine.team2);
+        if (boardCount >= 5) {
+            GameBoard.setUnitAt(targetSquare.row, targetSquare.col, null);
+        } else {
+            GameBoard.setUnitAt(targetSquare.row, targetSquare.col, unitToPlace);
+        }
+
+        Commands.selectedSquare = coord;
+        Commands.selectedRow = targetSquare.row;
+        Commands.selectedColumn = targetSquare.col;
+        Commands.updateDisplay();
+    }
+
+    private static Unit selectCardToPlace(List<Unit> hand) {
+        List<Integer> weights = new ArrayList<>();
+        int totalWeight = 0;
+
+        for (Unit unit : hand) {
+            int weight = unit.getAtk();
+            weights.add(weight);
+            totalWeight += weight;
+        }
+
+        int selectedCardIndex = 0;
+        if (totalWeight > 0) {
+            int randomWeight = RandomGenerator.randomIntegerPick(1, totalWeight + 1);
+            int runningSum = 0;
+            for (int i = 0; i < weights.size(); i++) {
+                runningSum += weights.get(i);
+                if (randomWeight < runningSum) {
+                    selectedCardIndex = i;
+                    break;
+                }
+            }
+        }
+
+        return hand.get(selectedCardIndex);
+    }
+
+    private static List<TargetSquare> getBestPlacementSquares(int[] aiKingPos, int[] playerKingPos) {
         int[][] clockDirs = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}};
         int[][] orthDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
 
@@ -59,65 +128,6 @@ public class AIPlacement {
                 validTargets.add(new TargetSquare(targetRow, targetCol));
             }
         }
-        if (validTargets.isEmpty()) {
-            return;
-        }
-
-        TargetSquare targetSquare = null;
-        if (validTargets.size() == 1) {
-            targetSquare = validTargets.get(0);
-        } else if (validTargets.size() > 1) {
-            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
-            targetSquare = validTargets.get(draw - 1);
-        }
-
-        List<Unit> hand = GameEngine.team2.hand.hand;
-
-        if (hand.isEmpty()) {
-            return;
-        }
-
-        List<Integer> weights = new ArrayList<>();
-        int totalWeight = 0;
-
-        for (Unit unit : hand) {
-            int weight = unit.getAtk();
-            weights.add(weight);
-            totalWeight += weight;
-        }
-
-        int selectedCardIndex = 0;
-        if (totalWeight > 0) {
-            int randomWeight = RandomGenerator.randomIntegerPick(1, totalWeight + 1);
-            int runningSum = 0;
-            for (int i = 0; i < weights.size(); i++) {
-                runningSum += weights.get(i);
-                if (randomWeight < runningSum) {
-                    selectedCardIndex = i;
-                    break;
-                }
-            }
-        }
-
-        Unit unitToPlace = hand.get(selectedCardIndex);
-        String coord = GameLogicAI.getCoordinateString(targetSquare.row, targetSquare.col);
-
-        System.out.println(GameEngine.team2.getName() + " places " + unitToPlace.getUnitName() + " to " + coord + ".");
-
-        unitToPlace.setTeam(GameEngine.team2);
-        unitToPlace.setHasMovedThisTurn(true);
-        hand.remove(unitToPlace);
-
-        int boardCount = getBoardCount(GameEngine.team2);
-        if (boardCount >= 5) {
-            GameBoard.setUnitAt(targetSquare.row, targetSquare.col, null);
-        } else {
-            GameBoard.setUnitAt(targetSquare.row, targetSquare.col, unitToPlace);
-        }
-
-        Commands.selectedSquare = coord;
-        Commands.selectedRow = targetSquare.row;
-        Commands.selectedColumn = targetSquare.col;
-        Commands.updateDisplay();
+        return validTargets;
     }
 }
