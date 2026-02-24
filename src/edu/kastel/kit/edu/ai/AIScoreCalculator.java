@@ -9,52 +9,65 @@ public class AIScoreCalculator {
     static int getDirectionalScore(Unit unit, int row, int col, int rowDir, int colDir) {
         int targetRow = row + rowDir;
         int targetCol = col + colDir;
+
         if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
             return -9999999;
         }
 
         Unit target = GameBoard.getUnitAt(targetRow, targetCol);
-        if (target != null) {
-            if (target.getTeam().equals(unit.getTeam())) {
-                Unit merged = unit.mergeUnits(unit, target);
-                if (merged != null) {
-                    return merged.getAtk() + merged.getDef() - unit.getAtk() - unit.getDef();
-                } else {
-                    return -target.getAtk() - target.getDef();
-                }
-            } else {
-                if (Commands.isKing(unit)) {
-                    return unit.getAtk();
-                } else if (!target.isFaceUp()) {
-                    return unit.getAtk() - 500;
-                } else if (target.isBlocking()) {
-                    return unit.getAtk() - target.getDef();
-                } else {
-                    return 2 * (unit.getAtk() - target.getAtk());
-                }
-            }
-        } else {
-            int[] playerKing = GameBoard.getPlayerKingPosition();
-            if (playerKing == null) {
-                return 0;
-            }
-            int steps = Math.abs(targetRow - playerKing[0]) + Math.abs(targetCol - playerKing[1]);
-            int enemies = 0;
-            int[][] ortho = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-            for (int[] dir : ortho) {
-                int adjRow = targetRow + dir[0];
-                int adjCol = targetCol + dir[1];
 
-                if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
-                    Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                    if (adjUnit != null && unit.getTeam().equals(GameEngine.team1)) {
-                        enemies++;
-                    }
+        if (target == null) {
+            return getEmptySquareScore(unit, targetRow, targetCol);
+        }
+
+        if (target.getTeam().equals(unit.getTeam())) {
+            return getMergeScore(unit, target);
+        } else {
+            return getCombatScore(unit, target);
+        }
+    }
+
+    private static int getEmptySquareScore(Unit unit, int targetRow, int targetCol) {
+        int[] playerKing = GameBoard.getPlayerKingPosition();
+        if (playerKing == null) {
+            return 0;
+        }
+        int steps = Math.abs(targetRow - playerKing[0]) + Math.abs(targetCol - playerKing[1]);
+        int enemies = 0;
+        int[][] ortho = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        for (int[] dir : ortho) {
+            int adjRow = targetRow + dir[0];
+            int adjCol = targetCol + dir[1];
+
+            if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
+                Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
+                if (adjUnit != null && unit.getTeam().equals(GameEngine.team1)) {
+                    enemies++;
                 }
-                return (10 * steps) - enemies;
             }
         }
-        return 0;
+        return (10 * steps) - enemies;
+    }
+
+    private static int getCombatScore(Unit unit, Unit target) {
+        if (Commands.isKing(unit)) {
+            return unit.getAtk();
+        } else if (!target.isFaceUp()) {
+            return unit.getAtk() - 500;
+        } else if (target.isBlocking()) {
+            return unit.getAtk() - target.getDef();
+        } else {
+            return 2 * (unit.getAtk() - target.getAtk());
+        }
+    }
+
+    private static int getMergeScore(Unit unit, Unit target) {
+        Unit merged = unit.mergeUnits(unit, target);
+        if (merged != null) {
+            return merged.getAtk() + merged.getDef() - unit.getAtk() - unit.getDef();
+        } else {
+            return -target.getAtk() - target.getDef();
+        }
     }
 
     static int getBlockScore(Unit unit, int row, int col) {
