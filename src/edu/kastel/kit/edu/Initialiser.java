@@ -30,7 +30,7 @@ public final class Initialiser {
     private static void initialiseGameBoard() {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
-                GameBoard.gameBoard[i][j] = null;
+                GameBoard.GAME_BOARD[i][j] = null;
             }
         }
     }
@@ -69,7 +69,7 @@ public final class Initialiser {
         Unit team1King = new Unit("Farmer", "King", 0, 0, GameEngine.team1);
         Unit team2King = new Unit("Farmer", "King", 0, 0, GameEngine.team2);
 
-        GameBoard.gameBoard[6][3] = team1King;
-        GameBoard.gameBoard[0][3] = team2King;
+        GameBoard.GAME_BOARD[6][3] = team1King;
+        GameBoard.GAME_BOARD[0][3] = team2King;
     }
 }

@@ -3,7 +3,7 @@ package edu.kastel.kit.edu;
 public final class GameBoard {
     public static final int DIMENSION = 7;
     private static final String EMPTY = "   ";
-    public static final Unit[][] gameBoard = new Unit[DIMENSION][DIMENSION];
+    public static final Unit[][] GAME_BOARD = new Unit[DIMENSION][DIMENSION];
 
     private GameBoard() {
     }
@@ -19,7 +19,7 @@ public final class GameBoard {
             int adjCol = column + dir[1];
 
             if (adjRow >= 0 && adjRow < DIMENSION && adjCol >= 0 && adjCol < DIMENSION) {
-                if (gameBoard[adjRow][adjCol] == null) {
+                if (GAME_BOARD[adjRow][adjCol] == null) {
                     return true;
                 }
             }
@@ -30,11 +30,11 @@ public final class GameBoard {
     //public static boolean checkEnemy
 
     public static Unit getUnitAt(int row, int col) {
-        return gameBoard[row][col];
+        return GAME_BOARD[row][col];
     }
 
     public static void setUnitAt(int row, int col, Unit unit) {
-        gameBoard[row][col] = unit;
+        GAME_BOARD[row][col] = unit;
     }
 
     public static void showGameBoard(char selCol, int selRow) {
@@ -58,10 +58,10 @@ public final class GameBoard {
                 for (int col = 0; col <= DIMENSION; col++) {
                     System.out.print(getVerticalChar(row, col, selectedRow, selectedCol));
                     if (col < DIMENSION) {
-                        if (gameBoard[row][col] == null) {
+                        if (GAME_BOARD[row][col] == null) {
                             System.out.print(EMPTY);
                         } else {
-                            System.out.print(gameBoard[row][col].toString());
+                            System.out.print(GAME_BOARD[row][col].toString());
                         }
                     }
                 }
@@ -95,6 +95,10 @@ public final class GameBoard {
             return getRightEdgeChar(isTopRight, isBottomRight);
         }
 
+        return getInnerChar(isTopLeft, isTopRight, isBottomLeft, isBottomRight);
+    }
+
+    private static char getInnerChar(boolean isTopLeft, boolean isTopRight, boolean isBottomLeft, boolean isBottomRight) {
         if (isTopLeft) {
             return BoardTheme.get(BoardTheme.SEL_INNER_TOP_LEFT);
         }
