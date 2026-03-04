@@ -2,15 +2,15 @@ package edu.kastel.kit.edu;
 
 import java.util.List;
 
-public class Initialiser {
-    public static Deck deck1;
-    public static Deck deck2;
+public final class Initialiser {
+    private static Deck deck1;
+    private static Deck deck2;
 
-    public static List<Unit> player1DrawPile;
-    public static List<Unit> player2DrawPile;
+    private static List<Unit> player1DrawPile;
+    private static List<Unit> player2DrawPile;
 
-    static Unit team1King;
-    static Unit team2King;
+    private Initialiser() {
+    }
 
     public static void initialise() {
         RandomGenerator.initialise(GameData.seed);
@@ -54,18 +54,20 @@ public class Initialiser {
         RandomGenerator.shuffleDeck(player2DrawPile);
     }
 
-    public static void initialiseTeams() {
+    private static void initialiseTeams() {
         GameEngine.team1 = new Team(GameData.team1Name, deck1, new Hand(), player1DrawPile);
         GameEngine.team2 = new Team(GameData.team2Name, deck2, new Hand(), player2DrawPile);
     }
 
-    public static void initialiseHands(Team team) {
-        team.hand.handLoader(team.shuffledDeck);
+    private static void initialiseHands(Team team) {
+        for (int i = 0; i < 5; i++) {
+            team.hand.handLoader(team.shuffledDeck);
+        }
     }
 
-    public static void initialiseKings() {
-        team1King = new Unit("Farmer", "King", 0, 0, GameEngine.team1);
-        team2King = new Unit("Farmer", "King", 0, 0, GameEngine.team2);
+    private static void initialiseKings() {
+        Unit team1King = new Unit("Farmer", "King", 0, 0, GameEngine.team1);
+        Unit team2King = new Unit("Farmer", "King", 0, 0, GameEngine.team2);
 
         GameBoard.gameBoard[6][3] = team1King;
         GameBoard.gameBoard[0][3] = team2King;

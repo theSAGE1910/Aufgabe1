@@ -19,7 +19,7 @@ public class Commands {
 
         if (words.length == 2) {
             key = words[0];
-            argument = words[1];
+            argument = words[1].toUpperCase();
         }
 
         switch (key.toLowerCase()) {
@@ -141,21 +141,36 @@ public class Commands {
             return;
         }
 
-        Hand currentHand = GameEngine.activeTeam.hand;
+        int[] kingPosition = getActiveKingPosition();
+        if (kingPosition != null) {
+            int rowDiff = Math.abs(selectedRow - kingPosition[0]);
+            int colDiff = Math.abs(selectedColumn - kingPosition[1]);
+            if (rowDiff > 1 || colDiff > 1) {
+                System.err.println("ERROR: Target square must be adjacent to the Farmer King.");
+                return;
+            }
+        }
 
+        Hand currentHand = GameEngine.activeTeam.hand;
         int handIndex = parseHandIndex(argument, currentHand);
         if (handIndex == -1) {
             return;
         }
 
         Unit unitToPlace = currentHand.hand.get(handIndex);
-
         Output.printPlacement(GameEngine.activeTeam.getName(), unitToPlace, selectedSquare);
 
         unitToPlace.setTeam(GameEngine.activeTeam);
         unitToPlace.setHasMovedThisTurn(false);
-        GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
         currentHand.removeUnitFromHand(unitToPlace);
+
+        int boardCount = Output.getBoardCount(GameEngine.activeTeam);
+        if (boardCount >= 5) {
+            GameBoard.setUnitAt(selectedRow, selectedColumn, null);
+        } else {
+            GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
+        }
+        GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
         updateDisplay();
     }
 
@@ -183,40 +198,51 @@ public class Commands {
     private static void handleYield(String argument) {
         Hand currentHand = GameEngine.activeTeam.hand;
 
+        if (currentHand.hand.size() == 5 && argument == null) {
+            System.err.println("ERROR: Hand is full. You must specify a card to discard.");
+        } else if (currentHand.hand.size() < 5 && argument != null) {
+            System.err.println("ERROR: Hand is not full. You cannot discard a card.");
+        }
+
         int discardIndex = 0;
         if (argument != null) {
             discardIndex = parseHandIndex(argument, currentHand);
             if (discardIndex == -1) {
                 return;
             }
+
+            Unit unitToDiscard = currentHand.hand.get(discardIndex);
+            currentHand.removeUnitFromHand(unitToDiscard);
+            Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
         }
 
-        Unit unitToDiscard = currentHand.hand.get(discardIndex);
-
-        currentHand.removeUnitFromHand(unitToDiscard);
-        Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
-
-        GameEngine.activeTeam.hand.handLoader(GameEngine.activeTeam.shuffledDeck);
-
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
-                Unit boardUnit = GameBoard.getUnitAt(row, col);
-                if (boardUnit != null && boardUnit.getTeam().equals(GameEngine.activeTeam)) {
-                    boardUnit.setHasMovedThisTurn(false);
-                }
-            }
-        }
-
+        resetTeamMovement(GameEngine.activeTeam);
         GameEngine.switchTurn();
 
         if (GameEngine.activeTeam.equals(GameEngine.team1)) {
             Output.printPlayerTurn();
         } else {
             Output.printEnemyTurn();
+        }
+
+        if (!tryDrawCard(GameEngine.activeTeam)) {
+            return;
+        }
+
+        if (GameEngine.activeTeam.equals(GameEngine.team2)) {
             GameLogicAI.executeTurn();
-            GameEngine.activeTeam.hand.handLoader(GameEngine.activeTeam.shuffledDeck);
+
+            if (!isRunning) {
+                return;
+            }
+
+            resetTeamMovement(GameEngine.team2);
             GameEngine.switchTurn();
             Output.printPlayerTurn();
+
+            if (!tryDrawCard(GameEngine.team1)) {
+                return;
+            }
         }
 
         updateDisplay();
@@ -283,4 +309,39 @@ public class Commands {
 
         return coords;
     }
+
+    private static int[] getActiveKingPosition() {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit boardUnit = GameBoard.getUnitAt(row, col);
+                if (boardUnit != null && boardUnit.getTeam().equals(GameEngine.activeTeam)) {
+                    return new int[] {row, col};
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void resetTeamMovement(Team team) {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit boardUnit = GameBoard.getUnitAt(row, col);
+                if (boardUnit != null && boardUnit.getTeam().equals(team)) {
+                    boardUnit.setHasMovedThisTurn(false);
+                }
+            }
+        }
+    }
+
+    private static boolean tryDrawCard(Team team) {
+        boolean success = team.hand.handLoader(team.shuffledDeck);
+        if (!success) {
+            System.err.println("ERROR: " + team.getName() + " has no more cards left in the deck!");
+            Team winner = team.equals(GameEngine.team1) ? GameEngine.team2 : GameEngine.team1;
+            System.out.println(winner.getName() + " wins!");
+            isRunning = false;
+        }
+        return success;
+    }
+
 }

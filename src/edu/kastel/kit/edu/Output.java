@@ -1,6 +1,9 @@
 package edu.kastel.kit.edu;
 
-public class Output {
+public final class Output {
+    private Output() {
+    }
+
     public static void printNoBlock(String name) {
         System.out.println(name + " no longer blocks.");
     }
@@ -14,7 +17,8 @@ public class Output {
     }
 
     public static void printAtkMove(String mover, int atkMov, int defMov, String target, int atkTar, int defTar, String field) {
-        System.out.println(mover + " (" + atkMov + "/" + defMov + ") attacks " + target + "(" + atkTar + "/" + defTar + ") on " + field + "!");
+        System.out.println(mover + " (" + atkMov + "/" + defMov + ") attacks "
+                + target + "(" + atkTar + "/" + defTar + ") on " + field + "!");
     }
 
     public static void printFlip(String name, int atk, int def, String field) {
@@ -58,14 +62,6 @@ public class Output {
         System.out.println("It is Enemy's turn!");
     }
 
-    public static void printUnitName(Unit unit) {
-        System.out.print(unit.getRole() + " " + unit.getQualifier());
-    }
-
-    public static void printTeamName(String name) {
-        System.out.print("(" + name + ")");
-    }
-
     public static void printHand(Hand team) {
         int numbering = 1;
         for (Unit unit : team.hand) {
@@ -100,13 +96,13 @@ public class Output {
 
     public static void printVisibleUnit(Unit unit) {
         System.out.println(unit.getQualifier() + " " + unit.getRole() + " (Team " + unit.getTeam().getName() + ")");
-        System.out.println("ATK: " + unit.getAtk());
-        System.out.println("DEF: " + unit.getDef());
+        printPlayerUnitStat(unit);
     }
 
     public static void printState(Team team1, Team team2) {
         System.out.printf(" %-14s%15s%n", team1.getName(), team2.getName());
-        System.out.printf(" %-14s%15s%n", team1.getTeamHP() + "/" + Team.INITIAL_HP + " LP", team2.getTeamHP() + "/" + Team.INITIAL_HP + " LP");
+        System.out.printf(" %-14s%15s%n", team1.getTeamHP() + "/" + Team.INITIAL_HP + " LP",
+                team2.getTeamHP() + "/" + Team.INITIAL_HP + " LP");
         System.out.printf(" %-14s%15s%n", "DC: " + team1.shuffledDeck.size() + "/" + team1.getInitialDeckSize(),
                 team2.shuffledDeck.size() + "/" + team2.getInitialDeckSize());
         System.out.printf(" %-14s%15s%n", "BC: " + getBoardCount(team1) + "/5", "BC:" + getBoardCount(team2) + "/5");
