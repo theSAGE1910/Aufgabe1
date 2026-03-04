@@ -38,7 +38,7 @@ public class AIPlacement {
         System.out.println(GameEngine.team2.getName() + " places " + unitToPlace.getUnitName() + " to " + coord + ".");
 
         unitToPlace.setTeam(GameEngine.team2);
-        unitToPlace.setHasMovedThisTurn(true);
+        unitToPlace.setHasMovedThisTurn(false);
         hand.remove(unitToPlace);
 
         int boardCount = getBoardCount(GameEngine.team2);

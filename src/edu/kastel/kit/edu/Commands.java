@@ -153,7 +153,7 @@ public class Commands {
         Output.printPlacement(GameEngine.activeTeam.getName(), unitToPlace, selectedSquare);
 
         unitToPlace.setTeam(GameEngine.activeTeam);
-        unitToPlace.setHasMovedThisTurn(true);
+        unitToPlace.setHasMovedThisTurn(false);
         GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
         currentHand.removeUnitFromHand(unitToPlace);
         updateDisplay();
