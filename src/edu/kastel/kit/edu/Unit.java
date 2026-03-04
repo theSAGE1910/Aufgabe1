@@ -1,9 +1,6 @@
 package edu.kastel.kit.edu;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -168,23 +165,18 @@ public class Unit {
 
     @Override
     public String toString() {
-        if (this.role.equals("King")) {
-            if (this.team.getName().equals(GameData.team1Name)) {
-                return GameData.playerKingSymbol;
-            } else {
-                return GameData.enemyKingSymbol;
-            }
+        String prefix = this.hasMovedThisTurn() ? " " : "*";
+
+        char symbol;
+        if (this.getTeam().equals(GameEngine.team1)) {
+            symbol = this.getRole().equals("King") ? 'X' : 'x';
+        } else {
+            symbol = this.getRole().equals("King") ? 'Y' : 'y';
         }
 
-        if (this.isFaceUp) {
-            if (this.team.getName().equals(GameData.team1Name)) {
-                return GameData.playerUnitSymbol;
-            } else {
-                return GameData.enemyUnitSymbol;
-            }
-        }
+        String suffix = this.isBlocking() ? "b" : " ";
 
-        return " ? ";
+        return prefix + symbol + suffix;
     }
 
     public String getUnitName() {
