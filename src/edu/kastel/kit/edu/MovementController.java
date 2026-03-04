@@ -102,6 +102,14 @@ public class MovementController {
             Output.printNoBlock(movingUnit.getUnitName());
         }
 
+        String targetDisplay;
+        if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.activeTeam)) {
+            targetDisplay = "???";
+        } else if (Commands.isKing(targetUnit)){
+            targetDisplay = targetUnit.getUnitName();
+        } else {
+            targetDisplay = targetUnit.getUnitName() + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")";
+        }
         Output.printAtkMove(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(),
                 targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
 

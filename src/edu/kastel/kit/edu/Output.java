@@ -18,7 +18,7 @@ public final class Output {
 
     public static void printAtkMove(String mover, int atkMov, int defMov, String target, int atkTar, int defTar, String field) {
         System.out.println(mover + " (" + atkMov + "/" + defMov + ") attacks "
-                + target + "(" + atkTar + "/" + defTar + ") on " + field + "!");
+                + target + " on " + field + "!");
     }
 
     public static void printFlip(String name, int atk, int def, String field) {
