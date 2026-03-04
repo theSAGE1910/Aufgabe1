@@ -13,7 +13,7 @@ public final class Output {
     }
 
     public static void printMovement(String name, String field) {
-        System.out.println(name + " moves to " + field);
+        System.out.println(name + " moves to " + field + ".");
     }
 
     public static void printAtkMove(String mover, int atkMov, int defMov, String target, int atkTar, int defTar, String field) {
@@ -30,7 +30,7 @@ public final class Output {
     }
 
     public static void printDamage(String team, int damage) {
-        System.out.println(team + " takes " + damage + "!");
+        System.out.println(team + " takes " + damage + " damage!");
     }
 
     public static void printMerge(String unit1, String unit2, String field) {
@@ -81,7 +81,7 @@ public final class Output {
     }
 
     public static void printStat(int atk, int def) {
-        System.out.println("(" + atk + "/" + def + ").");
+        System.out.println("(" + atk + "/" + def + ")");
     }
 
     public static void printFarmerKing(Unit unit) {
@@ -105,7 +105,7 @@ public final class Output {
                 team2.getTeamHP() + "/" + Team.INITIAL_HP + " LP");
         System.out.printf(" %-14s%15s%n", "DC: " + team1.shuffledDeck.size() + "/" + team1.getInitialDeckSize(),
                 team2.shuffledDeck.size() + "/" + team2.getInitialDeckSize());
-        System.out.printf(" %-14s%15s%n", "BC: " + getBoardCount(team1) + "/5", "BC:" + getBoardCount(team2) + "/5");
+        System.out.printf(" %-14s%15s%n", "BC: " + getBoardCount(team1) + "/5", "BC: " + getBoardCount(team2) + "/5");
     }
 
     public static int getBoardCount(Team team) {
