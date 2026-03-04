@@ -150,6 +150,8 @@ public class Commands {
 
         Unit unitToPlace = currentHand.hand.get(handIndex);
 
+        Output.printPlacement(GameEngine.activeTeam.getName(), unitToPlace, selectedSquare);
+
         unitToPlace.setTeam(GameEngine.activeTeam);
         unitToPlace.setHasMovedThisTurn(true);
         GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
@@ -166,7 +168,7 @@ public class Commands {
         Unit unitToShow = GameBoard.getUnitAt(selectedRow, selectedColumn);
 
         if (unitToShow == null) {
-            System.out.println();
+            System.out.println("<no unit>");
         } else {
             if (isKing(unitToShow)) {
                 Output.printFarmerKing(unitToShow);

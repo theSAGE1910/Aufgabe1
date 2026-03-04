@@ -80,6 +80,10 @@ public class Output {
         printStat(unit.getAtk(), unit.getDef());
     }
 
+    public static void printPlacement(String team, Unit unit, String field) {
+        System.out.println(team + " places " + unit.getUnitName() + " to " + field.toUpperCase() + ".");
+    }
+
     public static void printStat(int atk, int def) {
         System.out.println("(" + atk + "/" + def + ").");
     }

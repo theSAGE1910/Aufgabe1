@@ -63,67 +63,67 @@ public class GameBoard {
         boolean isBottomLeft = (row == selectedRow + 1 && col == selectedCol);
         boolean isBottomRight = (row == selectedRow + 1 && col == selectedCol + 1);
         if (row == 0 && col == 0) {
-            return (isTopLeft ? BoardTheme.selCornerTopLeft : BoardTheme.cornerTopLeft);
+            return (isTopLeft ? BoardTheme.getSelCornerTopLeft() : BoardTheme.getCornerTopLeft());
         } else if (row == 0 && col == DIMENSION) {
-            return (isTopRight ? BoardTheme.selCornerTopRight : BoardTheme.cornerTopRight);
+            return (isTopRight ? BoardTheme.getSelCornerTopRight() : BoardTheme.getCornerTopRight());
         } else if (row == DIMENSION && col == 0) {
-            return (isBottomLeft ? BoardTheme.selCornerBottomLeft : BoardTheme.cornerBottomLeft);
+            return (isBottomLeft ? BoardTheme.getSelCornerBottomLeft() : BoardTheme.getCornerBottomLeft());
         } else if (row == DIMENSION && col == DIMENSION) {
-            return (isBottomRight ? BoardTheme.selCornerBottomRight : BoardTheme.cornerBottomRight);
+            return (isBottomRight ? BoardTheme.getSelCornerBottomRight() : BoardTheme.getCornerBottomRight());
         }
         if (row == 0) {
             if (isTopLeft) {
-                return (BoardTheme.selEdgeTopLeft);
+                return (BoardTheme.getSelEdgeTopLeft());
             } else if (isTopRight) {
-                return (BoardTheme.selEdgeTopRight);
+                return (BoardTheme.getSelEdgeTopRight());
             } else {
-                return (BoardTheme.edgeTop);
+                return (BoardTheme.getEdgeTop());
             }
         } else if (col == DIMENSION) {
             if (isTopRight) {
-                return (BoardTheme.selEdgeRightTop);
+                return (BoardTheme.getSelEdgeRightTop());
             } else if (isBottomRight) {
-                return (BoardTheme.selEdgeRightBottom);
+                return (BoardTheme.getSelEdgeRightBottom());
             } else {
-                return (BoardTheme.edgeRight);
+                return (BoardTheme.getEdgeRight());
             }
         } else if (row == DIMENSION) {
             if (isBottomLeft) {
-                return (BoardTheme.selEdgeBottomLeft);
+                return (BoardTheme.getSelEdgeBottomLeft());
             } else if (isBottomRight) {
-                return (BoardTheme.selEdgeBottomRight);
+                return (BoardTheme.getSelEdgeBottomRight());
             } else {
-                return (BoardTheme.edgeBottom);
+                return (BoardTheme.getEdgeBottom());
             }
         } else if (col == 0) {
             if (isTopLeft) {
-                return (BoardTheme.selEdgeLeftTop);
+                return (BoardTheme.getSelEdgeLeftTop());
             } else if (isBottomLeft) {
-                return (BoardTheme.selEdgeLeftBottom);
+                return (BoardTheme.getSelEdgeLeftBottom());
             } else {
-                return (BoardTheme.edgeLeft);
+                return (BoardTheme.getEdgeLeft());
             }
         }
         if (isTopLeft) {
-            return (BoardTheme.selInnerTopLeft);
+            return (BoardTheme.getSelInnerTopLeft());
         } else if (isTopRight) {
-            return (BoardTheme.selInnerTopRight);
+            return (BoardTheme.getSelInnerTopRight());
         } else if (isBottomLeft) {
-            return (BoardTheme.selInnerBottomLeft);
+            return (BoardTheme.getSelInnerBottomLeft());
         } else if (isBottomRight) {
-            return (BoardTheme.selInnerBottomRight);
+            return (BoardTheme.getSelInnerBottomRight());
         }
-        return (BoardTheme.cross);
+        return (BoardTheme.getCross());
     }
 
     private static char getHorizontalChar(int row, int col, int selectedRow, int selectedCol) {
         boolean isHighlighted = (col == selectedCol) && (row == selectedRow || row == selectedRow + 1);
-        return (isHighlighted ? BoardTheme.selHorizontal : BoardTheme.horizontal);
+        return (isHighlighted ? BoardTheme.getSelHorizontal() : BoardTheme.getHorizontal());
     }
 
     private static char getVerticalChar(int row, int col, int selectedRow, int selectedCol) {
         boolean isHighlighted = (row == selectedRow) && (col == selectedCol || col == selectedCol + 1);
-        return (isHighlighted ? BoardTheme.selVertical : BoardTheme.vertical);
+        return (isHighlighted ? BoardTheme.getSelVertical() : BoardTheme.getVertical());
     }
 
     public static void setUnitAt(int row, int col, Unit unit) {
@@ -131,9 +131,9 @@ public class GameBoard {
     }
 
     public static int[] getEnemyKingPosition() {
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
-                Unit unit = GameBoard.getUnitAt(row, col);
+        for (int row = 0; row < DIMENSION; row++) {
+            for (int col = 0; col < DIMENSION; col++) {
+                Unit unit = getUnitAt(row, col);
                 if (unit != null && unit.getTeam().equals(GameEngine.team2) && unit.getRole().equals("King")) {
                     return new int[]{row, col};
                 }
@@ -143,8 +143,8 @@ public class GameBoard {
     }
 
     public static int[] getPlayerKingPosition() {
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+        for (int row = 0; row < DIMENSION; row++) {
+            for (int col = 0; col < DIMENSION; col++) {
                 Unit unit = GameBoard.getUnitAt(row, col);
                 if (unit != null && unit.getTeam().equals(GameEngine.team1) && unit.getRole().equals("King")) {
                     return new int[]{row, col};
@@ -165,7 +165,7 @@ public class GameBoard {
         return -1;
     }
 
-    //try to make these two methods into one, by passing key row and col hehe:)
+    //if I have time, make these two methods into one, by passing key row and col hehe:)
 
     public static int getUnitCol(Unit unit) {
         for (int row = 0; row < GameBoard.DIMENSION; row++) {
