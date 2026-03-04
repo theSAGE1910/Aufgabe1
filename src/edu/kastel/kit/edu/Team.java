@@ -5,12 +5,12 @@ import java.util.List;
 public class Team {
     public static final int INITIAL_HP = 8000;
 
+    public Hand hand;
+    public List<Unit> shuffledDeck;
     private int initialDeckSize;
     private String name;
     private int teamHP;
     private Deck deck;
-    public Hand hand;
-    List<Unit> shuffledDeck;
 
     public Team(String name, Deck deck, Hand hand, List<Unit> shuffledDeck) {
         this.name = name;
@@ -18,6 +18,7 @@ public class Team {
         this.deck = deck;
         this.hand = hand;
         this.shuffledDeck = shuffledDeck;
+        this.initialDeckSize = shuffledDeck.size();
     }
 
     public void takeDamage(int amount) {
