@@ -3,40 +3,40 @@ package edu.kastel.kit.edu;
 public class BoardTheme {
     private static final String STANDARD_CHARSET = "++++++++-|+############=N####";
 
-    public static char cornerTopLeft;
-    public static char cornerTopRight;
-    public static char cornerBottomLeft;
-    public static char cornerBottomRight;
+    private static char cornerTopLeft;
+    private static char cornerTopRight;
+    private static char cornerBottomLeft;
+    private static char cornerBottomRight;
 
-    public static char edgeTop;
-    public static char edgeRight;
-    public static char edgeBottom;
-    public static char edgeLeft;
+    private static char edgeTop;
+    private static char edgeRight;
+    private static char edgeBottom;
+    private static char edgeLeft;
 
-    public static char horizontal;
-    public static char vertical;
-    public static char cross;
+    private static char horizontal;
+    private static char vertical;
+    private static char cross;
 
-    public static char selCornerTopLeft;
-    public static char selCornerTopRight;
-    public static char selCornerBottomLeft;
-    public static char selCornerBottomRight;
+    private static char selCornerTopLeft;
+    private static char selCornerTopRight;
+    private static char selCornerBottomLeft;
+    private static char selCornerBottomRight;
 
-    public static char selEdgeTopLeft;
-    public static char selEdgeTopRight;
-    public static char selEdgeRightTop;
-    public static char selEdgeRightBottom;
-    public static char selEdgeBottomLeft;
-    public static char selEdgeBottomRight;
-    public static char selEdgeLeftTop;
-    public static char selEdgeLeftBottom;
-    public static char selHorizontal;
-    public static char selVertical;
+    private static char selEdgeTopLeft;
+    private static char selEdgeTopRight;
+    private static char selEdgeRightTop;
+    private static char selEdgeRightBottom;
+    private static char selEdgeBottomLeft;
+    private static char selEdgeBottomRight;
+    private static char selEdgeLeftTop;
+    private static char selEdgeLeftBottom;
+    private static char selHorizontal;
+    private static char selVertical;
 
-    public static char selInnerTopLeft;
-    public static char selInnerTopRight;
-    public static char selInnerBottomLeft;
-    public static char selInnerBottomRight;
+    private static char selInnerTopLeft;
+    private static char selInnerTopRight;
+    private static char selInnerBottomLeft;
+    private static char selInnerBottomRight;
 
     public static void initialiseTheme() {
         String keySet = GameData.boardData;
@@ -78,5 +78,99 @@ public class BoardTheme {
         selInnerTopRight = keySet.charAt(26);
         selInnerBottomLeft = keySet.charAt(27);
         selInnerBottomRight = keySet.charAt(28);
+    }
+
+    public static char getCornerTopLeft() {
+        return cornerTopLeft;
+    }
+    public static char getCornerTopRight() {
+        return cornerTopRight;
+    }
+    public static char getCornerBottomLeft() {
+        return cornerBottomLeft;
+    }
+    public static char getCornerBottomRight() {
+        return cornerBottomRight;
+    }
+
+    public static char getEdgeTop() {
+        return edgeTop;
+    }
+    public static char getEdgeRight() {
+        return edgeRight;
+    }
+    public static char getEdgeBottom() {
+        return edgeBottom;
+    }
+    public static char getEdgeLeft() {
+        return edgeLeft;
+    }
+
+    public static char getHorizontal() {
+        return horizontal;
+    }
+    public static char getVertical() {
+        return vertical;
+    }
+    public static char getCross() {
+        return cross;
+    }
+
+    public static char getSelCornerTopLeft() {
+        return selCornerTopLeft;
+    }
+    public static char getSelCornerTopRight() {
+        return selCornerTopRight;
+    }
+    public static char getSelCornerBottomLeft() {
+        return selCornerBottomLeft;
+    }
+    public static char getSelCornerBottomRight() {
+        return selCornerBottomRight;
+    }
+
+    public static char getSelEdgeTopLeft() {
+        return selEdgeTopLeft;
+    }
+    public static char getSelEdgeTopRight() {
+        return selEdgeTopRight;
+    }
+    public static char getSelEdgeRightTop() {
+        return selEdgeRightTop;
+    }
+    public static char getSelEdgeRightBottom() {
+        return selEdgeRightBottom;
+    }
+    public static char getSelEdgeBottomLeft() {
+        return selEdgeBottomLeft;
+    }
+    public static char getSelEdgeBottomRight() {
+        return selEdgeBottomRight;
+    }
+    public static char getSelEdgeLeftTop() {
+        return selEdgeLeftTop;
+    }
+    public static char getSelEdgeLeftBottom() {
+        return selEdgeLeftBottom;
+    }
+
+    public static char getSelHorizontal() {
+        return selHorizontal;
+    }
+    public static char getSelVertical() {
+        return selVertical;
+    }
+
+    public static char getSelInnerTopLeft() {
+        return selInnerTopLeft;
+    }
+    public static char getSelInnerTopRight() {
+        return selInnerTopRight;
+    }
+    public static char getSelInnerBottomLeft() {
+        return selInnerBottomLeft;
+    }
+    public static char getSelInnerBottomRight() {
+        return selInnerBottomRight;
     }
 }
