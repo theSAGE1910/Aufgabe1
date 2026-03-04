@@ -67,6 +67,7 @@ public final class Output {
         for (Unit unit : team.hand) {
             System.out.print("[" + numbering + "]" + " " + unit.getUnitName() + " ");
             printStat(unit.getAtk(), unit.getDef());
+            System.out.println();
             numbering++;
         }
     }
@@ -74,14 +75,15 @@ public final class Output {
     public static void printDiscard(String team, Unit unit) {
         System.out.print(team + " discarded " + unit.getUnitName() + " ");
         printStat(unit.getAtk(), unit.getDef());
+        System.out.println(".");
     }
 
     public static void printPlacement(String team, Unit unit, String field) {
         System.out.println(team + " places " + unit.getUnitName() + " on " + field.toUpperCase() + ".");
     }
 
-    public static void printStat(int atk, int def) {
-        System.out.println("(" + atk + "/" + def + ")");
+    private static void printStat(int atk, int def) {
+        System.out.print("(" + atk + "/" + def + ")");
     }
 
     public static void printFarmerKing(Unit unit) {

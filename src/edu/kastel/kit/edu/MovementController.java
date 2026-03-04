@@ -108,7 +108,7 @@ public class MovementController {
         } else if (Commands.isKing(targetUnit)){
             targetDisplay = targetUnit.getUnitName();
         } else {
-            targetDisplay = targetUnit.getUnitName() + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")";
+            targetDisplay = targetUnit.getUnitName();   // + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")"
         }
         Output.printAtkMove(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(),
                 targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
@@ -145,10 +145,11 @@ public class MovementController {
         if (mergedUnit != null) {
             GameBoard.setUnitAt(targetRow, targetCol, mergedUnit);
             mergedUnit.setHasMovedThisTurn(true);
+            System.out.println("Success!");
         } else {
             GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
             movingUnit.setHasMovedThisTurn(true);
-            Output.printMergeFail(movingUnit.getUnitName());
+            Output.printMergeFail(targetUnit.getUnitName());
         }
 
         Commands.selectedSquare = argument;

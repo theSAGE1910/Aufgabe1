@@ -71,7 +71,10 @@ public final class GameBoard {
         System.out.print("    ");
 
         for (char ch = 'A'; ch < 'A' + DIMENSION; ch++) {
-            System.out.print(ch + "   ");
+            System.out.print(ch);
+            if (ch < 'A' + DIMENSION - 1) {
+                System.out.print("   ");
+            }
         }
         System.out.println();
     }
