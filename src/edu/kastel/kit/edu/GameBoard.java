@@ -204,7 +204,7 @@ public final class GameBoard {
     //if I have time, make these two methods into one, by passing key row and col hehe:)
 
     public static int getUnitCol(Unit unit) {
-        return getUnitPosition(unit)[0];
+        return getUnitPosition(unit)[1];
     }
 
     private static int[] getUnitPosition(Unit unit) {
