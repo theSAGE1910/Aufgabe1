@@ -167,10 +167,10 @@ public class Commands {
         int boardCount = Output.getBoardCount(GameEngine.activeTeam);
         if (boardCount >= 5) {
             GameBoard.setUnitAt(selectedRow, selectedColumn, null);
+            Output.printElimination(unitToPlace.getUnitName());
         } else {
             GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
         }
-        GameBoard.setUnitAt(selectedRow, selectedColumn, unitToPlace);
         updateDisplay();
     }
 

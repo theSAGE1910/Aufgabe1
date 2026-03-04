@@ -77,7 +77,7 @@ public final class Output {
     }
 
     public static void printPlacement(String team, Unit unit, String field) {
-        System.out.println(team + " places " + unit.getUnitName() + " to " + field.toUpperCase() + ".");
+        System.out.println(team + " places " + unit.getUnitName() + " on " + field.toUpperCase() + ".");
     }
 
     public static void printStat(int atk, int def) {

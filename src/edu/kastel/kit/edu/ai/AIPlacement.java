@@ -35,7 +35,7 @@ public class AIPlacement {
         Unit unitToPlace = selectCardToPlace(hand);
         String coord = AIMovement.getCoordinateString(targetSquare.row, targetSquare.col);
 
-        System.out.println(GameEngine.team2.getName() + " places " + unitToPlace.getUnitName() + " to " + coord + ".");
+        Output.printPlacement(GameEngine.team2.getName(), unitToPlace, coord);
 
         unitToPlace.setTeam(GameEngine.team2);
         unitToPlace.setHasMovedThisTurn(false);
@@ -44,6 +44,7 @@ public class AIPlacement {
         int boardCount = getBoardCount(GameEngine.team2);
         if (boardCount >= 5) {
             GameBoard.setUnitAt(targetSquare.row, targetSquare.col, null);
+            Output.printElimination(unitToPlace.getUnitName());
         } else {
             GameBoard.setUnitAt(targetSquare.row, targetSquare.col, unitToPlace);
         }
