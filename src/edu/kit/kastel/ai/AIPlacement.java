@@ -1,13 +1,32 @@
-package edu.kastel.kit.edu.ai;
+package edu.kit.kastel.ai;
 
-import edu.kastel.kit.edu.*;
-
+import edu.kit.kastel.Commands;
+import edu.kit.kastel.GameBoard;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.Output;
+import edu.kit.kastel.RandomGenerator;
+import edu.kit.kastel.Unit;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.kastel.kit.edu.Output.getBoardCount;
+import static edu.kit.kastel.Output.getBoardCount;
 
-public class AIPlacement {
+/**
+ * Utility class responsible for handling the AI's unit placement logic.
+ * Evaluates valid squares around the AI's Farmer King and selects the optimal
+ * unit from the hand to place based on a weighted random draw of attack values.
+ * @author uxuwg
+ * @version 0.7
+ */
+public final class AIPlacement {
+    private AIPlacement() {
+    }
+
+    /**
+     * Executes the unit placement phase for the AI.
+     * Identifies the best valid target squares around the AI's Farmer King,
+     * selects one, and places a weighted randomly chosen unit from the AI's hand.
+     */
     public static void placeUnit() {
         int[] aiKingPos = GameBoard.getEnemyKingPosition();
         int[] playerKingPos = GameBoard.getPlayerKingPosition();
@@ -27,13 +46,13 @@ public class AIPlacement {
             targetSquare = validTargets.get(draw - 1);
         }
 
-        List<Unit> hand = GameEngine.team2.hand.hand;
+        List<Unit> hand = GameEngine.team2.getHand().getHand();
         if (hand.isEmpty()) {
             return;
         }
 
         Unit unitToPlace = selectCardToPlace(hand);
-        String coord = AIMovement.getCoordinateString(targetSquare.row, targetSquare.col);
+        String coord = AIMovement.getCoordinateString(targetSquare.getRow(), targetSquare.getCol());
 
         Output.printPlacement(GameEngine.team2.getName(), unitToPlace, coord);
 
@@ -43,15 +62,15 @@ public class AIPlacement {
 
         int boardCount = getBoardCount(GameEngine.team2);
         if (boardCount >= 5) {
-            GameBoard.setUnitAt(targetSquare.row, targetSquare.col, null);
+            GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), null);
             Output.printElimination(unitToPlace.getUnitName());
         } else {
-            GameBoard.setUnitAt(targetSquare.row, targetSquare.col, unitToPlace);
+            GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
         }
 
         Commands.selectedSquare = coord;
-        Commands.selectedRow = targetSquare.row;
-        Commands.selectedColumn = targetSquare.col;
+        Commands.selectedRow = targetSquare.getRow();
+        Commands.selectedColumn = targetSquare.getCol();
         Commands.updateDisplay();
     }
 
@@ -71,7 +90,7 @@ public class AIPlacement {
             int runningSum = 0;
             for (int i = 0; i < weights.size(); i++) {
                 runningSum += weights.get(i);
-                if (randomWeight < runningSum) {
+                if (randomWeight <= runningSum) {
                     selectedCardIndex = i;
                     break;
                 }

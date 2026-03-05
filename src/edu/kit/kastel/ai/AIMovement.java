@@ -1,11 +1,31 @@
-package edu.kastel.kit.edu.ai;
+package edu.kit.kastel.ai;
 
-import edu.kastel.kit.edu.*;
-
+import edu.kit.kastel.Commands;
+import edu.kit.kastel.GameBoard;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.MovementController;
+import edu.kit.kastel.Output;
+import edu.kit.kastel.RandomGenerator;
+import edu.kit.kastel.Unit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AIMovement {
+/**
+ * Utility class handling the AI's movement phase.
+ * It is responsible for evaluating the board state to move the AI's Farmer King
+ * and subsequently determining the optimal actions for all other active AI units.
+ * @author uxuwg
+ * @version 0.7
+ */
+public final class AIMovement {
+    private AIMovement() {
+    }
+
+    /**
+     * Executes the movement of the AI's Farmer King.
+     * Evaluates valid adjacent squares based on scoring and moves the King.
+     * If multiple squares share the highest score, one is chosen randomly.
+     */
     public static void moveFarmerKing() {
         int[] enemyKingPos = GameBoard.getEnemyKingPosition();
         if (enemyKingPos == null) {
@@ -28,7 +48,7 @@ public class AIMovement {
 
         if (targetSquare != null) {
             String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
-            String targetCoord = getCoordinateString(targetSquare.row, targetSquare.col);
+            String targetCoord = getCoordinateString(targetSquare.getRow(), targetSquare.getCol());
 
             Commands.selectedSquare = startCoord;
             Commands.selectedRow = enemyKingRow;
@@ -38,6 +58,12 @@ public class AIMovement {
         }
     }
 
+    /**
+     * Executes the action phase for all standard AI units.
+     * Iteratively evaluates all movable AI units, calculates their possible action
+     * scores (Move, Block, or stay En Place), and executes the action for the
+     * unit that holds the highest weight.
+     */
     public static void moveUnits() {
         while (Commands.isRunning) {
             List<Unit> movableUnits = getMovableUnits();
@@ -174,6 +200,12 @@ public class AIMovement {
         return movableUnits;
     }
 
+    /**
+     * Converts a row and column index into a standard board coordinate string.
+     * @param row the row index (0-6)
+     * @param col the column index (0-6)
+     * @return the formatted coordinate string (e.g., "A7", "D4")
+     */
     static String getCoordinateString(int row, int col) {
         char colChar = (char) ('A' + col);
         int rowNum = 7 - row;

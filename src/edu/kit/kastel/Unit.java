@@ -1,31 +1,42 @@
-package edu.kastel.kit.edu;
+package edu.kit.kastel;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Represents a single playable unit (card or board piece) in the game.
+ * Stores the unit's stats, role, and current board state. Contains the logic
+ * for parsing units from files and evaluating the complex math required to merge them.
+ * @author uxuwg
+ * @version 0.9
+ */
 public class Unit {
 
     private static final String REGEX = "^([^;]+);([^;]+);([0-9]+);([0-9]+)$";
-    private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     private static final String ERROR_INCOMPATIBLE = "ERROR: Incompatible to merge!";
+
+    private static final List<Unit> UNIT_LIST = new ArrayList<>();
 
     private final String qualifier;
     private final String role;
     private final int atk;
     private final int def;
     private final int weight;
-    public int row;
-    public int column;
+
     private Team team;
     private boolean isFaceUp;
     private boolean hasMovedThisTurn = false;
     private boolean isBlocking = false;
 
-    public static List<Unit> unitList = new ArrayList<>();
-
+    /**
+     * Constructs a basic unit without an assigned team (used during initial file parsing).
+     * @param qualifier the prefix name of the unit
+     * @param role the suffix name of the unit
+     * @param atk the base attack value
+     * @param def the base defense value
+     */
     public Unit(String qualifier, String role, int atk, int def) {
         this.qualifier = qualifier;
         this.role = role;
@@ -34,6 +45,14 @@ public class Unit {
         this.weight = atk + def;
     }
 
+    /**
+     * Constructs a fully qualified unit assigned to a specific team.
+     * @param qualifier the prefix name of the unit (e.g., "Farmer")
+     * @param role the suffix name of the unit (e.g., "King")
+     * @param atk the base attack value
+     * @param def the base defense value
+     * @param team the team this unit belongs to
+     */
     public Unit(String qualifier, String role, int atk, int def, Team team) {
         this.qualifier = qualifier;
         this.role = role;
@@ -43,29 +62,40 @@ public class Unit {
         this.team = team;
     }
 
-    public void displayUnit(Unit unit) {
-        System.out.print(unit.qualifier + " " + unit.role);
-    }
-
+    /**
+     * Retrieves the global list of all parsed units.
+     * @return the list of available unit templates
+     */
     public static List<Unit> getUnitList() {
-        return unitList;
+        return UNIT_LIST;
     }
 
+    /**
+     * Parses the raw string data from the units file.
+     * @param unitData the list of raw string lines from the configuration file
+     * @return the populated list of unit templates
+     */
     public static List<Unit> extractUnits(List<String> unitData) {
 
         Pattern pattern = Pattern.compile(REGEX);
         for (String unit : unitData) {
             Matcher matcher = pattern.matcher(unit);
             if (matcher.find()) {
-                unitList.add(new Unit(matcher.group(1),
+                getUnitList().add(new Unit(matcher.group(1),
                         matcher.group(2),
                         Integer.parseInt(matcher.group(3)),
                         Integer.parseInt(matcher.group(4)), null));
             }
         }
-        return unitList;
+        return getUnitList();
     }
 
+    /**
+     * Attempts to merge two friendly units based on their stats and compatibility rules.
+     * @param moverUnit the unit moving into the target square
+     * @param targetUnit the stationary unit currently on the target square
+     * @return a newly merged Unit object, or null if the units are incompatible
+     */
     public Unit mergeUnits(Unit moverUnit, Unit targetUnit) {
         int[] mergedAtkDef = compatibilityCheck(moverUnit, targetUnit);
 
@@ -120,17 +150,21 @@ public class Unit {
     }
 
     private int calculateG3t(Unit moverUnit, Unit targetUnit) {
-        BigInteger moverAtk = BigInteger.valueOf(moverUnit.atk);
-        BigInteger targetAtk = BigInteger.valueOf(targetUnit.atk);
-        BigInteger moverDef = BigInteger.valueOf(moverUnit.def);
-        BigInteger targetDef = BigInteger.valueOf(targetUnit.def);
+        int gcdAtk = calculateGcd(moverUnit.atk, targetUnit.atk);
+        int gcdDef = calculateGcd(moverUnit.def, targetUnit.def);
 
-        BigInteger gcdAtk = moverAtk.gcd(targetAtk);
-        BigInteger gcdDef = moverDef.gcd(targetDef);
+        return Math.max(gcdAtk, gcdDef);
+    }
 
-        BigInteger g3t = gcdAtk.max(gcdDef);
-
-        return g3t.intValue();
+    private int calculateGcd(int moverStat, int targetStat) {
+        int int1 = moverStat;
+        int int2 = targetStat;
+        while (int2 != 0) {
+            int remainder = int2;
+            int2 = int1 % int2;
+            int1 = remainder;
+        }
+        return Math.abs(int1);
     }
 
     private boolean checkPrimeCondition(Unit moverUnit, Unit targetUnit) {
@@ -158,11 +192,6 @@ public class Unit {
         }
     }
 
-    public void assignCoordinate(Unit unit, int row, int column) {
-        unit.row = row;
-        unit.column = column;
-    }
-
     @Override
     public String toString() {
         String prefix = this.hasMovedThisTurn() ? " " : "*";
@@ -179,54 +208,106 @@ public class Unit {
         return prefix + symbol + suffix;
     }
 
+    /**
+     * Gets the full combined name of the unit, including both qualifier and role.
+     * @return the full combined name of the unit
+     */
     public String getUnitName() {
         return this.qualifier + " " + this.role;
     }
 
+    /**
+     * Gets the prefix name of the unit, which typically indicates its base type or class.
+     * @return the prefix name of the unit
+     */
     public String getQualifier() {
         return qualifier;
     }
 
+    /**
+     * Gets the suffix name of the unit, which typically indicates its specific role.
+     * @return the suffix name of the unit
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     * Gets the current attack value of the unit.
+     * @return the current attack value
+     */
     public int getAtk() {
         return atk;
     }
 
+    /**
+     * Gets the current defense value of the unit.
+     * @return the current defense value
+     */
     public int getDef() {
         return def;
     }
 
+    /**
+     * Sets the team affiliation of the unit, which determines its ownership and interactions on the board.
+     * @param team the team to assign this unit to
+     */
     public void setTeam(Team team) {
         this.team = team;
     }
 
+    /**
+     * Gets the team affiliation of the unit, which determines its ownership and interactions on the board.
+     * @return the team this unit currently belongs to
+     */
     public Team getTeam() {
         return team;
     }
 
+    /**
+     * Checks whether the unit's stats are currently visible to the opponent.
+     * @return true if the unit's stats are visible to the opponent, false if hidden
+     */
     public boolean isFaceUp() {
         return isFaceUp;
     }
 
+    /**
+     * Sets the visibility state of the unit, determining whether its stats are visible to the opponent.
+     * @param faceUp the new visibility state of the unit
+     */
     public void setFaceUp(boolean faceUp) {
         this.isFaceUp = faceUp;
     }
 
+    /**
+     * Checks whether the unit has already performed its action for the current turn.
+     * @return true if the unit has already acted this turn, false otherwise
+     */
     public boolean hasMovedThisTurn() {
         return hasMovedThisTurn;
     }
 
+    /**
+     * Sets the movement state of the unit.
+     * @param hasMovedThisTurn the new movement state flag for the unit
+     */
     public void setHasMovedThisTurn(boolean hasMovedThisTurn) {
         this.hasMovedThisTurn = hasMovedThisTurn;
     }
 
+    /**
+     * Checks whether the unit is currently in a defensive blocking stance.
+     * @return true if the unit is currently in a defensive blocking stance
+     */
     public boolean isBlocking() {
         return isBlocking;
     }
 
+    /**
+     * Sets the blocking state of the unit.
+     * @param isBlocking the new blocking stance state for the unit
+     */
     public void setBlocking(boolean isBlocking) {
         this.isBlocking = isBlocking;
     }

@@ -1,11 +1,33 @@
-package edu.kastel.kit.edu.ai;
+package edu.kit.kastel.ai;
 
-import edu.kastel.kit.edu.Commands;
-import edu.kastel.kit.edu.GameBoard;
-import edu.kastel.kit.edu.GameEngine;
-import edu.kastel.kit.edu.Unit;
+import edu.kit.kastel.Commands;
+import edu.kit.kastel.GameBoard;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.Unit;
 
-public class AIScoreCalculator {
+/**
+ * Utility class for calculating heuristic scores for various AI unit actions.
+ * The AI uses these scores to evaluate and compare the desirability of different
+ * moves, such as moving to an empty square, attacking, merging, blocking, or
+ * staying in place.
+ * @author uxuwg
+ * @version 0.7
+ */
+public final class AIScoreCalculator {
+    private AIScoreCalculator() {
+    }
+
+    /**
+     * Calculates the heuristic score for moving a unit in a specific direction.
+     * Evaluates the target square to determine if the move results in moving to an
+     * empty space, merging with a friendly unit, or engaging in combat.
+     * @param unit the AI unit evaluating the move
+     * @param row the current row index of the unit
+     * @param col the current column index of the unit
+     * @param rowDir the row direction modifier (e.g., -1 for up, 1 for down)
+     * @param colDir the column direction modifier (e.g., -1 for left, 1 for right)
+     * @return the calculated score for the action, or -9999999 if the target is out of bounds
+     */
     static int getDirectionalScore(Unit unit, int row, int col, int rowDir, int colDir) {
         int targetRow = row + rowDir;
         int targetCol = col + colDir;
@@ -50,14 +72,15 @@ public class AIScoreCalculator {
     }
 
     private static int getCombatScore(Unit unit, Unit target) {
+        int unitAtk = unit.getAtk();
         if (Commands.isKing(unit)) {
-            return unit.getAtk();
+            return unitAtk;
         } else if (!target.isFaceUp()) {
-            return unit.getAtk() - 500;
+            return unitAtk - 500;
         } else if (target.isBlocking()) {
-            return unit.getAtk() - target.getDef();
+            return unitAtk - target.getDef();
         } else {
-            return 2 * (unit.getAtk() - target.getAtk());
+            return 2 * (unitAtk - target.getAtk());
         }
     }
 
@@ -70,24 +93,43 @@ public class AIScoreCalculator {
         }
     }
 
+    /**
+     * Calculates the heuristic score for an AI unit choosing to take the block action.
+     * The score is determined by comparing the unit's defense against the highest
+     * attack value of any enemy unit in its line of sight.
+     * @param unit the AI unit evaluating the block action
+     * @param row the current row index of the unit
+     * @param col the current column index of the unit
+     * @return the calculated score for blocking (minimum of 1)
+     */
     static int getBlockScore(Unit unit, int row, int col) {
-        int maxEnemyAtk = getHighestEnemyAtkInLine(unit, row, col);
+        int maxEnemyAtk = getHighestEnemyAtkInLine(row, col);
         return Math.max(1, (unit.getDef() - maxEnemyAtk) / 100);
     }
 
+    /**
+     * Calculates the heuristic score for an AI unit choosing to stay en place
+     * (not moving or taking any action). Evaluated against the highest enemy attack
+     * in its line of sight.
+     * @param unit the AI unit evaluating the en place action
+     * @param row the current row index of the unit
+     * @param col the current column index of the unit
+     * @return the calculated score for staying en place (minimum of 0)
+     */
     static int getEnPlaceScore(Unit unit, int row, int col) {
-        int maxEnemyAtk = getHighestEnemyAtkInLine(unit, row, col);
+        int maxEnemyAtk = getHighestEnemyAtkInLine(row, col);
         return Math.max(0, (unit.getAtk() - maxEnemyAtk) / 100);
     }
 
-    private static int getHighestEnemyAtkInLine(Unit unit, int row, int col) {
+    private static int getHighestEnemyAtkInLine(int row, int col) {
         int maxAtk = 0;
         int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
         for (int[] dir : dirs) {
             int targetRow = row + dir[0];
             int targetCol = col + dir[1];
-            if (targetRow >= 0 && targetRow < GameBoard.DIMENSION && targetCol >= 0 && targetCol < GameBoard.DIMENSION) {
+            while (targetRow >= 0 && targetRow < GameBoard.DIMENSION && targetCol >= 0 && targetCol < GameBoard.DIMENSION) {
                 Unit target = GameBoard.getUnitAt(targetRow, targetCol);
+
                 if (target != null) {
                     if (target.getTeam().equals(GameEngine.team1)) {
                         if (target.getAtk() > maxAtk) {
@@ -96,6 +138,7 @@ public class AIScoreCalculator {
                     }
                     break;
                 }
+
                 targetRow += dir[0];
                 targetCol += dir[1];
             }

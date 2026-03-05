@@ -1,17 +1,28 @@
-package edu.kastel.kit.edu;
+package edu.kit.kastel;
 
 import java.util.List;
 
+/**
+ * Utility class responsible for bootstrapping and setting up the initial state of the game.
+ * It handles the creation of the board, parsing units, building and shuffling decks,
+ * assigning teams, drawing initial hands, and placing the Farmer Kings.
+ * @author uxuwg
+ * @version 0.9
+ */
 public final class Initialiser {
-    private static Deck deck1;
-    private static Deck deck2;
-
-    private static List<Unit> player1DrawPile;
-    private static List<Unit> player2DrawPile;
+    private static Deck deck1 = null;
+    private static Deck deck2 = null;
+    private static List<Unit> player1DrawPile = null;
+    private static List<Unit> player2DrawPile = null;
 
     private Initialiser() {
     }
 
+    /**
+     * Executes the complete initialization sequence for the game.
+     * Sets the RNG seed, prepares the board, loads configurations, builds teams,
+     * and prepares the first turn.
+     */
     public static void initialise() {
         RandomGenerator.initialise(GameData.seed);
         initialiseGameBoard();
@@ -60,8 +71,8 @@ public final class Initialiser {
     }
 
     private static void initialiseHands(Team team) {
-        for (int i = 0; i < 5; i++) {
-            team.hand.handLoader(team.shuffledDeck);
+        for (int i = 0; i < Hand.MAX_HAND_SIZE; i++) {
+            team.getHand().handLoader(team.getShuffledDeck());
         }
     }
 
@@ -69,7 +80,7 @@ public final class Initialiser {
         Unit team1King = new Unit("Farmer", "King", 0, 0, GameEngine.team1);
         Unit team2King = new Unit("Farmer", "King", 0, 0, GameEngine.team2);
 
-        GameBoard.GAME_BOARD[6][3] = team1King;
-        GameBoard.GAME_BOARD[0][3] = team2King;
+        GameBoard.setUnitAt(GameBoard.DIMENSION - 1, GameBoard.DIMENSION / 2, team1King);
+        GameBoard.setUnitAt(0, GameBoard.DIMENSION / 2, team2King);
     }
 }

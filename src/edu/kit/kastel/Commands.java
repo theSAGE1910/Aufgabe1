@@ -1,17 +1,38 @@
-package edu.kastel.kit.edu;
+package edu.kit.kastel;
 
-import edu.kastel.kit.edu.ai.GameLogicAI;
+import edu.kit.kastel.ai.GameLogicAI;
 
-public class Commands {
-    public static final String REGEX_SPACE = " ";
+/**
+ * Handles the parsing and execution of all user input commands.
+ * This class acts as the central controller for the game, routing commands
+ * to their respective logic methods and updating the game state.
+ * @author uxuwg
+ * @version 0.9
+ */
+public final class Commands {
+
+    /** Flag indicating whether the main game loop is currently running. */
     public static boolean isRunning = true;
-    static String currentSquare;
-    public static String selectedSquare = null;
-    static int row;
-    static int column;
-    public static int selectedRow;
-    public static int selectedColumn;
 
+    /** The coordinate string of the currently selected square. */
+    public static String selectedSquare = null;
+
+    /** The row index of the currently selected square. */
+    public static int selectedRow = 0;
+
+    /** The column index of the currently selected square. */
+    public static int selectedColumn = 0;
+
+    private static String currentSquare = null;
+    private static final String REGEX_SPACE = " ";
+
+    private Commands() {
+    }
+
+    /**
+     * Parses the user input and delegates it to the appropriate command handler.
+     * @param input the raw string input from the user
+     */
     public static void processCommands(String input) {
         String key = input.toUpperCase();
         String argument = null;
@@ -27,7 +48,10 @@ public class Commands {
                 handleSelect(argument);
                 break;
             case "board":
-                handleBoard();
+                if (currentSquare != null && currentSquare.length() == 2) {
+                    GameBoard.showGameBoard(currentSquare.charAt(0),
+                            Character.getNumericValue(currentSquare.charAt(1)));
+                }
                 break;
             case "move":
                 MovementController.handleMove(argument);
@@ -39,7 +63,7 @@ public class Commands {
                 handleBlock();
                 break;
             case "hand":
-                handleHand();
+                Output.printHand(GameEngine.activeTeam.getHand());
                 break;
             case "place":
                 handlePlace(argument);
@@ -51,7 +75,8 @@ public class Commands {
                 handleYield(argument);
                 break;
             case "state":
-                handleState();
+                Output.printState(GameEngine.team1, GameEngine.team2);
+                updateDisplay();
                 break;
             case "quit":
                 isRunning = false;
@@ -72,13 +97,6 @@ public class Commands {
             updateDisplay();
         } else {
             System.err.println("ERROR: Invalid square selected.");
-        }
-    }
-
-    private static void handleBoard() {
-        if (currentSquare != null && currentSquare.length() == 2) {
-            GameBoard.showGameBoard(currentSquare.charAt(0),
-                    Character.getNumericValue(currentSquare.charAt(1)));
         }
     }
 
@@ -126,10 +144,6 @@ public class Commands {
         updateDisplay();
     }
 
-    private static void handleHand() {
-        Output.printHand(GameEngine.activeTeam.hand);
-    }
-
     private static void handlePlace(String argument) {
         if (selectedSquare == null) {
             System.err.println("ERROR: No square selected.");
@@ -141,7 +155,9 @@ public class Commands {
             return;
         }
 
-        int[] kingPosition = getActiveKingPosition();
+        int[] kingPosition = GameEngine.activeTeam.equals(GameEngine.team1)
+                ? GameBoard.getPlayerKingPosition()
+                : GameBoard.getEnemyKingPosition();
         if (kingPosition != null) {
             int rowDiff = Math.abs(selectedRow - kingPosition[0]);
             int colDiff = Math.abs(selectedColumn - kingPosition[1]);
@@ -151,13 +167,13 @@ public class Commands {
             }
         }
 
-        Hand currentHand = GameEngine.activeTeam.hand;
+        Hand currentHand = GameEngine.activeTeam.getHand();
         int handIndex = parseHandIndex(argument, currentHand);
         if (handIndex == -1) {
             return;
         }
 
-        Unit unitToPlace = currentHand.hand.get(handIndex);
+        Unit unitToPlace = currentHand.getHand().get(handIndex);
         Output.printPlacement(GameEngine.activeTeam.getName(), unitToPlace, selectedSquare);
 
         unitToPlace.setTeam(GameEngine.activeTeam);
@@ -196,11 +212,11 @@ public class Commands {
     }
 
     private static void handleYield(String argument) {
-        Hand currentHand = GameEngine.activeTeam.hand;
+        Hand currentHand = GameEngine.activeTeam.getHand();
 
-        if (currentHand.hand.size() == 5 && argument == null) {
+        if (currentHand.getHand().size() == 5 && argument == null) {
             System.err.println("ERROR: Hand is full. You must specify a card to discard.");
-        } else if (currentHand.hand.size() < 5 && argument != null) {
+        } else if (currentHand.getHand().size() < 5 && argument != null) {
             System.err.println("ERROR: Hand is not full. You cannot discard a card.");
         }
 
@@ -211,7 +227,7 @@ public class Commands {
                 return;
             }
 
-            Unit unitToDiscard = currentHand.hand.get(discardIndex);
+            Unit unitToDiscard = currentHand.getHand().get(discardIndex);
             currentHand.removeUnitFromHand(unitToDiscard);
             Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
         }
@@ -248,16 +264,18 @@ public class Commands {
         updateDisplay();
     }
 
-    private static void handleState() {
-        Output.printState(GameEngine.team1, GameEngine.team2);
-        updateDisplay();
-    }
-
+    /**
+     * Updates the terminal display by implicitly calling the board and show commands.
+     */
     public static void updateDisplay() {
         processCommands("board");
         processCommands("show");
     }
 
+    /**
+     * Validates that a square is selected, holds a unit, and the unit hasn't moved yet.
+     * @return the valid Unit, or null if validation fails
+     */
     public static Unit getValidatedActiveUnit() {
         if (selectedSquare == null) {
             System.err.println("ERROR: No square selected.");
@@ -286,7 +304,7 @@ public class Commands {
 
         try {
             int index = Integer.parseInt(argument);
-            if (index < 1 || index > currentHand.hand.size()) {
+            if (index < 1 || index > currentHand.getHand().size()) {
                 System.err.println("ERROR: Invalid card index.");
                 return -1;
             }
@@ -297,10 +315,20 @@ public class Commands {
         }
     }
 
+    /**
+     * Checks if a specified unit is the Farmer King.
+     * @param unitToShow the unit to evaluate
+     * @return true if the unit is the Farmer King, false otherwise
+     */
     public static boolean isKing(Unit unitToShow) {
         return unitToShow.getQualifier().equals("Farmer") && unitToShow.getRole().equals("King");
     }
 
+    /**
+     * Converts an alphanumeric coordinate string into board array indices.
+     * @param coordinate the coordinate string
+     * @return an integer array containing the row at index 0 and column at index 1
+     */
     public static int[] getCoordinates(String coordinate) {
         int[] coords = new int[2];
 
@@ -308,18 +336,6 @@ public class Commands {
         coords[1] = Character.getNumericValue(coordinate.toUpperCase().charAt(0)) - 10;
 
         return coords;
-    }
-
-    private static int[] getActiveKingPosition() {
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
-                Unit boardUnit = GameBoard.getUnitAt(row, col);
-                if (boardUnit != null && boardUnit.getTeam().equals(GameEngine.activeTeam)) {
-                    return new int[] {row, col};
-                }
-            }
-        }
-        return null;
     }
 
     private static void resetTeamMovement(Team team) {
@@ -334,7 +350,7 @@ public class Commands {
     }
 
     private static boolean tryDrawCard(Team team) {
-        boolean success = team.hand.handLoader(team.shuffledDeck);
+        boolean success = team.getHand().handLoader(team.getShuffledDeck());
         if (!success) {
             System.err.println("ERROR: " + team.getName() + " has no more cards left in the deck!");
             Team winner = team.equals(GameEngine.team1) ? GameEngine.team2 : GameEngine.team1;
@@ -343,5 +359,4 @@ public class Commands {
         }
         return success;
     }
-
 }

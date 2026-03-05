@@ -1,8 +1,23 @@
-package edu.kastel.kit.edu;
+package edu.kit.kastel;
 
+/**
+ * Handles all movement and combat interactions for units on the game board.
+ * This class validates move commands, manages empty square movement, executes
+ * friendly unit merges, and resolves combat when moving onto an enemy unit.
+ * @author uxuwg
+ * @version 0.9
+ */
+public final class MovementController {
 
-public class MovementController {
+    private MovementController() {
+    }
 
+    /**
+     * The main entry point for a movement command.
+     * Validates the input, the active unit, and the target distance before
+     * delegating to the appropriate execution logic.
+     * @param argument the target square coordinate.
+     */
     public static void handleMove(String argument) {
         if (!isArgumentValid(argument)) {
             return;
@@ -105,13 +120,13 @@ public class MovementController {
         String targetDisplay;
         if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.activeTeam)) {
             targetDisplay = "???";
-        } else if (Commands.isKing(targetUnit)){
+        } else if (Commands.isKing(targetUnit)) {
             targetDisplay = targetUnit.getUnitName();
         } else {
-            targetDisplay = targetUnit.getUnitName();   // + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")"
+            targetDisplay = targetUnit.getUnitName();
         }
         Output.printAtkMove(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(),
-                targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
+                targetDisplay, argument);
 
         revealCombatUnits(argument, movingUnit, targetUnit);
 
@@ -128,7 +143,7 @@ public class MovementController {
         }
 
         movingUnit.setHasMovedThisTurn(true);
-        checkHpStatus();
+        hpStatusCheck();
 
         if (Commands.isRunning) {
             Commands.updateDisplay();
@@ -208,6 +223,7 @@ public class MovementController {
         } else if (movingUnit.getAtk() < targetUnit.getAtk()) {
             int damage = targetUnit.getAtk() - movingUnit.getAtk();
             movingUnit.getTeam().takeDamage(damage);
+            GameBoard.setUnitAt(Commands.selectedRow, Commands.selectedColumn, null);
             Output.printElimination(movingUnit.getUnitName());
             Output.printDamage(movingUnit.getTeam().getName(), damage);
             return false;
@@ -220,7 +236,7 @@ public class MovementController {
         }
     }
 
-    private static void checkHpStatus() {
+    private static void hpStatusCheck() {
         if (GameEngine.team1.getTeamHP() <= 0) {
             Output.printZeroPoints(GameEngine.team1.getName());
             Output.printWin(GameEngine.team2.getName());

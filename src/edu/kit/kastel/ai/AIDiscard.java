@@ -1,16 +1,32 @@
-package edu.kastel.kit.edu.ai;
+package edu.kit.kastel.ai;
 
-import edu.kastel.kit.edu.GameEngine;
-import edu.kastel.kit.edu.Output;
-import edu.kastel.kit.edu.RandomGenerator;
-import edu.kastel.kit.edu.Unit;
-
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.Output;
+import edu.kit.kastel.RandomGenerator;
+import edu.kit.kastel.Unit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AIDiscard {
+/**
+ * Utility class responsible for handling the AI's card discard phase.
+ * Evaluates the AI's hand at the end of its turn and discards a card if the hand is full,
+ * using an inverted weighted random selection that favors discarding weaker units.
+ * @author uxuwg
+ * @version 0.7
+ */
+public final class AIDiscard {
+    private AIDiscard() {
+    }
+
+    /**
+     * Executes the discard logic for the AI team.
+     * If the AI has exactly 5 cards in hand, it calculates an inverted weight for each card
+     * (Max Weight in hand - Card Weight, where Weight = ATK + DEF).
+     * A card is then selected randomly based on these inverted weights.
+     * If all cards have the exact same weight, the first card in the hand is discarded.
+     */
     public static void discardCard() {
-        List<Unit> hand = GameEngine.team2.hand.hand;
+        List<Unit> hand = GameEngine.team2.getHand().getHand();
         if (hand.size() < 5) {
             return;
         }
