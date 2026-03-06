@@ -3,6 +3,7 @@ package edu.kit.kastel;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,18 @@ public final class GameData {
             if (keyValue.length == 2) {
                 argInfo.put(keyValue[0], keyValue[1]);
             }
+//            else {
+//                System.err.println("ERROR: Invalid argument format: " + arg);
+//                return false;
+//            }
+        }
+
+        List<String> validKeys = Arrays.asList("seed", "team1", "team2", "verbosity", "board", "units", "deck", "deck1", "deck2");
+        for (String key : argInfo.keySet()) {
+            if (!validKeys.contains(key)) {
+                System.err.println("ERROR: Unknown parameter provided: " + key);
+                return false;
+            }
         }
 
         if (!containsMandatoryKeys(argInfo)) {
@@ -101,8 +114,7 @@ public final class GameData {
             return false;
         }
 
-        String[] orderedKeys = {"seed", "team1", "team2", "verbosity", "board", "units", "deck", "deck1", "deck2"};
-        for (String key : orderedKeys) {
+        for (String key : validKeys) {
             if (argInfo.containsKey(key)) {
                 if (!parseKeyValue(key)) {
                     return false;
@@ -118,11 +130,9 @@ public final class GameData {
                 seed = Integer.parseInt(argInfo.get(key));
                 break;
             case "board":
-                boardData = extractBoardKeySet(argInfo.get(key));
-                if (boardData == null) {
+                if (handleBoardData(key)) {
                     return false;
                 }
-                System.out.println(boardData);
                 break;
             case "units":
                 unitData = extractFilePath(argInfo.get(key));
@@ -161,11 +171,28 @@ public final class GameData {
                 break;
             case "verbosity":
                 verbosity = argInfo.get(key);
+                if (!verbosity.equals("all") && !verbosity.equals("compact")) {
+                    System.err.println("ERROR: Invalid verbosity! Valid options are 'all' or 'compact'.");
+                    return false;
+                }
                 break;
             default:
-                System.err.println("Repeat");
+                break;
         }
         return true;
+    }
+
+    private static boolean handleBoardData(String key) {
+        boardData = extractBoardKeySet(argInfo.get(key));
+        if (boardData == null) {
+            return true;
+        }
+        System.out.println(boardData);
+        if (boardData.length() != 29) {
+            System.err.println("ERROR: Board key set must be exactly 29 characters long.");
+            return true;
+        }
+        return false;
     }
 
     private static boolean printData(List<String> data) {
@@ -179,13 +206,18 @@ public final class GameData {
     }
 
     private static String extractBoardKeySet(String filePath) {
-        String keySet = null;
+
         try {
-            keySet = Files.readString(Path.of(filePath));
+            List<String> lines = Files.readAllLines(Path.of(filePath));
+            if (lines.isEmpty()) {
+                System.err.println("ERROR: Board file is empty.");
+                return null;
+            }
+            return lines.getFirst();
         } catch (IOException e) {
             System.err.println(ERROR_IO_EXCEPTION);
+            return null;
         }
-        return keySet;
     }
 
     private static List<String> extractFilePath(String filePath) {
