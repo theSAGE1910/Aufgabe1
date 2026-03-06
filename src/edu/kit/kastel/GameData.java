@@ -93,12 +93,15 @@ public final class GameData {
         for (String arg : args) {
             String[] keyValue = arg.split(REGEX_EQUALS);
             if (keyValue.length == 2) {
+                if (argInfo.containsKey(keyValue[0])) {
+                    System.err.println("ERROR: Duplicate argument provided.");
+                    return false;
+                }
                 argInfo.put(keyValue[0], keyValue[1]);
+            } else {
+                System.err.println("ERROR: Invalid argument format: " + arg);
+                return false;
             }
-//            else {
-//                System.err.println("ERROR: Invalid argument format: " + arg);
-//                return false;
-//            }
         }
 
         List<String> validKeys = Arrays.asList("seed", "team1", "team2", "verbosity", "board", "units", "deck", "deck1", "deck2");
@@ -114,7 +117,8 @@ public final class GameData {
             return false;
         }
 
-        for (String key : validKeys) {
+        String[] orderedKeys = {"seed", "board", "units", "deck", "deck1", "deck2", "team1", "team2", "verbosity"};
+        for (String key : orderedKeys) {
             if (argInfo.containsKey(key)) {
                 if (!parseKeyValue(key)) {
                     return false;
@@ -136,20 +140,17 @@ public final class GameData {
                 break;
             case "units":
                 unitData = extractFilePath(argInfo.get(key));
-                if (printData(unitData)) {
+                if (handleUnitData()) {
                     return false;
                 }
                 break;
             case "deck":
                 List<String> deckData = extractFilePath(argInfo.get(key));
-                if (deckData == null) {
+                if (printData(deckData)) {
                     return false;
                 }
                 deck1Data = deckData;
                 deck2Data = deckData;
-                for (String line : deckData) {
-                    System.out.println(line);
-                }
                 break;
             case "deck1":
                 deck1Data = extractFilePath(argInfo.get(key));
@@ -165,9 +166,15 @@ public final class GameData {
                 break;
             case "team1":
                 team1Name = argInfo.get(key);
+                if (checkTeamNameLength(team1Name)) {
+                    return false;
+                }
                 break;
             case "team2":
                 team2Name = argInfo.get(key);
+                if (checkTeamNameLength(team2Name)) {
+                    return false;
+                }
                 break;
             case "verbosity":
                 verbosity = argInfo.get(key);
@@ -180,6 +187,28 @@ public final class GameData {
                 break;
         }
         return true;
+    }
+
+    private static boolean handleUnitData() {
+        if (printData(unitData)) {
+            return true;
+        }
+        if (unitData == null) {
+            System.err.println("ERROR: Empty unit file provided.");
+            return true;
+        } else if (unitData.size() > 80) {
+            System.err.println("ERROR: Too many units defined! A maximum of 40 unit types is allowed.");
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean checkTeamNameLength(String teamName) {
+        if (teamName.length() > 15) {
+            System.err.println("ERROR: Team names must be at most 14 characters long.");
+            return true;
+        }
+        return false;
     }
 
     private static boolean handleBoardData(String key) {
