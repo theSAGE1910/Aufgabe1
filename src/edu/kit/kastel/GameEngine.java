@@ -35,17 +35,9 @@ public final class GameEngine {
      */
     public static void run(String[] args) {
         if (GameData.extractArgumentInfo(args)) {
-            Initialiser.initialise();
-
-            for (String unitLine : GameData.unitData) {
-                System.out.println(unitLine);
+            if (Initialiser.initialise()) {
+                GameUI.getInput();
             }
-
-            for (String deckLine : GameData.deck1Data) {
-                System.out.println(deckLine);
-            }
-
-            GameUI.getInput();
         }
     }
 

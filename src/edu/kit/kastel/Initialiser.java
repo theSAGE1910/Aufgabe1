@@ -22,13 +22,18 @@ public final class Initialiser {
      * Executes the complete initialization sequence for the game.
      * Sets the RNG seed, prepares the board, loads configurations, builds teams,
      * and prepares the first turn.
+     * @return true if initialization was successful, false if there were errors in loading decks or configurations
      */
-    public static void initialise() {
+    public static boolean initialise() {
         RandomGenerator.initialise(GameData.seed);
         initialiseGameBoard();
         BoardTheme.initialiseTheme();
         initialiseUnits();
-        initialiseDecks();
+
+        if (!initialiseDecks()) {
+            return false;
+        }
+
         initialiseTeams();
         initialiseHands(GameEngine.team1);
         initialiseHands(GameEngine.team2);
@@ -36,6 +41,7 @@ public final class Initialiser {
         GameEngine.activeTeam = GameEngine.team1;
 
         initialiseKings();
+        return true;
     }
 
     private static void initialiseGameBoard() {
@@ -50,19 +56,30 @@ public final class Initialiser {
         Unit.extractUnits(GameData.unitData);
     }
 
-    private static void initialiseDecks() {
+    private static boolean initialiseDecks() {
         deck1 = new Deck();
         deck2 = new Deck();
-        deck1.extractDeckSize(GameData.deck1Data);
-        deck2.extractDeckSize(GameData.deck2Data);
-        deck1.assignDeck();
-        deck2.assignDeck();
+
+        if (!deck1.extractDeckSize(GameData.deck1Data)) {
+            return false;
+        }
+        if (!deck2.extractDeckSize(GameData.deck2Data)) {
+            return false;
+        }
+        if (!deck1.assignDeck()) {
+            return false;
+        }
+        if (!deck2.assignDeck()) {
+            return false;
+        }
 
         player1DrawPile = deck1.generatePlayableDeck();
         player2DrawPile = deck2.generatePlayableDeck();
 
         RandomGenerator.shuffleDeck(player1DrawPile);
         RandomGenerator.shuffleDeck(player2DrawPile);
+
+        return true;
     }
 
     private static void initialiseTeams() {

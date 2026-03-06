@@ -198,7 +198,7 @@ public final class Output {
         printStateLine(team1.getTeamHP() + "/" + Team.INITIAL_HP + " LP",
                 team2.getTeamHP() + "/" + Team.INITIAL_HP + " LP");
         printStateLine("DC: " + team1.getShuffledDeck().size() + "/" + team1.getInitialDeckSize(),
-                team2.getShuffledDeck().size() + "/" + team2.getInitialDeckSize());
+                "DC: " + team2.getShuffledDeck().size() + "/" + team2.getInitialDeckSize());
         printStateLine("BC: " + getBoardCount(team1) + "/5",
                 "BC: " + getBoardCount(team2) + "/5");
     }

@@ -38,7 +38,18 @@ public final class AIScoreCalculator {
 
         Unit target = GameBoard.getUnitAt(targetRow, targetCol);
 
-        if (target == null) {
+        if (target != null) {
+            boolean isMoverKing = Commands.isKing(unit);
+            boolean isTargetKing = Commands.isKing(target);
+            boolean isSameTeam = unit.getTeam().equals(target.getTeam());
+
+            if (isMoverKing && !isSameTeam) {
+                return -9999999;
+            }
+            if (!isMoverKing && isTargetKing && isSameTeam) {
+                return -9999999;
+            }
+        } else {
             return getEmptySquareScore(unit, targetRow, targetCol);
         }
 

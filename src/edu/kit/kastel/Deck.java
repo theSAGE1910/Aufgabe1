@@ -31,37 +31,52 @@ public class Deck {
     /**
      * Parses the raw string lines from the deck configuration file into an array of integers.
      * @param deckData the list of string lines read directly from the deck file
+     * @return true if parsing was successful, false if there was a numeric format error
      */
-    public void extractDeckSize(List<String> deckData) {
+    public boolean extractDeckSize(List<String> deckData) {
         this.allUnitCount = new int[deckData.size()];
         int size = 0;
+        int sum = 0;
         try {
             for (String line : deckData) {
-                this.allUnitCount[size] = Integer.parseInt(line.trim());
+                int count = Integer.parseInt(line.trim());
+                this.allUnitCount[size] = count;
+                sum += count;
                 size++;
             }
         } catch (NumberFormatException e) {
             System.err.println(ERROR_NUMERIC_EXCEPTION);
+            return false;
         }
+
+        if (sum != 40) {
+            System.err.println("ERROR: Deck must contain exactly 40 cards.");
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Maps the extracted unit counts to the globally loaded unit types.
      * Validates that the number of counts matches the number of defined units
      * before assigning them to the deck map.
+     * @return true if the assignment was successful, false if there was a mismatch or if sizes were not extracted
      */
-    public void assignDeck() {
+    public boolean assignDeck() {
         if (this.allUnitCount == null) {
             System.err.println("ERROR: You must extract deck sizes before assigning.");
-            return;
+            return false;
         }
 
         if (Unit.getUnitList().size() == this.allUnitCount.length) {
             for (int i = 0; i < Unit.getUnitList().size(); i++) {
                 this.deckInfo.put(Unit.getUnitList().get(i), this.allUnitCount[i]);
             }
+            return true;
         } else {
             System.err.println("ERROR: The number of units and deck counts do not match.");
+            return false;
         }
     }
 

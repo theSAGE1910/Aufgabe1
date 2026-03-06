@@ -123,7 +123,7 @@ public final class MovementController {
         } else if (Commands.isKing(targetUnit)) {
             targetDisplay = targetUnit.getUnitName();
         } else {
-            targetDisplay = targetUnit.getUnitName();
+            targetDisplay = targetUnit.getUnitName() + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")";
         }
         Output.printAtkMove(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(),
                 targetDisplay, argument);

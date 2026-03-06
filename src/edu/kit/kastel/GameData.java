@@ -101,32 +101,57 @@ public final class GameData {
             return false;
         }
 
-        for (String key : argInfo.keySet()) {
-            parseKeyValue(key);
+        String[] orderedKeys = {"seed", "team1", "team2", "verbosity", "board", "units", "deck", "deck1", "deck2"};
+        for (String key : orderedKeys) {
+            if (argInfo.containsKey(key)) {
+                if (!parseKeyValue(key)) {
+                    return false;
+                }
+            }
         }
         return true;
     }
 
-    private static void parseKeyValue(String key) {
+    private static boolean parseKeyValue(String key) {
         switch (key) {
             case "seed":
                 seed = Integer.parseInt(argInfo.get(key));
                 break;
             case "board":
                 boardData = extractBoardKeySet(argInfo.get(key));
+                if (boardData == null) {
+                    return false;
+                }
+                System.out.println(boardData);
                 break;
             case "units":
                 unitData = extractFilePath(argInfo.get(key));
+                if (printData(unitData)) {
+                    return false;
+                }
                 break;
             case "deck":
-                deck1Data = extractFilePath(argInfo.get(key));
-                deck2Data = extractFilePath(argInfo.get(key));
+                List<String> deckData = extractFilePath(argInfo.get(key));
+                if (deckData == null) {
+                    return false;
+                }
+                deck1Data = deckData;
+                deck2Data = deckData;
+                for (String line : deckData) {
+                    System.out.println(line);
+                }
                 break;
             case "deck1":
                 deck1Data = extractFilePath(argInfo.get(key));
+                if (printData(deck1Data)) {
+                    return false;
+                }
                 break;
             case "deck2":
                 deck2Data = extractFilePath(argInfo.get(key));
+                if (printData(deck2Data)) {
+                    return false;
+                }
                 break;
             case "team1":
                 team1Name = argInfo.get(key);
@@ -140,6 +165,17 @@ public final class GameData {
             default:
                 System.err.println("Repeat");
         }
+        return true;
+    }
+
+    private static boolean printData(List<String> data) {
+        if (data == null) {
+            return true;
+        }
+        for (String line : data) {
+            System.out.println(line);
+        }
+        return false;
     }
 
     private static String extractBoardKeySet(String filePath) {

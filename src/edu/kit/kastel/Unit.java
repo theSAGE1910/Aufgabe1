@@ -194,10 +194,11 @@ public class Unit {
 
     @Override
     public String toString() {
-        String prefix = this.hasMovedThisTurn() ? " " : "*";
+        boolean isActiveTeam = this.getTeam() != null && this.getTeam().equals(GameEngine.activeTeam);
+        String prefix = (isActiveTeam && !this.hasMovedThisTurn()) ? "*" : " ";
 
         char symbol;
-        if (this.getTeam().equals(GameEngine.team1)) {
+        if (this.getTeam() != null && this.getTeam().equals(GameEngine.team1)) {
             symbol = this.getRole().equals("King") ? 'X' : 'x';
         } else {
             symbol = this.getRole().equals("King") ? 'Y' : 'y';

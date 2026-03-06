@@ -23,7 +23,6 @@ public final class Commands {
     /** The column index of the currently selected square. */
     public static int selectedColumn = 0;
 
-    private static String currentSquare = null;
     private static final String REGEX_SPACE = " ";
 
     private Commands() {
@@ -48,9 +47,9 @@ public final class Commands {
                 handleSelect(argument);
                 break;
             case "board":
-                if (currentSquare != null && currentSquare.length() == 2) {
-                    GameBoard.showGameBoard(currentSquare.charAt(0),
-                            Character.getNumericValue(currentSquare.charAt(1)));
+                if (selectedSquare != null && selectedSquare.length() == 2) {
+                    GameBoard.showGameBoard(selectedSquare.charAt(0),
+                            Character.getNumericValue(selectedSquare.charAt(1)));
                 }
                 break;
             case "move":
@@ -90,7 +89,6 @@ public final class Commands {
     private static void handleSelect(String argument) {
         if (argument != null && argument.length() == 2) {
             selectedSquare = argument;
-            currentSquare = argument;
 
             selectedRow = getCoordinates(argument)[0];
             selectedColumn = getCoordinates(argument)[1];
@@ -191,7 +189,7 @@ public final class Commands {
     }
 
     private static void handleShow() {
-        if (currentSquare == null) {
+        if (selectedSquare == null) {
             System.out.println("ERROR: No square selected.");
             return;
         }
@@ -260,8 +258,6 @@ public final class Commands {
                 return;
             }
         }
-
-        updateDisplay();
     }
 
     /**
