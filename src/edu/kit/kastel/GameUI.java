@@ -11,9 +11,6 @@ import java.util.Scanner;
  */
 public final class GameUI {
 
-    private static final String HELPING_TEXT
-            = "Use one of the following commands: select, board, move, flip, block, hand, place, show, yield, state, quit.";
-
     private GameUI() {
     }
 
@@ -24,12 +21,13 @@ public final class GameUI {
      */
     public static void getInput() {
         String input;
-        System.out.println(HELPING_TEXT);
-
         try (Scanner scanner = new Scanner(System.in)) {
             while (Commands.isRunning) {
-                //System.out.print("> ");
                 input = scanner.nextLine();
+                if (input == null || input.trim().isEmpty()) {
+                    continue;
+                }
+
                 Commands.processCommands(input);
             }
         }

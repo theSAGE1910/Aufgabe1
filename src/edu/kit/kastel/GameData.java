@@ -76,6 +76,7 @@ public final class GameData {
      */
     public static String team2Name = "Enemy";
 
+    private static final String UNIT_DATA_REGEX = "^([^;]+);([^;]+);([0-9]+);([0-9]+)$";
     private static final String REGEX_EQUALS = "=";
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     private static Map<String, String> argInfo = null;
@@ -190,16 +191,30 @@ public final class GameData {
     }
 
     private static boolean handleUnitData() {
-        if (printData(unitData)) {
+
+        if (unitData == null) {
             return true;
         }
-        if (unitData == null) {
-            System.err.println("ERROR: Empty unit file provided.");
+
+        if (unitData.isEmpty()) {
+            System.err.println("ERROR: Unit file is empty.");
             return true;
+        }
+
+        if (printData(unitData)) {
+            return false;
         } else if (unitData.size() > 80) {
             System.err.println("ERROR: Too many units defined! A maximum of 40 unit types is allowed.");
             return true;
         }
+
+        for (String line : unitData) {
+            if (!line.matches(UNIT_DATA_REGEX)) {
+                System.err.println("ERROR: Invalid unit format detected.");
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -250,11 +265,12 @@ public final class GameData {
     }
 
     private static List<String> extractFilePath(String filePath) {
-        List<String> lines = null;
+        List<String> lines;
         try {
             lines = Files.readAllLines(Path.of(filePath));
         } catch (IOException e) {
             System.err.println(ERROR_IO_EXCEPTION);
+            return null;
         }
         return lines;
     }

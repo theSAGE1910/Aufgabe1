@@ -23,6 +23,10 @@ public final class GameEngine {
      */
     public static Team activeTeam;
 
+    private static final String HELPING_TEXT
+            = "Use one of the following commands: select, board, move, flip, block, hand, place, show, yield, state, quit.";
+
+
     private GameEngine() {
     }
 
@@ -36,6 +40,7 @@ public final class GameEngine {
     public static void run(String[] args) {
         if (GameData.extractArgumentInfo(args)) {
             if (Initialiser.initialise()) {
+                System.out.println(HELPING_TEXT);
                 GameUI.getInput();
             }
         }
