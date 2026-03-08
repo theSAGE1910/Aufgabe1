@@ -44,8 +44,8 @@ public final class AIPlacement {
 
         TargetSquare targetSquare = validTargets.get(0);
         if (validTargets.size() > 1) {
-            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
-            targetSquare = validTargets.get(draw - 1);
+            int draw = RandomGenerator.randomIntegerPick(0, validTargets.size() - 1);
+            targetSquare = validTargets.get(draw);
         }
 
         List<Unit> hand = GameEngine.team2.getHand().getHand();
@@ -88,7 +88,7 @@ public final class AIPlacement {
 
         int selectedCardIndex = 0;
         if (totalWeight > 0) {
-            int randomWeight = RandomGenerator.randomIntegerPick(1, totalWeight + 1);
+            int randomWeight = RandomGenerator.randomIntegerPick(0, totalWeight - 1);
             int runningSum = 0;
             for (int i = 0; i < weights.size(); i++) {
                 runningSum += weights.get(i);

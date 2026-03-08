@@ -141,16 +141,16 @@ public final class GameBoard {
 
     private static char getInnerChar(boolean isTopLeft, boolean isTopRight, boolean isBottomLeft, boolean isBottomRight) {
         if (isTopLeft) {
-            return BoardTheme.get(BoardTheme.SEL_INNER_TOP_LEFT);
+            return BoardTheme.get(BoardTheme.SEL_CORNER_BOTTOM_RIGHT);
         }
         if (isTopRight) {
-            return BoardTheme.get(BoardTheme.SEL_INNER_TOP_RIGHT);
-        }
-        if (isBottomLeft) {
             return BoardTheme.get(BoardTheme.SEL_INNER_BOTTOM_LEFT);
         }
+        if (isBottomLeft) {
+            return BoardTheme.get(BoardTheme.SEL_INNER_TOP_RIGHT);
+        }
         if (isBottomRight) {
-            return BoardTheme.get(BoardTheme.SEL_INNER_BOTTOM_RIGHT);
+            return BoardTheme.get(BoardTheme.SEL_INNER_TOP_LEFT);
         }
 
         return BoardTheme.get(BoardTheme.CROSS);

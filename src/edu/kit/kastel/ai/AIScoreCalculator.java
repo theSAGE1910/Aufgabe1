@@ -66,15 +66,20 @@ public final class AIScoreCalculator {
         }
         int steps = Math.abs(targetRow - playerKing[0]) + Math.abs(targetCol - playerKing[1]);
         int enemies = 0;
-        int[][] ortho = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-        for (int[] dir : ortho) {
-            int adjRow = targetRow + dir[0];
-            int adjCol = targetCol + dir[1];
 
-            if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
-                Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                if (adjUnit != null && adjUnit.getTeam().equals(GameEngine.team1)) {
-                    enemies++;
+        for (int rows = -1; rows <= 1; rows++) {
+            for (int columns = -1; columns <= 1; columns++) {
+                if (rows == 0 && columns == 0) {
+                    continue;
+                }
+                int adjRow = targetRow + rows;
+                int adjCol = targetCol + columns;
+
+                if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
+                    Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
+                    if (adjUnit != null && adjUnit.getTeam().equals(GameEngine.team1)) {
+                        enemies++;
+                    }
                 }
             }
         }
