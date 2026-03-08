@@ -12,6 +12,7 @@ public class QuitCommand implements Command {
     public void execute(String argument) {
         if (argument != null) {
             System.err.println("ERROR: Command does not take any arguments.");
+            return;
         }
         GameState.isRunning = false;
     }

@@ -3,7 +3,6 @@ package edu.kit.kastel.commands;
 import edu.kit.kastel.CommandProcessor;
 import edu.kit.kastel.GameEngine;
 import edu.kit.kastel.GameState;
-import edu.kit.kastel.GameUI;
 import edu.kit.kastel.Hand;
 import edu.kit.kastel.Unit;
 import edu.kit.kastel.Output;
@@ -21,10 +20,10 @@ public class YieldCommand implements Command {
 
         if (currentHand.getHand().size() == 5 && argument == null) {
             System.err.println("ERROR: Hand is full. You must specify a card to discard.");
-            GameUI.getInput();
+            return;
         } else if (currentHand.getHand().size() < 5 && argument != null) {
             System.err.println("ERROR: Hand is not full. You cannot discard a card.");
-            GameUI.getInput();
+            return;
         }
 
         int discardIndex = 0;
@@ -41,6 +40,8 @@ public class YieldCommand implements Command {
 
         GameEngine.resetTeamMovement(GameEngine.activeTeam);
         GameEngine.switchTurn();
+        //GameEngine.resetTeamBlocks(GameEngine.activeTeam);
+
         GameState.hasPlacedThisTurn = false;
         GameState.selectedSquare = null;
 
@@ -62,6 +63,8 @@ public class YieldCommand implements Command {
 
             GameEngine.resetTeamMovement(GameEngine.team2);
             GameEngine.switchTurn();
+            //GameEngine.resetTeamBlocks(GameEngine.activeTeam);
+
             GameState.hasPlacedThisTurn = false;
             Output.printPlayerTurn();
             GameState.selectedSquare = null;

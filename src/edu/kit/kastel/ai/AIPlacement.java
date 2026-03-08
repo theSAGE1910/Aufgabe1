@@ -142,18 +142,22 @@ public final class AIPlacement {
         int enemies = 0;
         int fellows = 0;
 
-        int[][] orthDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-        for (int[] dir : orthDirs) {
-            int adjRow = row + dir[0];
-            int adjCol = col + dir[1];
+        for (int rows = -1; rows <= 1; rows++) {
+            for (int columns = -1; columns <= 1; columns++) {
+                if (rows == 0 && columns == 0) {
+                    continue;
+                }
+                int adjRow = row + rows;
+                int adjCol = col + columns;
 
-            if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
-                Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                if (adjacentUnit != null) {
-                    if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
-                        enemies++;
-                    } else if (adjacentUnit.getTeam().equals(GameEngine.team2)) {
-                        fellows++;
+                if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
+                    Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
+                    if (adjacentUnit != null) {
+                        if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
+                            enemies++;
+                        } else if (adjacentUnit.getTeam().equals(GameEngine.team2)) {
+                            fellows++;
+                        }
                     }
                 }
             }

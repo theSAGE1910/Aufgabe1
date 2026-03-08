@@ -94,7 +94,11 @@ public class Deck {
             int amountInDeck = entry.getValue();
 
             for (int i = 0; i < amountInDeck; i++) {
-                playableDeck.add(currentUnit);
+                Unit newCard = new Unit(currentUnit.getQualifier(),
+                        currentUnit.getRole(),
+                        currentUnit.getAtk(),
+                        currentUnit.getDef());
+                playableDeck.add(newCard);
             }
         }
 

@@ -73,7 +73,7 @@ public final class AIScoreCalculator {
 
             if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
                 Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                if (adjUnit != null && unit.getTeam().equals(GameEngine.team1)) {
+                if (adjUnit != null && adjUnit.getTeam().equals(GameEngine.team1)) {
                     enemies++;
                 }
             }

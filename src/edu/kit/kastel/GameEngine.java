@@ -76,6 +76,21 @@ public final class GameEngine {
     }
 
     /**
+     * Resets the block status of all units belonging to the specified team at the START of their turn.
+     * @param team the team for which to reset the block status
+     */
+    public static void resetTeamBlocks(Team team) {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit boardUnit = GameBoard.getUnitAt(row, col);
+                if (boardUnit != null && boardUnit.getTeam().equals(team)) {
+                    boardUnit.setBlocking(false);
+                }
+            }
+        }
+    }
+
+    /**
      * Attempts to draw a card from the specified team's deck and add it to their hand.
      * @param team the team for which to attempt drawing a card from the deck
      * @return true if the card was successfully drawn and added to the team's hand, false if the deck is empty and the game has ended
