@@ -313,4 +313,12 @@ public class Unit {
         this.isBlocking = isBlocking;
     }
 
+    /**
+     * Checks if a specified unit is the Farmer King.
+     * @param unitToShow the unit to evaluate
+     * @return true if the unit is the Farmer King, false otherwise
+     */
+    public static boolean isKing(Unit unitToShow) {
+        return unitToShow.getQualifier().equals("Farmer") && unitToShow.getRole().equals("King");
+    }
 }

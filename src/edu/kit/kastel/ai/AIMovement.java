@@ -1,12 +1,7 @@
 package edu.kit.kastel.ai;
 
-import edu.kit.kastel.Commands;
-import edu.kit.kastel.GameBoard;
-import edu.kit.kastel.GameEngine;
-import edu.kit.kastel.MovementController;
-import edu.kit.kastel.Output;
-import edu.kit.kastel.RandomGenerator;
-import edu.kit.kastel.Unit;
+import edu.kit.kastel.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +35,7 @@ public final class AIMovement {
 
         TargetSquare targetSquare = null;
         if (validTargets.size() == 1) {
-            targetSquare = validTargets.getFirst();
+            targetSquare = validTargets.get(0);
         } else if (validTargets.size() > 1) {
             int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
             targetSquare = validTargets.get(draw - 1);
@@ -50,9 +45,9 @@ public final class AIMovement {
             String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
             String targetCoord = getCoordinateString(targetSquare.getRow(), targetSquare.getCol());
 
-            Commands.selectedSquare = startCoord;
-            Commands.selectedRow = enemyKingRow;
-            Commands.selectedColumn = enemyKingCol;
+            GameState.selectedSquare = startCoord;
+            GameState.selectedRow = enemyKingRow;
+            GameState.selectedColumn = enemyKingCol;
 
             MovementController.handleMove(targetCoord);
         }
@@ -65,7 +60,7 @@ public final class AIMovement {
      * unit that holds the highest weight.
      */
     public static void moveUnits() {
-        while (Commands.isRunning) {
+        while (GameState.isRunning) {
             List<Unit> movableUnits = getMovableUnits();
 
             if (movableUnits.isEmpty()) {
@@ -107,9 +102,9 @@ public final class AIMovement {
             int bestUnitCol = GameBoard.getUnitCol(bestUnit);
             String startCoord = getCoordinateString(bestUnitRow, bestUnitCol);
 
-            Commands.selectedSquare = startCoord;
-            Commands.selectedRow = bestUnitRow;
-            Commands.selectedColumn = bestUnitCol;
+            GameState.selectedSquare = startCoord;
+            GameState.selectedRow = bestUnitRow;
+            GameState.selectedColumn = bestUnitCol;
 
             executeUnitAction(selectedActionIndex, bestUnitRow, bestUnitCol, bestUnit, startCoord);
         }
@@ -224,7 +219,7 @@ public final class AIMovement {
             bestUnit.setBlocking(true);
             bestUnit.setHasMovedThisTurn(true);
             Output.printBlock(bestUnit.getUnitName(), startCoord);
-            Commands.updateDisplay();
+            GameUI.updateDisplay();
         } else if (selectedActionIndex == 5) {
             MovementController.handleMove(startCoord);
         }

@@ -89,11 +89,4 @@ public class Team {
         return this.shuffledDeck;
     }
 
-    /**
-     * Retrieves the base deck configuration for the team.
-     * @return the Deck object
-     */
-    public Deck getDeck() {
-        return this.deck;
-    }
 }

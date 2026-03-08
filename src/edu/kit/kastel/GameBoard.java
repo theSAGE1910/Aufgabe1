@@ -276,4 +276,18 @@ public final class GameBoard {
         }
         return new int[]{-1, -1};
     }
+
+    /**
+     * Converts an alphanumeric coordinate string into board array indices.
+     * @param coordinate the coordinate string
+     * @return an integer array containing the row at index 0 and column at index 1
+     */
+    public static int[] getCoordinates(String coordinate) {
+        int[] coords = new int[2];
+
+        coords[0] = 7 - Character.getNumericValue(coordinate.charAt(1));
+        coords[1] = Character.getNumericValue(coordinate.toUpperCase().charAt(0)) - 10;
+
+        return coords;
+    }
 }

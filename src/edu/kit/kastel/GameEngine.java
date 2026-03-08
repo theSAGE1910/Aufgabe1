@@ -57,4 +57,35 @@ public final class GameEngine {
             activeTeam = team1;
         }
     }
+
+    /**
+     * Resets the movement status of all units belonging to the specified team at the end of a turn.
+     * @param team the team for which to reset the movement status of all units
+     */
+    public static void resetTeamMovement(Team team) {
+        for (int row = 0; row < GameBoard.DIMENSION; row++) {
+            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+                Unit boardUnit = GameBoard.getUnitAt(row, col);
+                if (boardUnit != null && boardUnit.getTeam().equals(team)) {
+                    boardUnit.setHasMovedThisTurn(false);
+                }
+            }
+        }
+    }
+
+    /**
+     * Attempts to draw a card from the specified team's deck and add it to their hand.
+     * @param team the team for which to attempt drawing a card from the deck
+     * @return true if the card was successfully drawn and added to the team's hand, false if the deck is empty and the game has ended
+     */
+    public static boolean tryDrawCard(Team team) {
+        boolean success = team.getHand().handLoader(team.getShuffledDeck());
+        if (!success) {
+            System.err.println("ERROR: " + team.getName() + " has no more cards left in the deck!");
+            Team winner = team.equals(GameEngine.team1) ? GameEngine.team2 : GameEngine.team1;
+            System.out.println(winner.getName() + " wins!");
+            GameState.isRunning = false;
+        }
+        return success;
+    }
 }

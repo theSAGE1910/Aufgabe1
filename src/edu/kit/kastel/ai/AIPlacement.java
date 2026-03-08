@@ -1,11 +1,7 @@
 package edu.kit.kastel.ai;
 
-import edu.kit.kastel.Commands;
-import edu.kit.kastel.GameBoard;
-import edu.kit.kastel.GameEngine;
-import edu.kit.kastel.Output;
-import edu.kit.kastel.RandomGenerator;
-import edu.kit.kastel.Unit;
+import edu.kit.kastel.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +36,7 @@ public final class AIPlacement {
             return;
         }
 
-        TargetSquare targetSquare = validTargets.getFirst();
+        TargetSquare targetSquare = validTargets.get(0);
         if (validTargets.size() > 1) {
             int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
             targetSquare = validTargets.get(draw - 1);
@@ -68,10 +64,10 @@ public final class AIPlacement {
             GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
         }
 
-        Commands.selectedSquare = coord;
-        Commands.selectedRow = targetSquare.getRow();
-        Commands.selectedColumn = targetSquare.getCol();
-        Commands.updateDisplay();
+        GameState.selectedSquare = coord;
+        GameState.selectedRow = targetSquare.getRow();
+        GameState.selectedColumn = targetSquare.getCol();
+        GameUI.updateDisplay();
     }
 
     private static Unit selectCardToPlace(List<Unit> hand) {

@@ -36,7 +36,7 @@ public class Hand {
             if (shuffledDeck.isEmpty()) {
                 return false;
             } else {
-                Unit drawnCard = shuffledDeck.removeFirst();
+                Unit drawnCard = shuffledDeck.remove(0);
                 this.getHand().add(drawnCard);
             }
         }

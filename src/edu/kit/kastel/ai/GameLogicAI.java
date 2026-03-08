@@ -1,6 +1,7 @@
 package edu.kit.kastel.ai;
 
-import edu.kit.kastel.Commands;
+import edu.kit.kastel.CommandProcessor;
+import edu.kit.kastel.GameState;
 
 /**
  * A utility class that coordinates the overall sequence of actions for the AI's turn.
@@ -31,22 +32,22 @@ public final class GameLogicAI {
      * 4. Discard a card if the hand is full at the end of the turn.
      */
     public static void executeTurn() {
-        if (!Commands.isRunning) {
+        if (!GameState.isRunning) {
             return;
         }
         AIMovement.moveFarmerKing();
 
-        if (!Commands.isRunning) {
+        if (!GameState.isRunning) {
             return;
         }
         AIPlacement.placeUnit();
 
-        if (!Commands.isRunning) {
+        if (!GameState.isRunning) {
             return;
         }
         AIMovement.moveUnits();
 
-        if (!Commands.isRunning) {
+        if (!GameState.isRunning) {
             return;
         }
         AIDiscard.discardCard();

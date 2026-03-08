@@ -12,45 +12,13 @@ public final class MovementController {
     private MovementController() {
     }
 
-    /**
-     * The main entry point for a movement command.
-     * Validates the input, the active unit, and the target distance before
-     * delegating to the appropriate execution logic.
-     * @param argument the target square coordinate.
-     */
-    public static void handleMove(String argument) {
-        if (!isArgumentValid(argument)) {
-            return;
-        }
-
-        Unit movingUnit = Commands.getValidatedActiveUnit();
-        if (movingUnit == null) {
-            return;
-        }
-
-        int targetRow = Commands.getCoordinates(argument)[0];
-        int targetCol = Commands.getCoordinates(argument)[1];
-
-        if (!isDistanceValid(targetRow, targetCol)) {
-            return;
-        }
-
-        Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
-
-        if (!isValidKingInteraction(movingUnit, targetUnit)) {
-            return;
-        }
-
-        executeMove(argument, targetUnit, targetRow, targetCol, movingUnit);
-    }
-
-    private static boolean isValidKingInteraction(Unit movingUnit, Unit targetUnit) {
+    public static boolean isValidKingInteraction(Unit movingUnit, Unit targetUnit) {
         if (targetUnit == null) {
             return true;
         }
 
-        boolean isMoverKing = Commands.isKing(movingUnit);
-        boolean isTargetKing = Commands.isKing(targetUnit);
+        boolean isMoverKing = Unit.isKing(movingUnit);
+        boolean isTargetKing = Unit.isKing(targetUnit);
         boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
 
         if (isMoverKing && !isSameTeam) {
@@ -66,7 +34,7 @@ public final class MovementController {
         return true;
     }
 
-    private static boolean isArgumentValid(String argument) {
+    public static boolean isArgumentValid(String argument) {
         if (argument == null || argument.length() != 2) {
             System.err.println("ERROR: Invalid target square.");
             return false;
@@ -74,9 +42,9 @@ public final class MovementController {
         return true;
     }
 
-    private static boolean isDistanceValid(int targetRow, int targetCol) {
-        int rowDiff = Math.abs(targetRow - Commands.selectedRow);
-        int colDiff = Math.abs(targetCol - Commands.selectedColumn);
+    public static boolean isDistanceValid(int targetRow, int targetCol) {
+        int rowDiff = Math.abs(targetRow - GameState.selectedRow);
+        int colDiff = Math.abs(targetCol - GameState.selectedColumn);
 
         if (rowDiff + colDiff > 1) {
             System.err.println("ERROR: Move must be exactly 1 square orthogonally or en place.");
@@ -85,11 +53,11 @@ public final class MovementController {
         return true;
     }
 
-    private static void executeMove(String argument, Unit targetUnit, int targetRow, int targetCol, Unit movingUnit) {
+    public static void executeMove(String argument, Unit targetUnit, int targetRow, int targetCol, Unit movingUnit) {
         if (movingUnit == targetUnit) {
             movingUnit.setHasMovedThisTurn(true);
             Output.printMovement(movingUnit.getUnitName(), argument);
-            Commands.updateDisplay();
+            GameUI.updateDisplay();
         } else if (targetUnit == null) {
             moveToEmptySquare(argument, targetRow, targetCol, movingUnit);
         } else if (!movingUnit.getTeam().equals(targetUnit.getTeam())) {
@@ -100,15 +68,15 @@ public final class MovementController {
     }
 
     private static void moveToEmptySquare(String argument, int targetRow, int targetCol, Unit movingUnit) {
-        GameBoard.setUnitAt(Commands.selectedRow, Commands.selectedColumn, null);
+        GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
         GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
         movingUnit.setHasMovedThisTurn(true);
         Output.printMovement(movingUnit.getUnitName(), argument);
 
-        Commands.selectedSquare = argument;
-        Commands.selectedRow = targetRow;
-        Commands.selectedColumn = targetCol;
-        Commands.updateDisplay();
+        GameState.selectedSquare = argument;
+        GameState.selectedRow = targetRow;
+        GameState.selectedColumn = targetCol;
+        GameUI.updateDisplay();
     }
 
     private static void initiateCombat(String argument, Unit movingUnit, Unit targetUnit, int targetRow, int targetCol) {
@@ -120,7 +88,7 @@ public final class MovementController {
         String targetDisplay;
         if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.activeTeam)) {
             targetDisplay = "???";
-        } else if (Commands.isKing(targetUnit)) {
+        } else if (Unit.isKing(targetUnit)) {
             targetDisplay = targetUnit.getUnitName();
         } else {
             targetDisplay = targetUnit.getUnitName() + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")";
@@ -133,20 +101,20 @@ public final class MovementController {
         boolean attackerMovesToTargetSquare = resolveCombat(movingUnit, targetUnit, targetRow, targetCol);
 
         if (attackerMovesToTargetSquare) {
-            GameBoard.setUnitAt(Commands.selectedRow, Commands.selectedColumn, null);
+            GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
             GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
             Output.printMovement(movingUnit.getUnitName(), argument);
 
-            Commands.selectedSquare = argument;
-            Commands.selectedRow = targetRow;
-            Commands.selectedColumn = targetCol;
+            GameState.selectedSquare = argument;
+            GameState.selectedRow = targetRow;
+            GameState.selectedColumn = targetCol;
         }
 
         movingUnit.setHasMovedThisTurn(true);
         hpStatusCheck();
 
-        if (Commands.isRunning) {
-            Commands.updateDisplay();
+        if (GameState.isRunning) {
+            GameUI.updateDisplay();
         }
     }
 
@@ -156,7 +124,7 @@ public final class MovementController {
 
         Unit mergedUnit = movingUnit.mergeUnits(movingUnit, targetUnit);
 
-        GameBoard.setUnitAt(Commands.selectedRow, Commands.selectedColumn, null);
+        GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
         if (mergedUnit != null) {
             GameBoard.setUnitAt(targetRow, targetCol, mergedUnit);
             mergedUnit.setHasMovedThisTurn(true);
@@ -167,16 +135,16 @@ public final class MovementController {
             Output.printMergeFail(targetUnit.getUnitName());
         }
 
-        Commands.selectedSquare = argument;
-        Commands.selectedRow = targetRow;
-        Commands.selectedColumn = targetCol;
-        Commands.updateDisplay();
+        GameState.selectedSquare = argument;
+        GameState.selectedRow = targetRow;
+        GameState.selectedColumn = targetCol;
+        GameUI.updateDisplay();
     }
 
     private static void revealCombatUnits(String argument, Unit movingUnit, Unit targetUnit) {
         if (!movingUnit.isFaceUp()) {
             movingUnit.setFaceUp(true);
-            Output.printFlip(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(), Commands.selectedSquare);
+            Output.printFlip(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(), GameState.selectedSquare);
         }
         if (!targetUnit.isFaceUp()) {
             targetUnit.setFaceUp(true);
@@ -185,7 +153,7 @@ public final class MovementController {
     }
 
     private static boolean resolveCombat(Unit movingUnit, Unit targetUnit, int targetRow, int targetCol) {
-        if (Commands.isKing(targetUnit)) {
+        if (Unit.isKing(targetUnit)) {
             targetUnit.getTeam().takeDamage(movingUnit.getAtk());
             Output.printDamage(targetUnit.getTeam().getName(), movingUnit.getAtk());
             return false;
@@ -223,12 +191,12 @@ public final class MovementController {
         } else if (movingUnit.getAtk() < targetUnit.getAtk()) {
             int damage = targetUnit.getAtk() - movingUnit.getAtk();
             movingUnit.getTeam().takeDamage(damage);
-            GameBoard.setUnitAt(Commands.selectedRow, Commands.selectedColumn, null);
+            GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
             Output.printElimination(movingUnit.getUnitName());
             Output.printDamage(movingUnit.getTeam().getName(), damage);
             return false;
         } else {
-            GameBoard.setUnitAt(Commands.selectedRow, Commands.selectedColumn, null);
+            GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
             GameBoard.setUnitAt(targetRow, targetCol, null);
             Output.printElimination(targetUnit.getUnitName());
             Output.printElimination(movingUnit.getUnitName());
@@ -240,11 +208,11 @@ public final class MovementController {
         if (GameEngine.team1.getTeamHP() <= 0) {
             Output.printZeroPoints(GameEngine.team1.getName());
             Output.printWin(GameEngine.team2.getName());
-            Commands.isRunning = false;
+            GameState.isRunning = false;
         } else if (GameEngine.team2.getTeamHP() <= 0) {
             Output.printZeroPoints(GameEngine.team2.getName());
             Output.printWin(GameEngine.team1.getName());
-            Commands.isRunning = false;
+            GameState.isRunning = false;
         }
     }
 }

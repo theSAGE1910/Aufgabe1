@@ -257,7 +257,7 @@ public final class GameData {
                 System.err.println("ERROR: Board file is empty.");
                 return null;
             }
-            return lines.getFirst();
+            return lines.get(0);
         } catch (IOException e) {
             System.err.println(ERROR_IO_EXCEPTION);
             return null;

@@ -1,6 +1,5 @@
 package edu.kit.kastel.ai;
 
-import edu.kit.kastel.Commands;
 import edu.kit.kastel.GameBoard;
 import edu.kit.kastel.GameEngine;
 import edu.kit.kastel.Unit;
@@ -39,8 +38,8 @@ public final class AIScoreCalculator {
         Unit target = GameBoard.getUnitAt(targetRow, targetCol);
 
         if (target != null) {
-            boolean isMoverKing = Commands.isKing(unit);
-            boolean isTargetKing = Commands.isKing(target);
+            boolean isMoverKing = Unit.isKing(unit);
+            boolean isTargetKing = Unit.isKing(target);
             boolean isSameTeam = unit.getTeam().equals(target.getTeam());
 
             if (isMoverKing && !isSameTeam) {
@@ -84,7 +83,7 @@ public final class AIScoreCalculator {
 
     private static int getCombatScore(Unit unit, Unit target) {
         int unitAtk = unit.getAtk();
-        if (Commands.isKing(unit)) {
+        if (Unit.isKing(unit)) {
             return unitAtk;
         } else if (!target.isFaceUp()) {
             return unitAtk - 500;
