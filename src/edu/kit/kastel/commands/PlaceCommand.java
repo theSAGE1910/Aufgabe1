@@ -25,8 +25,13 @@ public class PlaceCommand implements Command {
             System.err.println("ERROR: No square selected.");
             return;
         }
-        if (GameBoard.getUnitAt(GameState.selectedRow, GameState.selectedColumn) != null) {
-            System.err.println("ERROR: Square already occupied.");
+
+        Unit targetUnit = GameBoard.getUnitAt(GameState.selectedRow, GameState.selectedColumn);
+
+        if (targetUnit != null) {
+            if (targetUnit.getTeam().equals(GameEngine.activeTeam) || targetUnit.getRole().equals("King")) {
+                System.err.println("ERROR: Square already occupied.");
+            }
             return;
         }
 
