@@ -43,7 +43,6 @@ public final class AIPlacement {
         }
 
         TargetSquare targetSquare = validTargets.get(0);
-
         if (validTargets.size() > 1) {
             int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
             targetSquare = validTargets.get(draw - 1);
@@ -104,7 +103,7 @@ public final class AIPlacement {
     }
 
     private static List<TargetSquare> getBestPlacementSquares(int[] aiKingPos, int[] playerKingPos) {
-        int[][] clockDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {-1, 1}, {1, 1}, {1, -1}, {-1, -1}};
+        int[][] clockDirs = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}};
 
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
@@ -143,8 +142,8 @@ public final class AIPlacement {
         int enemies = 0;
         int fellows = 0;
 
-        int[][] fourDirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        for (int[] dir : fourDirs) {
+        int[][] orthDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        for (int[] dir : orthDirs) {
             int adjRow = row + dir[0];
             int adjCol = col + dir[1];
 

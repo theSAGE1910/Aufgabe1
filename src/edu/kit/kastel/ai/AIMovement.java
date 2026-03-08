@@ -40,9 +40,15 @@ public final class AIMovement {
 
         List<TargetSquare> validTargets = getBestKingTargets(enemyKingRow, enemyKingCol, king);
 
-        if (!validTargets.isEmpty()) {
-            TargetSquare targetSquare = validTargets.get(0);
+        TargetSquare targetSquare = null;
+        if (validTargets.size() == 1) {
+            targetSquare = validTargets.get(0);
+        } else if (validTargets.size() > 1) {
+            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
+            targetSquare = validTargets.get(draw - 1);
+        }
 
+        if (targetSquare != null) {
             String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
             int targetRow = targetSquare.getRow();
             int targetCol = targetSquare.getCol();
@@ -118,11 +124,9 @@ public final class AIMovement {
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
-        int[][] kingDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {0, 0}};
-
-        for (int i = 0; i < kingDirs.length; i++) {
-            int targetRow = enemyKingRow + kingDirs[i][0];
-            int targetCol = enemyKingCol + kingDirs[i][1];
+        for (int i = 0; i < GameLogicAI.DIRECTIONS.length; i++) {
+            int targetRow = enemyKingRow + GameLogicAI.DIRECTIONS[i][0];
+            int targetCol = enemyKingCol + GameLogicAI.DIRECTIONS[i][1];
 
             if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
                 continue;
@@ -134,8 +138,7 @@ public final class AIMovement {
                 continue;
             }
 
-            int distance = (i == 0) ? 0 : 1;
-            int score = getKingScore(distance, targetUnit, king, targetRow, targetCol);
+            int score = getKingScore(i, targetUnit, king, targetRow, targetCol);
             if (score > maxScore) {
                 maxScore = score;
                 validTargets.clear();
@@ -148,7 +151,7 @@ public final class AIMovement {
     }
 
     private static int getKingScore(int dirIndex, Unit targetUnit, Unit king, int targetRow, int targetCol) {
-        //int distance = (dirIndex == 4) ? 0 : 1;
+        int distance = (dirIndex == 4) ? 0 : 1;
         int fellowsPresent = 0;
 
         if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team2) && targetUnit != king) {
@@ -159,7 +162,7 @@ public final class AIMovement {
         int enemies = counts[0];
         int fellows = counts[1];
 
-        return -fellows - 2 * enemies - dirIndex - 3 * fellowsPresent;
+        return -fellows - 2 * enemies - distance - 3 * fellowsPresent;
     }
 
     private static int[] countKingNeighbours(int targetRow, int targetCol) {
@@ -176,7 +179,6 @@ public final class AIMovement {
 
                 if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
                     Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
-
                     if (adjacentUnit != null) {
                         if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
                             enemies++;
