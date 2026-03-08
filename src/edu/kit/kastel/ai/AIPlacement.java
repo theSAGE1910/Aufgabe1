@@ -32,7 +32,6 @@ public final class AIPlacement {
     public static void placeUnit() {
         int[] aiKingPos = GameBoard.getEnemyKingPosition();
         int[] playerKingPos = GameBoard.getPlayerKingPosition();
-
         if (aiKingPos == null || playerKingPos == null) {
             return;
         }
@@ -62,14 +61,29 @@ public final class AIPlacement {
         unitToPlace.setHasMovedThisTurn(false);
         hand.remove(unitToPlace);
 
-        int boardCount = getBoardCount(GameEngine.team2);
-        if (boardCount >= 5) {
-            GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), null);
-            Output.printElimination(unitToPlace.getUnitName());
-        } else {
-            GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
-        }
+        Unit targetSquareUnit = GameBoard.getUnitAt(targetSquare.getRow(), targetSquare.getCol());
 
+        if (targetSquareUnit != null) {
+            Output.printMerge(unitToPlace.getUnitName(), targetSquareUnit.getUnitName(), coord);
+            Unit mergedUnit = unitToPlace.mergeUnits(unitToPlace, targetSquareUnit);
+            if (mergedUnit != null) {
+                GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), mergedUnit);
+                mergedUnit.setHasMovedThisTurn(false);
+                System.out.println("Success!");
+            } else {
+                GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
+                unitToPlace.setHasMovedThisTurn(false);
+                Output.printMergeFail(targetSquareUnit.getUnitName());
+            }
+        } else {
+            int boardCount = getBoardCount(GameEngine.team2);
+            if (boardCount >= 5) {
+                GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), null);
+                Output.printElimination(unitToPlace.getUnitName());
+            } else {
+                GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
+            }
+        }
         GameState.selectedSquare = coord;
         GameState.selectedRow = targetSquare.getRow();
         GameState.selectedColumn = targetSquare.getCol();
@@ -115,8 +129,12 @@ public final class AIPlacement {
             if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
                 continue;
             }
-            if (GameBoard.getUnitAt(targetRow, targetCol) != null) {
-                continue;
+
+            Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
+            if (targetUnit != null) {
+                if (targetUnit.getTeam().equals(GameEngine.team1) || targetUnit.getRole().equals("King")) {
+                    continue;
+                }
             }
 
             int steps = Math.abs(targetRow - playerKingPos[0]) + Math.abs(targetCol - playerKingPos[1]);

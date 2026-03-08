@@ -152,7 +152,8 @@ public final class AIMovement {
     }
 
     private static int getKingScore(int dirIndex, Unit targetUnit, Unit king, int targetRow, int targetCol) {
-        int distance = (dirIndex == 4) ? 0 : 1;
+        int[] aiKingPos = GameBoard.getEnemyKingPosition();
+        int distance = (targetRow == aiKingPos[0] && targetCol == aiKingPos[1]) ? 0 : 1;
         int fellowsPresent = 0;
 
         if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team2) && targetUnit != king) {

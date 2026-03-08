@@ -120,7 +120,7 @@ public class Unit {
         int[] mergedAtkDef = new int[2];
 
         if (moverUnit.getUnitName().equals(targetUnit.getUnitName())) {
-            System.err.println(ERROR_INCOMPATIBLE);
+            //System.err.println(ERROR_INCOMPATIBLE);
             return null;
         }
 
@@ -136,7 +136,7 @@ public class Unit {
                 mergedAtkDef[0] = moverUnit.atk + targetUnit.atk;
                 mergedAtkDef[1] = moverUnit.def + targetUnit.def;
             }  else {
-                System.err.println(ERROR_INCOMPATIBLE);
+                //System.err.println(ERROR_INCOMPATIBLE);
                 return null;
             }
         }

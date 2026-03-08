@@ -152,7 +152,7 @@ public final class MovementController {
         GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
         if (mergedUnit != null) {
             GameBoard.setUnitAt(targetRow, targetCol, mergedUnit);
-            mergedUnit.setHasMovedThisTurn(true);
+            mergedUnit.setHasMovedThisTurn(false);
             System.out.println("Success!");
         } else {
             GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
