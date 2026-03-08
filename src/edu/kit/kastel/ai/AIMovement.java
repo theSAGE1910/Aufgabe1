@@ -118,7 +118,7 @@ public final class AIMovement {
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
-        int[][] kingDirs = {{0, 0}, {-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        int[][] kingDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}, {0, 0}};
 
         for (int i = 0; i < kingDirs.length; i++) {
             int targetRow = enemyKingRow + kingDirs[i][0];
