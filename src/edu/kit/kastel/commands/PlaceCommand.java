@@ -1,6 +1,13 @@
 package edu.kit.kastel.commands;
 
-import edu.kit.kastel.*;
+import edu.kit.kastel.CommandProcessor;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameState;
+import edu.kit.kastel.GameBoard;
+import edu.kit.kastel.Hand;
+import edu.kit.kastel.Output;
+import edu.kit.kastel.Unit;
+import edu.kit.kastel.GameUI;
 
 /**
  * Command implementation for placing a unit from the player's hand onto the board.

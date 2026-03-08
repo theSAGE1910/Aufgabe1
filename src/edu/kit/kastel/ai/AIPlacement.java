@@ -1,6 +1,12 @@
 package edu.kit.kastel.ai;
 
-import edu.kit.kastel.*;
+import edu.kit.kastel.GameBoard;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameState;
+import edu.kit.kastel.GameUI;
+import edu.kit.kastel.RandomGenerator;
+import edu.kit.kastel.Unit;
+import edu.kit.kastel.Output;
 
 import java.util.ArrayList;
 import java.util.List;

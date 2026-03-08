@@ -21,7 +21,7 @@ import java.util.Map;
  * @author uxuwg
  * @version 0.9
  */
-public class CommandProcessor {
+public final class CommandProcessor {
 
     private static final String REGEX_SPACE = " ";
     private static final Map<String, Command> COMMANDS = new HashMap<>();
@@ -31,7 +31,7 @@ public class CommandProcessor {
      * Initializes the CommandProcessor with the given GameState and registers all available commands.
      * @param gameState the current state of the game, which will be passed to command handlers for execution
      */
-    public CommandProcessor(GameState gameState) {
+    private CommandProcessor(GameState gameState) {
         state = gameState;
 
         COMMANDS.put("select", new SelectCommand());

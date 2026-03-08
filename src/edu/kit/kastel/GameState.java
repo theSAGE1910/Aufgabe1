@@ -1,8 +1,9 @@
 package edu.kit.kastel;
 
 /**
- *
+ * Centralized class for managing the state of the game, including selected square, active unit, and turn status.
  * @author uxuwg
+ * @version 0.9
  */
 public final class GameState {
     /** Flag indicating whether the main game loop is currently running. */

@@ -1,6 +1,9 @@
 package edu.kit.kastel.commands;
 
-import edu.kit.kastel.*;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameState;
+import edu.kit.kastel.Output;
+import edu.kit.kastel.GameUI;
 
 /**
  * Command to display the current state of the game, including the board and the units of both teams.

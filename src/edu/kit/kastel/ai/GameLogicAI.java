@@ -1,6 +1,5 @@
 package edu.kit.kastel.ai;
 
-import edu.kit.kastel.CommandProcessor;
 import edu.kit.kastel.GameState;
 
 /**

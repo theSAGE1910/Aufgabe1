@@ -1,6 +1,10 @@
 package edu.kit.kastel.commands;
 
-import edu.kit.kastel.*;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameState;
+import edu.kit.kastel.Output;
+import edu.kit.kastel.Unit;
+import edu.kit.kastel.GameUI;
 
 /**
  * Command to set the active unit to 'block'.

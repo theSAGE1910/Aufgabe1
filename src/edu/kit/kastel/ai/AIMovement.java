@@ -1,6 +1,13 @@
 package edu.kit.kastel.ai;
 
-import edu.kit.kastel.*;
+import edu.kit.kastel.GameBoard;
+import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameState;
+import edu.kit.kastel.GameUI;
+import edu.kit.kastel.MovementController;
+import edu.kit.kastel.RandomGenerator;
+import edu.kit.kastel.Unit;
+import edu.kit.kastel.Output;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,13 +50,16 @@ public final class AIMovement {
 
         if (targetSquare != null) {
             String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
-            String targetCoord = getCoordinateString(targetSquare.getRow(), targetSquare.getCol());
+            int targetRow = targetSquare.getRow();
+            int targetCol = targetSquare.getCol();
+            String targetCoord = getCoordinateString(targetRow, targetCol);
 
             GameState.selectedSquare = startCoord;
             GameState.selectedRow = enemyKingRow;
             GameState.selectedColumn = enemyKingCol;
 
-            MovementController.handleMove(targetCoord);
+            Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
+            MovementController.executeMove(targetCoord, targetUnit, targetRow, targetCol, king);
         }
     }
 
@@ -214,14 +224,17 @@ public final class AIMovement {
             int targetRow = bestUnitRow + dirs[selectedActionIndex][0];
             int targetCol = bestUnitCol + dirs[selectedActionIndex][1];
             String targetCoord = getCoordinateString(targetRow, targetCol);
-            MovementController.handleMove(targetCoord);
+
+            Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
+            MovementController.executeMove(targetCoord, targetUnit, targetRow, targetCol, bestUnit);
         } else if (selectedActionIndex == 4) {
             bestUnit.setBlocking(true);
             bestUnit.setHasMovedThisTurn(true);
             Output.printBlock(bestUnit.getUnitName(), startCoord);
             GameUI.updateDisplay();
         } else if (selectedActionIndex == 5) {
-            MovementController.handleMove(startCoord);
+            Unit targetUnit = GameBoard.getUnitAt(bestUnitRow, bestUnitCol);
+            MovementController.executeMove(startCoord, targetUnit, bestUnitRow, bestUnitCol, bestUnit);
         }
     }
 

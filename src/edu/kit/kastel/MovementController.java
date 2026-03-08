@@ -12,6 +12,12 @@ public final class MovementController {
     private MovementController() {
     }
 
+    /**
+     * Validates that the move interaction does not violate any special rules regarding the Farmer King unit.
+     * @param movingUnit the unit that is attempting to move
+     * @param targetUnit the unit that is currently on the target square (can be null if the square is empty)
+     * @return true if the move is valid with respect to Farmer King interactions, false if it violates any rules
+     */
     public static boolean isValidKingInteraction(Unit movingUnit, Unit targetUnit) {
         if (targetUnit == null) {
             return true;
@@ -34,6 +40,11 @@ public final class MovementController {
         return true;
     }
 
+    /**
+     * Validates that the move command has a properly formatted target square argument.
+     * @param argument the target square argument from the move command
+     * @return true if the argument is valid, false if it is null or does not have exactly 2 characters
+     */
     public static boolean isArgumentValid(String argument) {
         if (argument == null || argument.length() != 2) {
             System.err.println("ERROR: Invalid target square.");
@@ -42,6 +53,12 @@ public final class MovementController {
         return true;
     }
 
+    /**
+     * Validates that the target square is within the allowed movement distance of 1 square orthogonally or en place.
+     * @param targetRow the row index of the target square
+     * @param targetCol the column index of the target square
+     * @return true if the target square is within the allowed movement distance, false if it is too far away
+     */
     public static boolean isDistanceValid(int targetRow, int targetCol) {
         int rowDiff = Math.abs(targetRow - GameState.selectedRow);
         int colDiff = Math.abs(targetCol - GameState.selectedColumn);
@@ -53,6 +70,14 @@ public final class MovementController {
         return true;
     }
 
+    /**
+     * Executes the move command based on the type of interaction between the moving unit and the target square.
+     * @param argument the target square argument from the move command
+     * @param targetUnit the unit that is currently on the target square
+     * @param targetRow the row index of the target square
+     * @param targetCol the column index of the target square
+     * @param movingUnit the unit that is attempting to move
+     */
     public static void executeMove(String argument, Unit targetUnit, int targetRow, int targetCol, Unit movingUnit) {
         if (movingUnit == targetUnit) {
             movingUnit.setHasMovedThisTurn(true);
