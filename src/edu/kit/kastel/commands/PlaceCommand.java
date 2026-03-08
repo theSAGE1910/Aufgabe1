@@ -29,10 +29,10 @@ public class PlaceCommand implements Command {
         Unit targetUnit = GameBoard.getUnitAt(GameState.selectedRow, GameState.selectedColumn);
 
         if (targetUnit != null) {
-            if (targetUnit.getTeam().equals(GameEngine.activeTeam) || targetUnit.getRole().equals("King")) {
+            if (targetUnit.getTeam().equals(GameEngine.activeTeam) && targetUnit.getRole().equals("King")) {
                 System.err.println("ERROR: Square already occupied.");
+                return;
             }
-            return;
         }
 
         int[] kingPosition = GameEngine.activeTeam.equals(GameEngine.team1)

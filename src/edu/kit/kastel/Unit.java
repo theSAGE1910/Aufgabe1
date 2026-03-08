@@ -21,8 +21,8 @@ public class Unit {
 
     private final String qualifier;
     private final String role;
-    private final int atk;
-    private final int def;
+    private int atk;
+    private int def;
     private final int weight;
 
     private Team team;
