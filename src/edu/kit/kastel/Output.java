@@ -113,17 +113,11 @@ public final class Output {
     }
 
     /**
-     * Prints the start-of-turn indicator for the player team.
+     * Prints the message indicating the start of a team's turn.
+     * @param team the name of the team whose turn is starting
      */
-    public static void printPlayerTurn() {
-        System.out.println("It is Player's turn!");
-    }
-
-    /**
-     * Prints the start-of-turn indicator for the enemy team.
-     */
-    public static void printEnemyTurn() {
-        System.out.println("It is Enemy's turn!");
+    public static void printTurn(String team) {
+        System.out.println("It is " + team + "'s turn!");
     }
 
     /**

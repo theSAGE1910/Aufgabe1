@@ -141,7 +141,7 @@ public final class GameBoard {
 
     private static char getInnerChar(boolean isTopLeft, boolean isTopRight, boolean isBottomLeft, boolean isBottomRight) {
         if (isTopLeft) {
-            return BoardTheme.get(BoardTheme.SEL_CORNER_BOTTOM_RIGHT);
+            return BoardTheme.get(BoardTheme.SEL_INNER_BOTTOM_RIGHT);
         }
         if (isTopRight) {
             return BoardTheme.get(BoardTheme.SEL_INNER_BOTTOM_LEFT);
@@ -164,10 +164,10 @@ public final class GameBoard {
             return isTopRight ? BoardTheme.get(BoardTheme.SEL_CORNER_TOP_RIGHT) : BoardTheme.get(BoardTheme.CORNER_TOP_RIGHT);
         }
         if (isTopLeft) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_TOP_LEFT);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_TOP_RIGHT);
         }
         if (isTopRight) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_TOP_RIGHT);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_TOP_LEFT);
         }
         return BoardTheme.get(BoardTheme.EDGE_TOP);
     }
@@ -180,30 +180,30 @@ public final class GameBoard {
             return isBottomRight ? BoardTheme.get(BoardTheme.SEL_CORNER_BOTTOM_RIGHT) : BoardTheme.get(BoardTheme.CORNER_BOTTOM_RIGHT);
         }
         if (isBottomLeft) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_BOTTOM_LEFT);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_BOTTOM_RIGHT);
         }
         if (isBottomRight) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_BOTTOM_RIGHT);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_BOTTOM_LEFT);
         }
         return BoardTheme.get(BoardTheme.EDGE_BOTTOM);
     }
 
     private static char getLeftEdgeChar(boolean isTopLeft, boolean isBottomLeft) {
         if (isTopLeft) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_LEFT_TOP);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_LEFT_BOTTOM);
         }
         if (isBottomLeft) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_LEFT_BOTTOM);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_LEFT_TOP);
         }
         return BoardTheme.get(BoardTheme.EDGE_LEFT);
     }
 
     private static char getRightEdgeChar(boolean isTopRight, boolean isBottomRight) {
         if (isTopRight) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_RIGHT_TOP);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_RIGHT_BOTTOM);
         }
         if (isBottomRight) {
-            return BoardTheme.get(BoardTheme.SEL_EDGE_RIGHT_BOTTOM);
+            return BoardTheme.get(BoardTheme.SEL_EDGE_RIGHT_TOP);
         }
         return BoardTheme.get(BoardTheme.EDGE_RIGHT);
     }

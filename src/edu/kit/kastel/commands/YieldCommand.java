@@ -46,9 +46,9 @@ public class YieldCommand implements Command {
         GameState.selectedSquare = null;
 
         if (GameEngine.activeTeam.equals(GameEngine.team1)) {
-            Output.printPlayerTurn();
+            Output.printTurn(GameEngine.team1.getName());
         } else {
-            Output.printEnemyTurn();
+            Output.printTurn(GameEngine.team2.getName());
         }
 
         if (!GameEngine.tryDrawCard(GameEngine.activeTeam)) {
@@ -63,10 +63,9 @@ public class YieldCommand implements Command {
 
             GameEngine.resetTeamMovement(GameEngine.team2);
             GameEngine.switchTurn();
-            //GameEngine.resetTeamBlocks(GameEngine.activeTeam);
 
             GameState.hasPlacedThisTurn = false;
-            Output.printPlayerTurn();
+            Output.printTurn(GameEngine.team1.getName());
             GameState.selectedSquare = null;
 
             if (!GameEngine.tryDrawCard(GameEngine.team1)) {

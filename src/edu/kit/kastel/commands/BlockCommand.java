@@ -30,10 +30,10 @@ public class BlockCommand implements Command {
             System.err.println("ERROR: You can only block your own units.");
             return;
         }
-        if (unitToBlock.isBlocking()) {
-            System.err.println("ERROR: Unit is already blocking.");
-            return;
-        }
+//        if (unitToBlock.isBlocking()) {
+//            System.err.println("ERROR: Unit is already blocking.");
+//            return;
+//        }
         unitToBlock.setBlocking(true);
         unitToBlock.setHasMovedThisTurn(true);
         Output.printBlock(unitToBlock.getUnitName(), GameState.selectedSquare);
