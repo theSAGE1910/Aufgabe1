@@ -40,15 +40,9 @@ public final class AIMovement {
 
         List<TargetSquare> validTargets = getBestKingTargets(enemyKingRow, enemyKingCol, king);
 
-        TargetSquare targetSquare = null;
-        if (validTargets.size() == 1) {
-            targetSquare = validTargets.get(0);
-        } else if (validTargets.size() > 1) {
-            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
-            targetSquare = validTargets.get(draw - 1);
-        }
+        if (!validTargets.isEmpty()) {
+            TargetSquare targetSquare = validTargets.get(0);
 
-        if (targetSquare != null) {
             String startCoord = getCoordinateString(enemyKingRow, enemyKingCol);
             int targetRow = targetSquare.getRow();
             int targetCol = targetSquare.getCol();
@@ -124,9 +118,11 @@ public final class AIMovement {
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
-        for (int i = 0; i < GameLogicAI.DIRECTIONS.length; i++) {
-            int targetRow = enemyKingRow + GameLogicAI.DIRECTIONS[i][0];
-            int targetCol = enemyKingCol + GameLogicAI.DIRECTIONS[i][1];
+        int[][] kingDirs = {{0, 0}, {-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+
+        for (int i = 0; i < kingDirs.length; i++) {
+            int targetRow = enemyKingRow + kingDirs[i][0];
+            int targetCol = enemyKingCol + kingDirs[i][1];
 
             if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
                 continue;
@@ -138,7 +134,8 @@ public final class AIMovement {
                 continue;
             }
 
-            int score = getKingScore(i, targetUnit, king, targetRow, targetCol);
+            int distance = (i == 0) ? 0 : 1;
+            int score = getKingScore(distance, targetUnit, king, targetRow, targetCol);
             if (score > maxScore) {
                 maxScore = score;
                 validTargets.clear();
@@ -179,6 +176,7 @@ public final class AIMovement {
 
                 if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
                     Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
+
                     if (adjacentUnit != null && adjacentUnit != king) {
                         if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
                             enemies++;
