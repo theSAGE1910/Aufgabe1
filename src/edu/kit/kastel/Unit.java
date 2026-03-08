@@ -107,7 +107,7 @@ public class Unit {
         int newDef = mergedAtkDef[1];
 
         String newQualifier = targetUnit.getQualifier() + " " + moverUnit.getQualifier();
-        String newRole = targetUnit.getRole() + " " + moverUnit.getRole();
+        String newRole = targetUnit.getRole();
 
         Unit mergedUnit = new Unit(newQualifier, newRole, newAtk, newDef, moverUnit.getTeam());
 
