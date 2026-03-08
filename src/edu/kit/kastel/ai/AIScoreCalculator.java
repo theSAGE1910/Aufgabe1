@@ -64,7 +64,7 @@ public final class AIScoreCalculator {
         if (playerKing == null) {
             return 0;
         }
-        int steps = Math.abs(targetRow - playerKing[0]) + Math.abs(targetCol - playerKing[1]);
+        int steps = Math.max(Math.abs(targetRow - playerKing[0]), Math.abs(targetCol - playerKing[1]));
         int enemies = 0;
 
         for (int rows = -1; rows <= 1; rows++) {

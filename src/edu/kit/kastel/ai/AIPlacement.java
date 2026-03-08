@@ -119,7 +119,7 @@ public final class AIPlacement {
                 continue;
             }
 
-            int steps = Math.abs(targetRow - playerKingPos[0]) + Math.abs(targetCol - playerKingPos[1]);
+            int steps = Math.max(Math.abs(targetRow - playerKingPos[0]), Math.abs(targetCol - playerKingPos[1]));
 
             int[] counts = countAdjacentUnits(targetRow, targetCol);
             int enemies = counts[0];
