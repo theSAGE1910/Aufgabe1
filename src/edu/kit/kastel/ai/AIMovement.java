@@ -125,6 +125,7 @@ public final class AIMovement {
         int maxScore = Integer.MIN_VALUE;
 
         for (int i = 0; i < GameLogicAI.DIRECTIONS.length; i++) {
+
             int targetRow = enemyKingRow + GameLogicAI.DIRECTIONS[i][0];
             int targetCol = enemyKingCol + GameLogicAI.DIRECTIONS[i][1];
 
@@ -158,14 +159,14 @@ public final class AIMovement {
             fellowsPresent = 1;
         }
 
-        int[] counts = countKingNeighbours(targetRow, targetCol);
+        int[] counts = countKingNeighbours(targetRow, targetCol, king);
         int enemies = counts[0];
         int fellows = counts[1];
 
-        return -fellows - 2 * enemies - distance - 3 * fellowsPresent;
+        return fellows - (2 * enemies) - distance - (3 * fellowsPresent);
     }
 
-    private static int[] countKingNeighbours(int targetRow, int targetCol) {
+    private static int[] countKingNeighbours(int targetRow, int targetCol, Unit king) {
         int enemies = 0;
         int fellows = 0;
 
@@ -179,7 +180,8 @@ public final class AIMovement {
 
                 if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
                     Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                    if (adjacentUnit != null) {
+
+                    if (adjacentUnit != null && adjacentUnit != king) {
                         if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
                             enemies++;
                         } else if (adjacentUnit.getTeam().equals(GameEngine.team2)) {
