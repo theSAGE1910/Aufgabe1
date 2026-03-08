@@ -16,7 +16,7 @@ import edu.kit.kastel.GameUI;
  */
 public class PlaceCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         if (GameState.hasPlacedThisTurn) {
             System.err.println("ERROR: You can only place one unit per turn.");
             return;

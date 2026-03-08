@@ -27,7 +27,6 @@ public final class GameUI {
                 if (input == null || input.trim().isEmpty()) {
                     continue;
                 }
-
                 CommandProcessor.processCommands(input);
             }
         }

@@ -41,6 +41,8 @@ public final class GameEngine {
         if (GameData.extractArgumentInfo(args)) {
             if (Initialiser.initialise()) {
                 System.out.println(HELPING_TEXT);
+
+                CommandProcessor.initialise();
                 GameUI.getInput();
             }
         }

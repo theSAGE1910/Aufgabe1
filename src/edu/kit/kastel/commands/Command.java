@@ -1,7 +1,5 @@
 package edu.kit.kastel.commands;
 
-import edu.kit.kastel.GameState;
-
 /**
  * Interface representing a command that can be executed in the game.
  * @author uxuwg
@@ -10,8 +8,8 @@ import edu.kit.kastel.GameState;
 public interface Command {
     /**
      * Executes the command.
+     *
      * @param argument The argument provided with the command.
-     * @param gameState The current state of the game.
      */
-    void execute(String argument, GameState gameState);
+    void execute(String argument);
 }

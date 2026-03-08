@@ -13,7 +13,7 @@ import edu.kit.kastel.GameUI;
  */
 public class BlockCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         if (argument != null) {
             System.err.println("ERROR: Command does not take any arguments.");
             return;

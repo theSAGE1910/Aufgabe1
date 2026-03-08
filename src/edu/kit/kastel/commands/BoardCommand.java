@@ -10,7 +10,7 @@ import edu.kit.kastel.GameState;
  */
 public class BoardCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         if (argument != null) {
             System.err.println("ERROR: Command does not take any arguments.");
             return;

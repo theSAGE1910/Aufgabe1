@@ -25,26 +25,29 @@ public final class CommandProcessor {
 
     private static final String REGEX_SPACE = " ";
     private static final Map<String, Command> COMMANDS = new HashMap<>();
-    private static GameState state = null;
+
+    private CommandProcessor() {
+    }
+
 
     /**
-     * Initializes the CommandProcessor with the given GameState and registers all available commands.
-     * @param gameState the current state of the game, which will be passed to command handlers for execution
+     * Initializes the command processor by populating the command map with available commands and their corresponding handlers.
      */
-    private CommandProcessor(GameState gameState) {
-        state = gameState;
+    public static void initialise() {
 
-        COMMANDS.put("select", new SelectCommand());
-        COMMANDS.put("board", new BoardCommand());
-        COMMANDS.put("move", new MoveCommand());
-        COMMANDS.put("flip", new FlipCommand());
-        COMMANDS.put("block", new BlockCommand());
-        COMMANDS.put("hand", new HandCommand());
-        COMMANDS.put("place", new PlaceCommand());
-        COMMANDS.put("show", new ShowCommand());
-        COMMANDS.put("yield", new YieldCommand());
-        COMMANDS.put("state", new StateCommand());
-        COMMANDS.put("quit", new QuitCommand());
+        if (COMMANDS.isEmpty()) {
+            COMMANDS.put("select", new SelectCommand());
+            COMMANDS.put("board", new BoardCommand());
+            COMMANDS.put("move", new MoveCommand());
+            COMMANDS.put("flip", new FlipCommand());
+            COMMANDS.put("block", new BlockCommand());
+            COMMANDS.put("hand", new HandCommand());
+            COMMANDS.put("place", new PlaceCommand());
+            COMMANDS.put("show", new ShowCommand());
+            COMMANDS.put("yield", new YieldCommand());
+            COMMANDS.put("state", new StateCommand());
+            COMMANDS.put("quit", new QuitCommand());
+        }
     }
 
     /**
@@ -52,7 +55,7 @@ public final class CommandProcessor {
      * @param input the raw string input from the user
      */
     public static void processCommands(String input) {
-        String key = input.toUpperCase();
+        String key = input.toLowerCase();
         String argument = null;
         String[] words = input.split(REGEX_SPACE);
 
@@ -68,7 +71,7 @@ public final class CommandProcessor {
 
         Command command = COMMANDS.get(key);
         if (command != null) {
-            command.execute(argument, state);
+            command.execute(argument);
         } else {
             System.err.println("ERROR: Invalid command");
         }

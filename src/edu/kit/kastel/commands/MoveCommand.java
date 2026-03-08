@@ -12,7 +12,7 @@ import edu.kit.kastel.Unit;
  */
 public class MoveCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         if (!MovementController.isArgumentValid(argument)) {
             return;
         }

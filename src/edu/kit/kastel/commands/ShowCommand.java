@@ -13,7 +13,7 @@ import edu.kit.kastel.Output;
  */
 public class ShowCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         if (GameState.selectedSquare == null) {
             System.out.println("ERROR: No square selected.");
             return;

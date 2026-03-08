@@ -11,14 +11,14 @@ import edu.kit.kastel.GameUI;
  */
 public class SelectCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         if (argument == null) {
             System.err.println("ERROR: Command requires an argument.");
         } else if (argument.length() == 2) {
-            gameState.selectedSquare = argument;
+            GameState.selectedSquare = argument;
             int[] coordinates = GameBoard.getCoordinates(argument);
-            gameState.selectedRow = coordinates[0];
-            gameState.selectedColumn = coordinates[1];
+            GameState.selectedRow = coordinates[0];
+            GameState.selectedColumn = coordinates[1];
             GameUI.updateDisplay();
         } else {
             System.err.println("ERROR: Invalid square selected.");

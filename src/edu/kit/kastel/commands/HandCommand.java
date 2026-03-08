@@ -1,7 +1,6 @@
 package edu.kit.kastel.commands;
 
 import edu.kit.kastel.GameEngine;
-import edu.kit.kastel.GameState;
 import edu.kit.kastel.Output;
 
 /**
@@ -11,7 +10,7 @@ import edu.kit.kastel.Output;
  */
 public class HandCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         if (argument != null) {
             System.err.println("ERROR: Command does not take any arguments.");
             return;

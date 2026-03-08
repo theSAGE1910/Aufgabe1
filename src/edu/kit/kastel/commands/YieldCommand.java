@@ -16,7 +16,7 @@ import edu.kit.kastel.ai.GameLogicAI;
  */
 public class YieldCommand implements Command {
     @Override
-    public void execute(String argument, GameState gameState) {
+    public void execute(String argument) {
         Hand currentHand = GameEngine.activeTeam.getHand();
 
         if (currentHand.getHand().size() == 5 && argument == null) {
