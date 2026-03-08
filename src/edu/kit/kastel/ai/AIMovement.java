@@ -148,21 +148,21 @@ public final class AIMovement {
     }
 
     private static int getKingScore(int dirIndex, Unit targetUnit, Unit king, int targetRow, int targetCol) {
-        int distance = (dirIndex == 4) ? 0 : 1;
+        //int distance = (dirIndex == 4) ? 0 : 1;
         int fellowsPresent = 0;
 
         if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team2) && targetUnit != king) {
             fellowsPresent = 1;
         }
 
-        int[] counts = countKingNeighbours(targetRow, targetCol, king);
+        int[] counts = countKingNeighbours(targetRow, targetCol);
         int enemies = counts[0];
         int fellows = counts[1];
 
-        return -fellows - 2 * enemies - distance - 3 * fellowsPresent;
+        return -fellows - 2 * enemies - dirIndex - 3 * fellowsPresent;
     }
 
-    private static int[] countKingNeighbours(int targetRow, int targetCol, Unit king) {
+    private static int[] countKingNeighbours(int targetRow, int targetCol) {
         int enemies = 0;
         int fellows = 0;
 
@@ -177,7 +177,7 @@ public final class AIMovement {
                 if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
                     Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
 
-                    if (adjacentUnit != null && adjacentUnit != king) {
+                    if (adjacentUnit != null) {
                         if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
                             enemies++;
                         } else if (adjacentUnit.getTeam().equals(GameEngine.team2)) {
