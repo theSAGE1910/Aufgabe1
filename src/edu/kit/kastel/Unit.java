@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 public class Unit {
 
     private static final String REGEX = "^([^;]+);([^;]+);([0-9]+);([0-9]+)$";
-    private static final String ERROR_INCOMPATIBLE = "ERROR: Incompatible to merge!";
 
     private static final List<Unit> UNIT_LIST = new ArrayList<>();
 
@@ -120,7 +119,6 @@ public class Unit {
         int[] mergedAtkDef = new int[2];
 
         if (moverUnit.getUnitName().equals(targetUnit.getUnitName())) {
-            //System.err.println(ERROR_INCOMPATIBLE);
             return null;
         }
 
@@ -136,7 +134,6 @@ public class Unit {
                 mergedAtkDef[0] = moverUnit.atk + targetUnit.atk;
                 mergedAtkDef[1] = moverUnit.def + targetUnit.def;
             }  else {
-                //System.err.println(ERROR_INCOMPATIBLE);
                 return null;
             }
         }

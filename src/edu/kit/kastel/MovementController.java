@@ -79,6 +79,11 @@ public final class MovementController {
      * @param movingUnit the unit that is attempting to move
      */
     public static void executeMove(String argument, Unit targetUnit, int targetRow, int targetCol, Unit movingUnit) {
+        if (movingUnit.isBlocking()) {
+            movingUnit.setBlocking(false);
+            Output.printNoBlock(movingUnit.getUnitName());
+        }
+
         if (movingUnit == targetUnit) {
             movingUnit.setHasMovedThisTurn(true);
             Output.printMovement(movingUnit.getUnitName(), argument);
@@ -105,16 +110,11 @@ public final class MovementController {
     }
 
     private static void initiateCombat(String argument, Unit movingUnit, Unit targetUnit, int targetRow, int targetCol) {
-        if (movingUnit.isBlocking()) {
-            movingUnit.setBlocking(false);
-            Output.printNoBlock(movingUnit.getUnitName());
-        }
-
         String targetDisplay;
-        if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.activeTeam)) {
-            targetDisplay = "???";
-        } else if (Unit.isKing(targetUnit)) {
+        if (Unit.isKing(targetUnit)) {
             targetDisplay = targetUnit.getUnitName();
+        } else if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.activeTeam)) {
+            targetDisplay = "???";
         } else {
             targetDisplay = targetUnit.getUnitName() + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")";
         }
@@ -138,9 +138,7 @@ public final class MovementController {
         movingUnit.setHasMovedThisTurn(true);
         hpStatusCheck();
 
-        if (GameState.isRunning) {
-            GameUI.updateDisplay();
-        }
+        GameUI.updateDisplay();
     }
 
     private static void mergeFriendlyUnits(String argument, Unit movingUnit, Unit targetUnit, int targetRow, int targetCol) {
@@ -167,11 +165,11 @@ public final class MovementController {
     }
 
     private static void revealCombatUnits(String argument, Unit movingUnit, Unit targetUnit) {
-        if (!movingUnit.isFaceUp()) {
+        if (!movingUnit.isFaceUp() && !Unit.isKing(movingUnit)) {
             movingUnit.setFaceUp(true);
             Output.printFlip(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(), GameState.selectedSquare);
         }
-        if (!targetUnit.isFaceUp()) {
+        if (!targetUnit.isFaceUp() && !Unit.isKing(targetUnit)) {
             targetUnit.setFaceUp(true);
             Output.printFlip(targetUnit.getUnitName(), targetUnit.getAtk(), targetUnit.getDef(), argument);
         }

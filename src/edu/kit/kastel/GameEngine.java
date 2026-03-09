@@ -99,7 +99,7 @@ public final class GameEngine {
         boolean success = team.getHand().handLoader(team.getShuffledDeck());
         if (!success) {
             System.err.println("ERROR: " + team.getName() + " has no more cards left in the deck!");
-            Team winner = team.equals(GameEngine.team1) ? GameEngine.team2 : GameEngine.team1;
+            Team winner = team.equals(team1) ? team2 : team1;
             System.out.println(winner.getName() + " wins!");
             GameState.isRunning = false;
         }
