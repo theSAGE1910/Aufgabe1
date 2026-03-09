@@ -78,7 +78,7 @@ public final class AIScoreCalculator {
                 }
             }
         }
-        return (10 * steps) - enemies;
+        return (10 * (steps)) - enemies;
     }
 
     private static int getCombatScore(Unit unit, Unit target) {
@@ -142,8 +142,9 @@ public final class AIScoreCalculator {
 
                 if (target != null) {
                     if (target.getTeam().equals(GameEngine.team1)) {
-                        if (target.getAtk() > maxAtk) {
-                            maxAtk = target.getAtk();
+                        int perceivedAtk = target.isFaceUp() ? target.getAtk() : 0;
+                        if (perceivedAtk > maxAtk) {
+                            maxAtk = perceivedAtk;
                         }
                     }
                     break;

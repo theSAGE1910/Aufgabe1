@@ -55,18 +55,24 @@ public final class CommandProcessor {
      * @param input the raw string input from the user
      */
     public static void processCommands(String input) {
-        String key = input.toLowerCase();
-        String argument = null;
         String[] words = input.split(REGEX_SPACE);
+        if (words.length == 0) {
+            System.err.println("ERROR: No command provided");
+            return;
+        }
 
-        if (words.length == 1) {
-            key = words[0].trim();
-        } else if (words.length == 2) {
-            key = words[0].trim();
+        String key = words[0].toLowerCase();
+        String argument = null;
+
+        if (words.length == 2) {
             argument = words[1].toUpperCase().trim();
         } else if (words.length > 2) {
-            System.err.println("ERROR: Invalid command format");
-            return;
+            if (key.equalsIgnoreCase("place")) {
+                argument = input.trim().substring(key.length()).toUpperCase();
+            } else {
+                System.err.println("ERROR: Invalid command format");
+                return;
+            }
         }
 
         Command command = COMMANDS.get(key);

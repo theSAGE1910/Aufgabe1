@@ -1,6 +1,5 @@
 package edu.kit.kastel.commands;
 
-import edu.kit.kastel.CommandProcessor;
 import edu.kit.kastel.GameEngine;
 import edu.kit.kastel.GameState;
 import edu.kit.kastel.GameBoard;
@@ -8,6 +7,11 @@ import edu.kit.kastel.Hand;
 import edu.kit.kastel.Output;
 import edu.kit.kastel.Unit;
 import edu.kit.kastel.GameUI;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Command implementation for placing a unit from the player's hand onto the board.
@@ -21,31 +25,66 @@ public class PlaceCommand implements Command {
             return;
         }
 
-        Unit targetSquareUnit = GameBoard.getUnitAt(GameState.selectedRow, GameState.selectedColumn);
-
-        if (!isValidTargetSquare(targetSquareUnit) || !isAdjacentToKing()) {
+        Unit initialTargetUnit = GameBoard.getUnitAt(GameState.selectedRow, GameState.selectedColumn);
+        if (!isValidTargetSquare(initialTargetUnit) || !isAdjacentToKing()) {
             return;
         }
 
+        if (argument == null) {
+            System.err.println("ERROR: No hand index provided.");
+            return;
+        }
+
+        String[] arguments = argument.trim().split(" ");
         Hand currentHand = GameEngine.activeTeam.getHand();
-        int handIndex = CommandProcessor.parseHandIndex(argument, currentHand);
-        if (handIndex == -1) {
-            return;
+
+        List<Unit> unitsToPlace = new ArrayList<>();
+        Set<Integer> duplicateChecker = new HashSet<>();
+
+        for (String arg : arguments) {
+            int index = parseIndex(arg, currentHand);
+            if (index == -1) {
+                return;
+            }
+            if (!duplicateChecker.add(index)) {
+                System.err.println("ERROR: Duplicate index provided.");
+                return;
+            }
+            unitsToPlace.add(currentHand.getHand().get(index));
         }
 
-        Unit unitToPlace = currentHand.getHand().get(handIndex);
-        Output.printPlacement(GameEngine.activeTeam.getName(), unitToPlace, GameState.selectedSquare);
-
-        prepareUnitForPlacement(unitToPlace, currentHand);
-
-        if (targetSquareUnit != null) {
-            executeMergePlacement(unitToPlace, targetSquareUnit);
-        } else {
-            executeStandardPlacement(unitToPlace);
-        }
+        executePlacement(unitsToPlace, currentHand);
 
         GameState.hasPlacedThisTurn = true;
         GameUI.updateDisplay();
+    }
+
+    private static void executePlacement(List<Unit> unitsToPlace, Hand currentHand) {
+        for (Unit unit : unitsToPlace) {
+            Output.printPlacement(GameEngine.activeTeam.getName(), unit, GameState.selectedSquare);
+            prepareUnitForPlacement(unit, currentHand);
+
+            Unit targetSquareUnit = GameBoard.getUnitAt(GameState.selectedRow, GameState.selectedColumn);
+            if (targetSquareUnit != null) {
+                executeMergePlacement(unit, targetSquareUnit);
+            } else {
+                executeStandardPlacement(unit);
+            }
+        }
+    }
+
+    private static int parseIndex(String argument, Hand currentHand) {
+        try {
+            int index = Integer.parseInt(argument);
+            if (index < 1 || index > currentHand.getHand().size()) {
+                System.err.println("ERROR: Invalid card index.");
+                return -1;
+            }
+            return index - 1;
+        } catch (NumberFormatException e) {
+            System.err.println("ERROR: Invalid card index.");
+            return -1;
+        }
     }
 
     private static void executeStandardPlacement(Unit unitToPlace) {
