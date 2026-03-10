@@ -20,10 +20,13 @@ public class YieldCommand implements Command {
     private static final String ERROR_HAND_IS_NOT_FULL_YOU_CANNOT_DISCARD_A_CARD
             = "ERROR: Hand is not full. You cannot discard a card.";
 
+    private static final int MAX_HAND_SIZE = 5;
+    private static final int INVALID_INDEX_FLAG = -1;
+
     @Override
     public void execute(String argument) {
         Hand currentHand = GameEngine.getActiveTeam().getHand();
-        
+
         boolean validToProceed = validateDiscardState(argument, currentHand);
 
         if (validToProceed && argument != null)  {
@@ -36,10 +39,10 @@ public class YieldCommand implements Command {
     }
 
     private static boolean validateDiscardState(String argument, Hand currentHand) {
-        if (currentHand.getHand().size() == 5 && argument == null) {
+        if (currentHand.getHand().size() == MAX_HAND_SIZE && argument == null) {
             System.err.println(ERROR_HAND_IS_FULL_YOU_MUST_SPECIFY_A_CARD_TO_DISCARD);
             return false;
-        } else if (currentHand.getHand().size() < 5 && argument != null) {
+        } else if (currentHand.getHand().size() < MAX_HAND_SIZE && argument != null) {
             System.err.println(ERROR_HAND_IS_NOT_FULL_YOU_CANNOT_DISCARD_A_CARD);
             return false;
         }
@@ -48,7 +51,7 @@ public class YieldCommand implements Command {
 
     private static boolean processDiscard(String argument, Hand currentHand) {
         int discardIndex = CommandProcessor.parseHandIndex(argument, currentHand);
-        if (discardIndex == -1) {
+        if (discardIndex == INVALID_INDEX_FLAG) {
             return false;
         }
         Unit unitToDiscard = currentHand.getHand().get(discardIndex);

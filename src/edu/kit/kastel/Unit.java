@@ -19,6 +19,23 @@ public class Unit {
     private static final List<Unit> UNIT_LIST = new ArrayList<>();
     private static final String PREFIX_SYMBOL = "*";
     private static final String BLOCK_SYMBOL = "b";
+    private static final String SPACE = " ";
+
+    private static final int GROUP_QUALIFIER = 1;
+    private static final int GROUP_ROLE = 2;
+    private static final int GROUP_ATK = 3;
+    private static final int GROUP_DEF = 4;
+
+    private static final int STAT_ARRAY_SIZE = 2;
+    private static final int ATK_INDEX = 0;
+    private static final int DEF_INDEX = 1;
+
+    private static final int MERGE_THRESHOLD = 100;
+    private static final int STAT_DIVISOR = 100;
+
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+    private static final int TWO = 2;
 
     private final String qualifier;
     private final String role;
@@ -82,10 +99,10 @@ public class Unit {
         for (String unit : unitData) {
             Matcher matcher = pattern.matcher(unit);
             if (matcher.find()) {
-                getUnitList().add(new Unit(matcher.group(1),
-                        matcher.group(2),
-                        Integer.parseInt(matcher.group(3)),
-                        Integer.parseInt(matcher.group(4)), null));
+                getUnitList().add(new Unit(matcher.group(GROUP_QUALIFIER),
+                        matcher.group(GROUP_ROLE),
+                        Integer.parseInt(matcher.group(GROUP_ATK)),
+                        Integer.parseInt(matcher.group(GROUP_DEF)), null));
             }
         }
         return getUnitList();
@@ -104,10 +121,10 @@ public class Unit {
             return null;
         }
 
-        int newAtk = mergedAtkDef[0];
-        int newDef = mergedAtkDef[1];
+        int newAtk = mergedAtkDef[ATK_INDEX];
+        int newDef = mergedAtkDef[DEF_INDEX];
 
-        String newQualifier = targetUnit.getQualifier() + " " + moverUnit.getQualifier();
+        String newQualifier = targetUnit.getQualifier() + SPACE + moverUnit.getQualifier();
         String newRole = targetUnit.getRole();
 
         Unit mergedUnit = new Unit(newQualifier, newRole, newAtk, newDef, moverUnit.getTeam());
@@ -118,23 +135,23 @@ public class Unit {
     }
 
     private int[] compatibilityCheck(Unit moverUnit, Unit targetUnit) {
-        int[] mergedAtkDef = new int[2];
+        int[] mergedAtkDef = new int[STAT_ARRAY_SIZE];
 
         if (moverUnit.getUnitName().equals(targetUnit.getUnitName())) {
             return null;
         }
 
         if (checkSymbioticCondition(moverUnit, targetUnit)) {
-            mergedAtkDef[0] = moverUnit.atk;
-            mergedAtkDef[1] = targetUnit.def;
+            mergedAtkDef[ATK_INDEX] = moverUnit.atk;
+            mergedAtkDef[DEF_INDEX] = targetUnit.def;
         } else {
             int g3t = calculateG3t(moverUnit, targetUnit);
-            if (g3t > 100) {
-                mergedAtkDef[0] = moverUnit.atk + targetUnit.atk - g3t;
-                mergedAtkDef[1] = moverUnit.def + targetUnit.def - g3t;
-            } else if (g3t == 100 && checkPrimeCondition(moverUnit, targetUnit)) {
-                mergedAtkDef[0] = moverUnit.atk + targetUnit.atk;
-                mergedAtkDef[1] = moverUnit.def + targetUnit.def;
+            if (g3t > MERGE_THRESHOLD) {
+                mergedAtkDef[ATK_INDEX] = moverUnit.atk + targetUnit.atk - g3t;
+                mergedAtkDef[DEF_INDEX] = moverUnit.def + targetUnit.def - g3t;
+            } else if (g3t == MERGE_THRESHOLD && checkPrimeCondition(moverUnit, targetUnit)) {
+                mergedAtkDef[ATK_INDEX] = moverUnit.atk + targetUnit.atk;
+                mergedAtkDef[DEF_INDEX] = moverUnit.def + targetUnit.def;
             }  else {
                 return null;
             }
@@ -158,7 +175,7 @@ public class Unit {
     private int calculateGcd(int moverStat, int targetStat) {
         int int1 = moverStat;
         int int2 = targetStat;
-        while (int2 != 0) {
+        while (int2 != ZERO) {
             int remainder = int2;
             int2 = int1 % int2;
             int1 = remainder;
@@ -167,10 +184,10 @@ public class Unit {
     }
 
     private boolean checkPrimeCondition(Unit moverUnit, Unit targetUnit) {
-        int moverAtk = moverUnit.atk / 100;
-        int targetAtk = targetUnit.atk / 100;
-        int moverDef = moverUnit.def / 100;
-        int targetDef = targetUnit.def / 100;
+        int moverAtk = moverUnit.atk / STAT_DIVISOR;
+        int targetAtk = targetUnit.atk / STAT_DIVISOR;
+        int moverDef = moverUnit.def / STAT_DIVISOR;
+        int targetDef = targetUnit.def / STAT_DIVISOR;
 
         boolean atkPrime = isPrime(moverAtk) && isPrime(targetAtk);
         boolean defPrime = isPrime(moverDef) && isPrime(targetDef);
@@ -179,11 +196,11 @@ public class Unit {
     }
 
     private boolean isPrime(int stat) {
-        if (stat == 1) {
+        if (stat == ONE) {
             return false;
         } else {
-            for (int i = 2; i < stat / 2; i++) {
-                if (stat % i == 0) {
+            for (int i = TWO; i < stat / TWO; i++) {
+                if (stat % i == ZERO) {
                     return false;
                 }
             }
@@ -194,7 +211,7 @@ public class Unit {
     @Override
     public String toString() {
         boolean isActiveTeam = this.getTeam() != null && this.getTeam().equals(GameEngine.getActiveTeam());
-        String prefix = (isActiveTeam && !this.hasMovedThisTurn()) ? PREFIX_SYMBOL : " ";
+        String prefix = (isActiveTeam && !this.hasMovedThisTurn()) ? PREFIX_SYMBOL : SPACE;
 
         char symbol;
         if (this.getTeam() != null && this.getTeam().equals(GameEngine.getTeam1())) {
@@ -203,7 +220,7 @@ public class Unit {
             symbol = this.getRole().equals(GameMessages.KING) ? GameMessages.ENEMY_KING_SYMBOL : GameMessages.ENEMY_UNIT_SYMBOL;
         }
 
-        String suffix = this.isBlocking() ? BLOCK_SYMBOL : " ";
+        String suffix = this.isBlocking() ? BLOCK_SYMBOL : SPACE;
 
         return prefix + symbol + suffix;
     }
@@ -213,7 +230,7 @@ public class Unit {
      * @return the full combined name of the unit
      */
     public String getUnitName() {
-        return this.qualifier + " " + this.role;
+        return this.qualifier + SPACE + this.role;
     }
 
     /**

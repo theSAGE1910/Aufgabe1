@@ -16,6 +16,8 @@ public class Hand {
      * The maximum number of cards a player can hold in their hand.
      */
     public static final int MAX_HAND_SIZE = 5;
+    private static final int FIRST_CARD_INDEX = 0;
+
     private final List<Unit> hand;
 
     /**
@@ -36,7 +38,7 @@ public class Hand {
             if (shuffledDeck.isEmpty()) {
                 return false;
             } else {
-                Unit drawnCard = shuffledDeck.remove(0);
+                Unit drawnCard = shuffledDeck.remove(FIRST_CARD_INDEX);
                 this.getHand().add(drawnCard);
             }
         }

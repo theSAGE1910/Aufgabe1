@@ -28,14 +28,18 @@ public final class Output {
     private static final String HIDDEN_UNIT_FORMAT = "??? (Team %s)%nATK: ???%nDEF: ???%n";
     private static final String VISIBLE_UNIT_FORMAT = "%s %s (Team %s)%nATK: %d%nDEF: %d%n";
 
-    private static final String STATE_LINE_BASE_FORMAT = "  %s";
-    private static final String STATE_LINE_FORMAT = "%s%s%s%n";
     private static final String LP_FORMAT = "%d/%d LP";
     private static final String DC_FORMAT = "DC: %d/%d";
     private static final String BC_FORMAT = "BC: %d/%d";
 
     private static final int MAX_STATE_LINE_LENGTH = 31;
     private static final int MAX_BOARD_UNITS = 5;
+
+    private static final int START_COUNT = 0;
+    private static final int START_INDEX = 0;
+    private static final int START_NUMBERING = 1;
+    private static final String SPACE = " ";
+    private static final String INDENT = "  "; // Add this line!
 
     private Output() {
     }
@@ -153,7 +157,7 @@ public final class Output {
      * @param teamHand the hand object containing the list of units
      */
     public static void printHand(Hand teamHand) {
-        int numbering = 1;
+        int numbering = START_NUMBERING;
         for (Unit unit : teamHand.getHand()) {
             System.out.printf(HAND_FORMAT, numbering, unit.getUnitName(), unit.getAtk(), unit.getDef());
             numbering++;
@@ -227,9 +231,9 @@ public final class Output {
      * @return the number of units the team currently has on the board
      */
     public static int getBoardCount(Team team) {
-        int count = 0;
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+        int count = START_COUNT;
+        for (int row = START_INDEX; row < GameBoard.DIMENSION; row++) {
+            for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
                 Unit boardUnit = GameBoard.getUnitAt(row, col);
                 if (boardUnit != null && boardUnit.getTeam().equals(team) && !boardUnit.getRole().equals(GameMessages.KING)) {
                     count++;
@@ -240,8 +244,8 @@ public final class Output {
     }
 
     private static void printStateLine(String left, String right) {
-        String base = String.format(STATE_LINE_BASE_FORMAT, left);
+        String base = INDENT + left;
         int spacesNeeded = MAX_STATE_LINE_LENGTH - base.length() - right.length();
-        System.out.printf(STATE_LINE_FORMAT, base, " ".repeat(Math.max(0, spacesNeeded)), right);
+        System.out.println(base + SPACE.repeat(Math.max(START_INDEX, spacesNeeded)) + right);
     }
 }

@@ -22,6 +22,29 @@ import static edu.kit.kastel.Output.getBoardCount;
  * @version 0.7
  */
 public final class AIPlacement {
+
+    private static final int INITIAL_VALUE = 0;
+    private static final int START_INDEX = 0;
+    private static final int ROW_INDEX = 0;
+    private static final int COL_INDEX = 1;
+    private static final int ENEMIES_INDEX = 0;
+    private static final int FELLOWS_INDEX = 1;
+
+    private static final int SINGLE_TARGET = 1;
+    private static final int RANDOM_MIN_BOUND = 1;
+    private static final int RANDOM_OFFSET = 1;
+
+    private static final int MAX_BOARD_UNITS = 5;
+    private static final int MIN_COORDINATE = 0;
+    private static final int ENEMY_SCORE_MULTIPLIER = 2;
+
+    private static final int[][] CLOCK_DIRS = {
+            {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}
+    };
+    private static final int[][] ORTH_DIRS = {
+            {-1, 0}, {0, 1}, {1, 0}, {0, -1}
+    };
+
     private AIPlacement() {
     }
 
@@ -42,10 +65,10 @@ public final class AIPlacement {
             return;
         }
 
-        TargetSquare targetSquare = validTargets.get(0);
-        if (validTargets.size() > 1) {
-            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
-            targetSquare = validTargets.get(draw - 1);
+        TargetSquare targetSquare = validTargets.get(START_INDEX);
+        if (validTargets.size() > SINGLE_TARGET) {
+            int draw = RandomGenerator.randomIntegerPick(RANDOM_MIN_BOUND, validTargets.size() + RANDOM_OFFSET);
+            targetSquare = validTargets.get(draw - RANDOM_OFFSET);
         }
 
         List<Unit> hand = GameEngine.getTeam2().getHand().getHand();
@@ -78,7 +101,7 @@ public final class AIPlacement {
             }
         } else {
             int boardCount = getBoardCount(GameEngine.getTeam2());
-            if (boardCount >= 5) {
+            if (boardCount >= MAX_BOARD_UNITS) {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), null);
                 Output.printElimination(unitToPlace.getUnitName());
             } else {
@@ -93,7 +116,7 @@ public final class AIPlacement {
 
     private static Unit selectCardToPlace(List<Unit> hand) {
         List<Integer> weights = new ArrayList<>();
-        int totalWeight = 0;
+        int totalWeight = INITIAL_VALUE;
 
         for (Unit unit : hand) {
             int weight = unit.getAtk();
@@ -101,11 +124,11 @@ public final class AIPlacement {
             totalWeight += weight;
         }
 
-        int selectedCardIndex = 0;
-        if (totalWeight > 0) {
-            int randomWeight = RandomGenerator.randomIntegerPick(1, totalWeight + 1);
-            int runningSum = 0;
-            for (int i = 0; i < weights.size(); i++) {
+        int selectedCardIndex = INITIAL_VALUE;
+        if (totalWeight > INITIAL_VALUE) {
+            int randomWeight = RandomGenerator.randomIntegerPick(RANDOM_MIN_BOUND, totalWeight + RANDOM_OFFSET);
+            int runningSum = INITIAL_VALUE;
+            for (int i = START_INDEX; i < weights.size(); i++) {
                 runningSum += weights.get(i);
                 if (randomWeight <= runningSum) {
                     selectedCardIndex = i;
@@ -118,16 +141,15 @@ public final class AIPlacement {
     }
 
     private static List<TargetSquare> getBestPlacementSquares(int[] aiKingPos, int[] playerKingPos) {
-        int[][] clockDirs = {{-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}};
-
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
-        for (int[] dir : clockDirs) {
-            int targetRow = aiKingPos[0] + dir[0];
-            int targetCol = aiKingPos[1] + dir[1];
+        for (int[] dir : CLOCK_DIRS) {
+            int targetRow = aiKingPos[ROW_INDEX] + dir[ROW_INDEX];
+            int targetCol = aiKingPos[COL_INDEX] + dir[COL_INDEX];
 
-            if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
+            if (targetRow < MIN_COORDINATE || targetRow >= GameBoard.DIMENSION
+                    || targetCol < MIN_COORDINATE || targetCol >= GameBoard.DIMENSION) {
                 continue;
             }
 
@@ -138,13 +160,13 @@ public final class AIPlacement {
                 }
             }
 
-            int steps = Math.abs(targetRow - playerKingPos[0]) + Math.abs(targetCol - playerKingPos[1]);
+            int steps = Math.abs(targetRow - playerKingPos[ROW_INDEX]) + Math.abs(targetCol - playerKingPos[COL_INDEX]);
 
             int[] counts = countAdjacentUnits(targetRow, targetCol);
-            int enemies = counts[0];
-            int fellows = counts[1];
+            int enemies = counts[ENEMIES_INDEX];
+            int fellows = counts[FELLOWS_INDEX];
 
-            int score = -steps + (2 * enemies) - fellows;
+            int score = -steps + (ENEMY_SCORE_MULTIPLIER * enemies) - fellows;
 
             if (score > maxScore) {
                 maxScore = score;
@@ -158,15 +180,15 @@ public final class AIPlacement {
     }
 
     private static int[] countAdjacentUnits(int row, int col) {
-        int enemies = 0;
-        int fellows = 0;
+        int enemies = INITIAL_VALUE;
+        int fellows = INITIAL_VALUE;
 
-        int[][] orthDirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-        for (int[] dir : orthDirs) {
-            int adjRow = row + dir[0];
-            int adjCol = col + dir[1];
+        for (int[] dir : ORTH_DIRS) {
+            int adjRow = row + dir[ROW_INDEX];
+            int adjCol = col + dir[COL_INDEX];
 
-            if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
+            if (adjRow >= MIN_COORDINATE && adjRow < GameBoard.DIMENSION
+                    && adjCol >= MIN_COORDINATE && adjCol < GameBoard.DIMENSION) {
                 Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
                 if (adjacentUnit != null) {
                     if (adjacentUnit.getTeam().equals(GameEngine.getTeam1())) {

@@ -15,6 +15,11 @@ public final class Initialiser {
     private static List<Unit> player1DrawPile = null;
     private static List<Unit> player2DrawPile = null;
 
+    private static final int START_INDEX = 0;
+    private static final int MAX_DIMENSION = 7;
+    private static final int OFFSET_ONE = 1;
+    private static final int OFFSET_TWO = 2;
+
     private Initialiser() {
     }
 
@@ -45,8 +50,8 @@ public final class Initialiser {
     }
 
     private static void initialiseGameBoard() {
-        for (int i = 0; i < 7; i++) {
-            for (int j = 0; j < 7; j++) {
+        for (int i = START_INDEX; i < MAX_DIMENSION; i++) {
+            for (int j = START_INDEX; j < MAX_DIMENSION; j++) {
                 GameBoard.setUnitAt(i, j, null);
             }
         }
@@ -88,16 +93,16 @@ public final class Initialiser {
     }
 
     private static void initialiseHands(Team team) {
-        for (int i = 0; i < Hand.MAX_HAND_SIZE; i++) {
+        for (int i = START_INDEX; i < Hand.MAX_HAND_SIZE; i++) {
             team.getHand().handLoader(team.getShuffledDeck());
         }
     }
 
     private static void initialiseKings() {
-        Unit team1King = new Unit(GameMessages.FARMER, GameMessages.KING, 0, 0, GameEngine.getTeam1());
-        Unit team2King = new Unit(GameMessages.FARMER, GameMessages.KING, 0, 0, GameEngine.getTeam2());
+        Unit team1King = new Unit(GameMessages.FARMER, GameMessages.KING, START_INDEX, START_INDEX, GameEngine.getTeam1());
+        Unit team2King = new Unit(GameMessages.FARMER, GameMessages.KING, START_INDEX, START_INDEX, GameEngine.getTeam2());
 
-        GameBoard.setUnitAt(GameBoard.DIMENSION - 1, GameBoard.DIMENSION / 2, team1King);
-        GameBoard.setUnitAt(0, GameBoard.DIMENSION / 2, team2King);
+        GameBoard.setUnitAt(GameBoard.DIMENSION - OFFSET_ONE, GameBoard.DIMENSION / OFFSET_TWO, team1King);
+        GameBoard.setUnitAt(START_INDEX, GameBoard.DIMENSION / OFFSET_TWO, team2King);
     }
 }

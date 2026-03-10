@@ -16,6 +16,13 @@ public final class MovementController {
             = "ERROR: Move must be exactly 1 square orthogonally or en place.";
     private static final String HIDDEN_TARGET = "???";
 
+    private static final int START_INDEX = 0;
+    private static final int DISTANCE_ONE = 1;
+    private static final int DISTANCE_TWO = 2;
+    private static final String FORMAT_PAREN_OPEN = " (";
+    private static final String FORMAT_SLASH = "/";
+    private static final String FORMAT_PAREN_CLOSE = ")";
+
     private MovementController() {
     }
 
@@ -53,7 +60,7 @@ public final class MovementController {
      * @return true if the argument is valid, false if it is null or does not have exactly 2 characters
      */
     public static boolean isArgumentValid(String argument) {
-        if (argument == null || argument.length() != 2) {
+        if (argument == null || argument.length() != DISTANCE_TWO) {
             System.err.println(ERROR_INVALID_TARGET_SQUARE);
             return false;
         }
@@ -70,7 +77,7 @@ public final class MovementController {
         int rowDiff = Math.abs(targetRow - GameState.getSelectedRow());
         int colDiff = Math.abs(targetCol - GameState.getSelectedColumn());
 
-        if (rowDiff + colDiff > 1) {
+        if (rowDiff + colDiff > DISTANCE_ONE) {
             System.err.println(ERROR_MOVE_MUST_BE_EXACTLY_1_SQUARE_ORTHOGONALLY_OR_EN_PLACE);
             return false;
         }
@@ -123,7 +130,8 @@ public final class MovementController {
         } else if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.getActiveTeam())) {
             targetDisplay = HIDDEN_TARGET;
         } else {
-            targetDisplay = targetUnit.getUnitName() + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")";
+            targetDisplay = targetUnit.getUnitName() + FORMAT_PAREN_OPEN + targetUnit.getAtk()
+                    + FORMAT_SLASH + targetUnit.getDef() + FORMAT_PAREN_CLOSE;
         }
         Output.printAtkMove(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(),
                 targetDisplay, argument);
@@ -235,11 +243,11 @@ public final class MovementController {
     }
 
     private static void hpStatusCheck() {
-        if (GameEngine.getTeam1().getTeamHP() <= 0) {
+        if (GameEngine.getTeam1().getTeamHP() <= START_INDEX) {
             Output.printZeroPoints(GameEngine.getTeam1().getName());
             Output.printWin(GameEngine.getTeam2().getName());
             GameState.setIsRunning(false);
-        } else if (GameEngine.getTeam2().getTeamHP() <= 0) {
+        } else if (GameEngine.getTeam2().getTeamHP() <= START_INDEX) {
             Output.printZeroPoints(GameEngine.getTeam2().getName());
             Output.printWin(GameEngine.getTeam1().getName());
             GameState.setIsRunning(false);

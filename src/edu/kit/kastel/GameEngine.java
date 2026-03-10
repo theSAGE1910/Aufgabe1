@@ -8,14 +8,16 @@ package edu.kit.kastel;
  */
 public final class GameEngine {
 
-    private static final String NO_MORE_CARDS_LEFT_IN_THE_DECK = "ERROR: %s has no more cards left in the deck!";
     private static Team team1 = null;
     private static Team team2 = null;
     private static Team activeTeam = null;
 
+    private static final int START_INDEX = 0;
+    private static final String WINS_SUFFIX = " wins!";
+    private static final String NO_MORE_CARDS_LEFT_IN_THE_DECK = "ERROR: %s has no more cards left in the deck!";
+
     private static final String HELPING_TEXT
             = "Use one of the following commands: select, board, move, flip, block, hand, place, show, yield, state, quit.";
-
 
     private GameEngine() {
     }
@@ -55,8 +57,8 @@ public final class GameEngine {
      * @param team the team for which to reset the movement status of all units
      */
     public static void resetTeamMovement(Team team) {
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+        for (int row = START_INDEX; row < GameBoard.DIMENSION; row++) {
+            for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
                 Unit boardUnit = GameBoard.getUnitAt(row, col);
                 if (boardUnit != null && boardUnit.getTeam().equals(team)) {
                     boardUnit.setHasMovedThisTurn(false);
@@ -70,8 +72,8 @@ public final class GameEngine {
      * @param team the team for which to reset the block status
      */
     public static void resetTeamBlocks(Team team) {
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+        for (int row = START_INDEX; row < GameBoard.DIMENSION; row++) {
+            for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
                 Unit boardUnit = GameBoard.getUnitAt(row, col);
                 if (boardUnit != null && boardUnit.getTeam().equals(team)) {
                     boardUnit.setBlocking(false);
@@ -90,7 +92,7 @@ public final class GameEngine {
         if (!success) {
             System.err.printf(NO_MORE_CARDS_LEFT_IN_THE_DECK, team.getName());
             Team winner = team.equals(getTeam1()) ? getTeam2() : getTeam1();
-            System.out.println(winner.getName() + " wins!");
+            System.out.println(winner.getName() + WINS_SUFFIX);
             GameState.setIsRunning(false);
         }
         return success;

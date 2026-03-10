@@ -29,6 +29,7 @@ public final class CommandProcessor {
     private static final String ERROR_INVALID_COMMAND = "ERROR: Invalid command";
     private static final String ERROR_INVALID_COMMAND_FORMAT = "ERROR: Invalid command format";
     private static final String ERROR_NO_COMMAND_PROVIDED = "ERROR: No command provided";
+
     private static final String SELECT = "select";
     private static final String MOVE = "move";
     private static final String FLIP = "flip";
@@ -39,15 +40,18 @@ public final class CommandProcessor {
     private static final String STATE = "state";
     private static final String QUIT = "quit";
 
+    private static final int INDEX_ZERO = 0;
+    private static final int INDEX_ONE = 1;
+    private static final int INDEX_TWO = 2;
+    private static final int INVALID_INDEX = -1;
+
     private CommandProcessor() {
     }
-
 
     /**
      * Initializes the command processor by populating the command map with available commands and their corresponding handlers.
      */
     public static void initialise() {
-
         if (COMMANDS.isEmpty()) {
             COMMANDS.put(SELECT, new SelectCommand());
             COMMANDS.put(GameMessages.BOARD, new BoardCommand());
@@ -69,17 +73,17 @@ public final class CommandProcessor {
      */
     public static void processCommands(String input) {
         String[] words = input.split(REGEX_SPACE);
-        if (words.length == 0) {
+        if (words.length == INDEX_ZERO) {
             System.err.println(ERROR_NO_COMMAND_PROVIDED);
             return;
         }
 
-        String key = words[0].toLowerCase();
+        String key = words[INDEX_ZERO].toLowerCase();
         String argument = null;
 
-        if (words.length == 2) {
-            argument = words[1].toUpperCase().trim();
-        } else if (words.length > 2) {
+        if (words.length == INDEX_TWO) {
+            argument = words[INDEX_ONE].toUpperCase().trim();
+        } else if (words.length > INDEX_TWO) {
             if (key.equalsIgnoreCase(PLACE)) {
                 argument = input.trim().substring(key.length()).toUpperCase();
             } else {
@@ -105,21 +109,19 @@ public final class CommandProcessor {
     public static int parseHandIndex(String argument, Hand currentHand) {
         if (argument == null) {
             System.err.println(ERROR_NO_CARD_INDEX_PROVIDED);
-            return -1;
+            return INVALID_INDEX;
         }
 
         try {
             int index = Integer.parseInt(argument);
-            if (index < 1 || index > currentHand.getHand().size()) {
+            if (index < INDEX_ONE || index > currentHand.getHand().size()) {
                 System.err.println(GameMessages.ERROR_INVALID_CARD_INDEX);
-                return -1;
+                return INVALID_INDEX;
             }
-            return index - 1;
+            return index - INDEX_ONE;
         } catch (NumberFormatException e) {
             System.err.println(GameMessages.ERROR_INVALID_CARD_INDEX);
-            return -1;
+            return INVALID_INDEX;
         }
     }
-
-
 }

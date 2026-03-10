@@ -15,6 +15,13 @@ import java.util.List;
  * @version 0.7
  */
 public final class AIDiscard {
+
+    private static final int MAX_HAND_SIZE = 5;
+    private static final int INITIAL_VALUE = 0;
+    private static final int RANDOM_MIN_BOUND = 1;
+    private static final int RANDOM_OFFSET = 1;
+    private static final int START_INDEX = 0;
+
     private AIDiscard() {
     }
 
@@ -27,7 +34,7 @@ public final class AIDiscard {
      */
     public static void discardCard() {
         List<Unit> hand = GameEngine.getTeam2().getHand().getHand();
-        if (hand.size() < 5) {
+        if (hand.size() < MAX_HAND_SIZE) {
             return;
         }
 
@@ -42,18 +49,18 @@ public final class AIDiscard {
         }
 
         List<Integer> invertedWeights = new ArrayList<>();
-        int totalInvWeight = 0;
+        int totalInvWeight = INITIAL_VALUE;
         for (int weight : originalWeights) {
             int invWeight = maxWeight - weight;
             invertedWeights.add(invWeight);
             totalInvWeight += invWeight;
         }
 
-        int selectedDiscardIndex = 0;
-        if (totalInvWeight > 0) {
-            int randomWeight = RandomGenerator.randomIntegerPick(1, totalInvWeight + 1);
-            int runningSum = 0;
-            for (int i = 0; i < invertedWeights.size(); i++) {
+        int selectedDiscardIndex = INITIAL_VALUE;
+        if (totalInvWeight > INITIAL_VALUE) {
+            int randomWeight = RandomGenerator.randomIntegerPick(RANDOM_MIN_BOUND, totalInvWeight + RANDOM_OFFSET);
+            int runningSum = INITIAL_VALUE;
+            for (int i = START_INDEX; i < invertedWeights.size(); i++) {
                 runningSum += invertedWeights.get(i);
                 if (randomWeight <= runningSum) {
                     selectedDiscardIndex = i;

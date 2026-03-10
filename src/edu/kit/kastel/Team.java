@@ -16,6 +16,8 @@ public class Team {
      */
     public static final int INITIAL_HP = 8000;
 
+    private static final int INITIAL_VALUE = 0;
+
     private final String name;
     private final Deck deck;
     private final Hand hand;
@@ -46,7 +48,7 @@ public class Team {
      * @param amount the integer amount of damage to take
      */
     public void takeDamage(int amount) {
-        this.teamHP = Math.max(0, this.teamHP - amount);
+        this.teamHP = Math.max(INITIAL_VALUE, this.teamHP - amount);
     }
 
     /**

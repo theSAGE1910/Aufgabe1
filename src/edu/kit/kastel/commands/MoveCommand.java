@@ -11,6 +11,10 @@ import edu.kit.kastel.Unit;
  * @version 0.9
  */
 public class MoveCommand implements Command {
+
+    private static final int ROW_INDEX = 0;
+    private static final int COL_INDEX = 1;
+
     @Override
     public void execute(String argument) {
         if (!MovementController.isArgumentValid(argument)) {
@@ -22,8 +26,8 @@ public class MoveCommand implements Command {
             return;
         }
 
-        int targetRow = GameBoard.getCoordinates(argument)[0];
-        int targetCol = GameBoard.getCoordinates(argument)[1];
+        int targetRow = GameBoard.getCoordinates(argument)[ROW_INDEX];
+        int targetCol = GameBoard.getCoordinates(argument)[COL_INDEX];
 
         if (!MovementController.isDistanceValid(targetRow, targetCol)) {
             return;

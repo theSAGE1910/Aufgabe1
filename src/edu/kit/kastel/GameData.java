@@ -16,6 +16,27 @@ import java.util.Map;
  */
 public final class GameData {
 
+    private static final int MAX_UNITS = 80;
+    private static final int INITIAL_SEED = 0;
+    private static final int EXPECTED_ARG_LENGTH = 2;
+    private static final int KEY_INDEX = 0;
+    private static final int VALUE_INDEX = 1;
+    private static final int FIRST_ELEMENT_INDEX = 0;
+
+    private static int seed = INITIAL_SEED;
+    private static String boardData = null;
+    private static List<String> unitData = null;
+    private static List<String> deck1Data = null;
+    private static List<String> deck2Data = null;
+    private static String verbosity = null;
+
+    private static final String DEFAULT_PLAYER = "Player";
+    private static final String DEFAULT_ENEMY = "Enemy";
+
+    private static String team1Name = DEFAULT_PLAYER;
+
+    private static String team2Name = DEFAULT_ENEMY;
+
     private static final String SEED = "seed";
     private static final String TEAM_1 = "team1";
     private static final String TEAM_2 = "team2";
@@ -50,22 +71,6 @@ public final class GameData {
     private static final String REGEX_EQUALS = "=";
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     private static Map<String, String> argInfo = null;
-
-    private static final int MAX_UNITS = 80;
-
-    private static int seed = 0;
-    private static String boardData = null;
-    private static List<String> unitData = null;
-    private static List<String> deck1Data = null;
-    private static List<String> deck2Data = null;
-    private static String verbosity = GameMessages.ALL;
-
-    private static final String DEFAULT_PLAYER = "Player";
-    private static final String DEFAULT_ENEMY = "Enemy";
-
-    private static String team1Name = DEFAULT_PLAYER;
-
-    private static String team2Name = DEFAULT_ENEMY;
 
     private GameData() {
     }
@@ -123,12 +128,12 @@ public final class GameData {
     private static boolean parseArguments(String[] args) {
         for (String arg : args) {
             String[] keyValue = arg.split(REGEX_EQUALS);
-            if (keyValue.length == 2) {
-                if (argInfo.containsKey(keyValue[0])) {
+            if (keyValue.length == EXPECTED_ARG_LENGTH) {
+                if (argInfo.containsKey(keyValue[KEY_INDEX])) {
                     System.err.println(ERROR_DUPLICATE_ARGUMENT_PROVIDED);
                     return false;
                 }
-                argInfo.put(keyValue[0], keyValue[1]);
+                argInfo.put(keyValue[KEY_INDEX], keyValue[VALUE_INDEX]);
             } else {
                 System.err.println(ERROR_INVALID_ARGUMENT_FORMAT + arg);
                 return false;
@@ -273,7 +278,7 @@ public final class GameData {
                 System.err.println(ERROR_BOARD_FILE_IS_EMPTY);
                 return null;
             }
-            return lines.get(0);
+            return lines.get(FIRST_ELEMENT_INDEX);
         } catch (IOException e) {
             System.err.println(ERROR_IO_EXCEPTION);
             return null;

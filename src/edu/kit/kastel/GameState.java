@@ -8,14 +8,15 @@ package edu.kit.kastel;
 public final class GameState {
     private static final String ERR_NO_UNIT = "ERROR: No unit on the selected square.";
     private static final String ERR_ALREADY_MOVED = "ERROR: Unit has already moved this turn.";
+    private static final int DEFAULT_COORDINATE = 0;
 
     private static boolean isRunning = true;
 
     private static String selectedSquare = null;
 
-    private static int selectedRow = 0;
+    private static int selectedRow = DEFAULT_COORDINATE;
 
-    private static int selectedColumn = 0;
+    private static int selectedColumn = DEFAULT_COORDINATE;
 
     private static boolean hasPlacedThisTurn = false;
 

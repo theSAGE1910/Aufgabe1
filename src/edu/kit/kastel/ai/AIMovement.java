@@ -22,6 +22,46 @@ import java.util.List;
  */
 public final class AIMovement {
 
+    private static final int INITIAL_VALUE = 0;
+    private static final int START_INDEX = 0;
+    private static final int ROW_INDEX = 0;
+    private static final int COL_INDEX = 1;
+    private static final int ENEMIES_INDEX = 0;
+    private static final int FELLOWS_INDEX = 1;
+
+    private static final int SINGLE_TARGET = 1;
+    private static final int RANDOM_MIN_BOUND = 1;
+    private static final int RANDOM_OFFSET = 1;
+
+    private static final int SAME_SQUARE_DISTANCE = 0;
+    private static final int ADJACENT_DISTANCE = 1;
+    private static final int FELLOW_PRESENT_VALUE = 1;
+
+    private static final int ENEMY_PENALTY_MULTIPLIER = 2;
+    private static final int FELLOW_KING_PRESENCE_PENALTY = 3;
+
+    private static final int MIN_COORDINATE = 0;
+    private static final int ROW_INVERSION_BASE = 7;
+
+    private static final int MIN_MOVE_ACTION_INDEX = 0;
+    private static final int MAX_MOVE_ACTION_INDEX = 3;
+    private static final int BLOCK_ACTION_INDEX = 4;
+    private static final int STAY_ACTION_INDEX = 5;
+    private static final int INVALID_ACTION_INDEX = -1;
+
+    private static final int WEIGHT_FLOOR = 0;
+
+    private static final int DIR_NEG = -1;
+    private static final int DIR_ZERO = 0;
+    private static final int DIR_POS = 1;
+
+    private static final int[][] KING_NEIGHBOUR_DIRS = {
+            {-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}
+    };
+    private static final int[][] UNIT_ACTION_DIRS = {
+            {-1, 0}, {0, 1}, {1, 0}, {0, -1}
+    };
+
     private AIMovement() {
     }
 
@@ -36,18 +76,18 @@ public final class AIMovement {
             return;
         }
 
-        int enemyKingRow = enemyKingPos[0];
-        int enemyKingCol = enemyKingPos[1];
+        int enemyKingRow = enemyKingPos[ROW_INDEX];
+        int enemyKingCol = enemyKingPos[COL_INDEX];
         Unit king = GameBoard.getUnitAt(enemyKingRow, enemyKingCol);
 
         List<TargetSquare> validTargets = getBestKingTargets(enemyKingRow, enemyKingCol, king);
 
         TargetSquare targetSquare = null;
-        if (validTargets.size() == 1) {
-            targetSquare = validTargets.get(0);
-        } else if (validTargets.size() > 1) {
-            int draw = RandomGenerator.randomIntegerPick(1, validTargets.size() + 1);
-            targetSquare = validTargets.get(draw - 1);
+        if (validTargets.size() == SINGLE_TARGET) {
+            targetSquare = validTargets.get(START_INDEX);
+        } else if (validTargets.size() > SINGLE_TARGET) {
+            int draw = RandomGenerator.randomIntegerPick(RANDOM_MIN_BOUND, validTargets.size() + RANDOM_OFFSET);
+            targetSquare = validTargets.get(draw - RANDOM_OFFSET);
         }
 
         if (targetSquare != null) {
@@ -87,7 +127,7 @@ public final class AIMovement {
                 int row = GameBoard.getUnitRow(unit);
                 int col = GameBoard.getUnitCol(unit);
 
-                int totalScore = 0;
+                int totalScore = INITIAL_VALUE;
 
                 List<Integer> scores = calculateUnitScores(unit, row, col);
 
@@ -126,12 +166,13 @@ public final class AIMovement {
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
-        for (int i = 0; i < GameLogicAI.DIRECTIONS.length; i++) {
+        for (int i = START_INDEX; i < GameLogicAI.DIRECTIONS.length; i++) {
 
-            int targetRow = enemyKingRow + GameLogicAI.DIRECTIONS[i][0];
-            int targetCol = enemyKingCol + GameLogicAI.DIRECTIONS[i][1];
+            int targetRow = enemyKingRow + GameLogicAI.DIRECTIONS[i][ROW_INDEX];
+            int targetCol = enemyKingCol + GameLogicAI.DIRECTIONS[i][COL_INDEX];
 
-            if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
+            if (targetRow < MIN_COORDINATE || targetRow >= GameBoard.DIMENSION
+                    || targetCol < MIN_COORDINATE || targetCol >= GameBoard.DIMENSION) {
                 continue;
             }
 
@@ -155,29 +196,28 @@ public final class AIMovement {
 
     private static int getKingScore(Unit targetUnit, Unit king, int targetRow, int targetCol) {
         int[] aiKingPos = GameBoard.getEnemyKingPosition();
-        int distance = (targetRow == aiKingPos[0] && targetCol == aiKingPos[1]) ? 0 : 1;
-        int fellowsPresent = 0;
+        int distance = (targetRow == aiKingPos[ROW_INDEX] && targetCol == aiKingPos[COL_INDEX])
+                ? SAME_SQUARE_DISTANCE : ADJACENT_DISTANCE;
+        int fellowsPresent = INITIAL_VALUE;
 
         if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.getTeam2()) && targetUnit != king) {
-            fellowsPresent = 1;
+            fellowsPresent = FELLOW_PRESENT_VALUE;
         }
 
         int[] counts = countKingNeighbours(targetRow, targetCol, king);
-        int enemies = counts[0];
-        int fellows = counts[1];
+        int enemies = counts[ENEMIES_INDEX];
+        int fellows = counts[FELLOWS_INDEX];
 
-        return fellows - (2 * enemies) - distance - (3 * fellowsPresent);
+        return fellows - (ENEMY_PENALTY_MULTIPLIER * enemies) - distance - (FELLOW_KING_PRESENCE_PENALTY * fellowsPresent);
     }
 
     private static int[] countKingNeighbours(int targetRow, int targetCol, Unit king) {
-        int enemies = 0;
-        int fellows = 0;
+        int enemies = INITIAL_VALUE;
+        int fellows = INITIAL_VALUE;
 
-        int[][] dirs = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
+        for (int[] dir : KING_NEIGHBOUR_DIRS) {
 
-        for (int[] dir : dirs) {
-
-            Unit adjacentUnit = getValidAdjacentUnit(targetRow + dir[0], targetCol + dir[1], king);
+            Unit adjacentUnit = getValidAdjacentUnit(targetRow + dir[ROW_INDEX], targetCol + dir[COL_INDEX], king);
 
             if (adjacentUnit != null) {
                 if (adjacentUnit.getTeam().equals(GameEngine.getTeam1())) {
@@ -191,7 +231,7 @@ public final class AIMovement {
     }
 
     private static Unit getValidAdjacentUnit(int row, int col, Unit king) {
-        if (row >= 0 && row < GameBoard.DIMENSION && col >= 0 && col < GameBoard.DIMENSION) {
+        if (row >= MIN_COORDINATE && row < GameBoard.DIMENSION && col >= MIN_COORDINATE && col < GameBoard.DIMENSION) {
             Unit unit = GameBoard.getUnitAt(row, col);
             if (unit != null && unit != king) {
                 return unit;
@@ -202,8 +242,8 @@ public final class AIMovement {
 
     private static List<Unit> getMovableUnits() {
         List<Unit> movableUnits = new ArrayList<>();
-        for (int row = 0; row < GameBoard.DIMENSION; row++) {
-            for (int col = 0; col < GameBoard.DIMENSION; col++) {
+        for (int row = START_INDEX; row < GameBoard.DIMENSION; row++) {
+            for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
                 Unit unit = GameBoard.getUnitAt(row, col);
                 if (unit != null && unit.getTeam().equals(GameEngine.getTeam2())
                         && !unit.getRole().equals(GameMessages.KING) && !unit.hasMovedThisTurn()) {
@@ -222,26 +262,25 @@ public final class AIMovement {
      */
     static String getCoordinateString(int row, int col) {
         char colChar = (char) (GameMessages.CHAR_BASE + col);
-        int rowNum = 7 - row;
+        int rowNum = ROW_INVERSION_BASE - row;
 
         return "" + colChar + rowNum;
     }
 
     private static void executeUnitAction(int selectedActionIndex, int bestUnitRow, int bestUnitCol, Unit bestUnit, String startCoord) {
-        if (selectedActionIndex >= 0 && selectedActionIndex <= 3) {
-            int[][] dirs = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
-            int targetRow = bestUnitRow + dirs[selectedActionIndex][0];
-            int targetCol = bestUnitCol + dirs[selectedActionIndex][1];
+        if (selectedActionIndex >= MIN_MOVE_ACTION_INDEX && selectedActionIndex <= MAX_MOVE_ACTION_INDEX) {
+            int targetRow = bestUnitRow + UNIT_ACTION_DIRS[selectedActionIndex][ROW_INDEX];
+            int targetCol = bestUnitCol + UNIT_ACTION_DIRS[selectedActionIndex][COL_INDEX];
             String targetCoord = getCoordinateString(targetRow, targetCol);
 
             Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
             MovementController.executeMove(targetCoord, targetUnit, targetRow, targetCol, bestUnit);
-        } else if (selectedActionIndex == 4) {
+        } else if (selectedActionIndex == BLOCK_ACTION_INDEX) {
             bestUnit.setBlocking(true);
             bestUnit.setHasMovedThisTurn(true);
             Output.printBlock(bestUnit.getUnitName(), startCoord);
             GameUI.updateDisplay();
-        } else if (selectedActionIndex == 5) {
+        } else if (selectedActionIndex == STAY_ACTION_INDEX) {
             Unit targetUnit = GameBoard.getUnitAt(bestUnitRow, bestUnitCol);
             MovementController.executeMove(startCoord, targetUnit, bestUnitRow, bestUnitCol, bestUnit);
         }
@@ -250,34 +289,34 @@ public final class AIMovement {
     private static List<Integer> calculateUnitScores(Unit unit, int row, int col) {
         List<Integer> scores = new ArrayList<>();
 
-        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, -1, 0));
-        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, 0, 1));
-        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, 1, 0));
-        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, 0, -1));
+        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, DIR_NEG, DIR_ZERO));
+        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, DIR_ZERO, DIR_POS));
+        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, DIR_POS, DIR_ZERO));
+        scores.add(AIScoreCalculator.getDirectionalScore(unit, row, col, DIR_ZERO, DIR_NEG));
         scores.add(AIScoreCalculator.getBlockScore(unit, row, col));
         scores.add(AIScoreCalculator.getEnPlaceScore(unit, row, col));
         return scores;
     }
 
     private static int getSelectedActionIndex(List<Integer> bestUnitScores) {
-        int selectedActionIndex = -1;
-        int totalWeight = 0;
+        int selectedActionIndex = INVALID_ACTION_INDEX;
+        int totalWeight = INITIAL_VALUE;
         List<Integer> validWeights = new ArrayList<>();
 
         for (int score : bestUnitScores) {
-            int weight = Math.max(0, score);
+            int weight = Math.max(WEIGHT_FLOOR, score);
             validWeights.add(weight);
             totalWeight += weight;
         }
 
-        if (totalWeight == 0) {
-            selectedActionIndex = 4;
+        if (totalWeight == INITIAL_VALUE) {
+            selectedActionIndex = BLOCK_ACTION_INDEX;
         } else {
-            int randomWeight = RandomGenerator.randomIntegerPick(1, totalWeight + 1);
-            int runningSum = 0;
-            for (int i = 0; i < validWeights.size(); i++) {
+            int randomWeight = RandomGenerator.randomIntegerPick(RANDOM_MIN_BOUND, totalWeight + RANDOM_OFFSET);
+            int runningSum = INITIAL_VALUE;
+            for (int i = START_INDEX; i < validWeights.size(); i++) {
                 runningSum += validWeights.get(i);
-                if (randomWeight <= runningSum && validWeights.get(i) > 0) {
+                if (randomWeight <= runningSum && validWeights.get(i) > WEIGHT_FLOOR) {
                     selectedActionIndex = i;
                     break;
                 }

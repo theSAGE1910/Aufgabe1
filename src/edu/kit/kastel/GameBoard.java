@@ -19,6 +19,13 @@ public final class GameBoard {
      */
     private static final Unit[][] GAME_BOARD = new Unit[DIMENSION][DIMENSION];
 
+    private static final int START_INDEX = 0;
+    private static final int ROW_INDEX = 0;
+    private static final int COL_INDEX = 1;
+    private static final int COORD_LENGTH = 2;
+    private static final int RADIX_TEN = 10;
+    private static final int NOT_FOUND = -1;
+
     private GameBoard() {
     }
 
@@ -59,8 +66,8 @@ public final class GameBoard {
     }
 
     private static int[] getKingPosition(Team team) {
-        for (int row = 0; row < DIMENSION; row++) {
-            for (int col = 0; col < DIMENSION; col++) {
+        for (int row = START_INDEX; row < DIMENSION; row++) {
+            for (int col = START_INDEX; col < DIMENSION; col++) {
                 Unit unit = getUnitAt(row, col);
                 if (unit != null && unit.getTeam().equals(team) && unit.getRole().equals(GameMessages.KING)) {
                     return new int[]{row, col};
@@ -76,10 +83,8 @@ public final class GameBoard {
      * @return the integer row index, or -1 if the unit is not on the board
      */
     public static int getUnitRow(Unit unit) {
-        return getUnitPosition(unit)[0];
+        return getUnitPosition(unit)[ROW_INDEX];
     }
-
-    //if I have time, make these two methods into one, by passing key row and col hehe:)
 
     /**
      * Retrieves the current column index of a specific unit on the board.
@@ -87,18 +92,18 @@ public final class GameBoard {
      * @return the integer column index, or -1 if the unit is not on the board
      */
     public static int getUnitCol(Unit unit) {
-        return getUnitPosition(unit)[1];
+        return getUnitPosition(unit)[COL_INDEX];
     }
 
     private static int[] getUnitPosition(Unit unit) {
-        for (int row = 0; row < DIMENSION; row++) {
-            for (int col = 0; col < DIMENSION; col++) {
+        for (int row = START_INDEX; row < DIMENSION; row++) {
+            for (int col = START_INDEX; col < DIMENSION; col++) {
                 if (getUnitAt(row, col) == unit) {
                     return new int[]{row, col};
                 }
             }
         }
-        return new int[]{-1, -1};
+        return new int[]{NOT_FOUND, NOT_FOUND};
     }
 
     /**
@@ -107,10 +112,10 @@ public final class GameBoard {
      * @return an integer array containing the row at index 0 and column at index 1
      */
     public static int[] getCoordinates(String coordinate) {
-        int[] coords = new int[2];
+        int[] coords = new int[COORD_LENGTH];
 
-        coords[0] = 7 - Character.getNumericValue(coordinate.charAt(1));
-        coords[1] = Character.getNumericValue(coordinate.toUpperCase().charAt(0)) - 10;
+        coords[ROW_INDEX] = DIMENSION - Character.getNumericValue(coordinate.charAt(COL_INDEX));
+        coords[COL_INDEX] = Character.getNumericValue(coordinate.toUpperCase().charAt(ROW_INDEX)) - RADIX_TEN;
 
         return coords;
     }

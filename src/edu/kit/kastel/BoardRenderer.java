@@ -7,7 +7,13 @@ package edu.kit.kastel;
  * @version 0.9
  */
 public final class BoardRenderer {
-    private static final String EMPTY = "   ";
+
+    private static final int START_INDEX = 0;
+    private static final int OFFSET_ONE = 1;
+    private static final String SPACE = " ";
+    private static final String TWO_SPACES = "  ";
+    private static final String THREE_SPACES = "   ";
+    private static final String FOUR_SPACES = "    ";
 
     private static final char OUT_OF_BOUND_COL = 'Z';
 
@@ -24,10 +30,10 @@ public final class BoardRenderer {
         int selectedRow = GameBoard.DIMENSION - selRow;
         int selectedCol = selCol - GameMessages.CHAR_BASE;
 
-        for (int row = 0; row <= GameBoard.DIMENSION; row++) {
+        for (int row = START_INDEX; row <= GameBoard.DIMENSION; row++) {
             if (GameData.getVerbosity().equalsIgnoreCase(GameMessages.ALL)) {
-                System.out.print("  ");
-                for (int col = 0; col <= GameBoard.DIMENSION; col++) {
+                System.out.print(TWO_SPACES);
+                for (int col = START_INDEX; col <= GameBoard.DIMENSION; col++) {
                     System.out.print(getIntersectionChar(row, col, selectedRow, selectedCol));
                     if (col < GameBoard.DIMENSION) {
                         char hLine = getHorizontalChar(row, col, selectedRow, selectedCol);
@@ -37,12 +43,12 @@ public final class BoardRenderer {
                 System.out.println();
             }
             if (row < GameBoard.DIMENSION) {
-                System.out.print((GameBoard.DIMENSION - row) + " ");
-                for (int col = 0; col <= GameBoard.DIMENSION; col++) {
+                System.out.print((GameBoard.DIMENSION - row) + SPACE);
+                for (int col = START_INDEX; col <= GameBoard.DIMENSION; col++) {
                     System.out.print(getVerticalChar(row, col, selectedRow, selectedCol));
                     if (col < GameBoard.DIMENSION) {
                         if (GameBoard.getUnitAt(row, col) == null) {
-                            System.out.print(EMPTY);
+                            System.out.print(THREE_SPACES);
                         } else {
                             System.out.print(GameBoard.getUnitAt(row, col).toString());
                         }
@@ -51,12 +57,12 @@ public final class BoardRenderer {
                 System.out.println();
             }
         }
-        System.out.print("    ");
+        System.out.print(FOUR_SPACES);
 
         for (char ch = GameMessages.CHAR_BASE; ch < GameMessages.CHAR_BASE + GameBoard.DIMENSION; ch++) {
             System.out.print(ch);
-            if (ch < GameMessages.CHAR_BASE + GameBoard.DIMENSION - 1) {
-                System.out.print("   ");
+            if (ch < GameMessages.CHAR_BASE + GameBoard.DIMENSION - OFFSET_ONE) {
+                System.out.print(THREE_SPACES);
             }
         }
         System.out.println();
@@ -66,22 +72,22 @@ public final class BoardRenderer {
      * Overloaded method to show the game board without any highlighted square.
      */
     public static void showGameBoard() {
-        showGameBoard(OUT_OF_BOUND_COL, 0);
+        showGameBoard(OUT_OF_BOUND_COL, START_INDEX);
     }
 
     private static char getIntersectionChar(int row, int col, int selectedRow, int selectedCol) {
         boolean isTopLeft = (row == selectedRow && col == selectedCol);
-        boolean isTopRight = (row == selectedRow && col == selectedCol + 1);
-        boolean isBottomLeft = (row == selectedRow + 1 && col == selectedCol);
-        boolean isBottomRight = (row == selectedRow + 1 && col == selectedCol + 1);
+        boolean isTopRight = (row == selectedRow && col == selectedCol + OFFSET_ONE);
+        boolean isBottomLeft = (row == selectedRow + OFFSET_ONE && col == selectedCol);
+        boolean isBottomRight = (row == selectedRow + OFFSET_ONE && col == selectedCol + OFFSET_ONE);
 
-        if (row == 0) {
+        if (row == START_INDEX) {
             return getTopEdgeChar(col, isTopLeft, isTopRight);
         }
         if (row == GameBoard.DIMENSION) {
             return getBottomEdgeChar(col, isBottomLeft, isBottomRight);
         }
-        if (col == 0) {
+        if (col == START_INDEX) {
             return getLeftEdgeChar(isTopLeft, isBottomLeft);
         }
         if (col == GameBoard.DIMENSION) {
@@ -109,7 +115,7 @@ public final class BoardRenderer {
     }
 
     private static char getTopEdgeChar(int col, boolean isTopLeft, boolean isTopRight) {
-        if (col == 0) {
+        if (col == START_INDEX) {
             return isTopLeft ? BoardTheme.get(BoardTheme.SEL_CORNER_TOP_LEFT) : BoardTheme.get(BoardTheme.CORNER_TOP_LEFT);
         }
         if (col == GameBoard.DIMENSION) {
@@ -125,7 +131,7 @@ public final class BoardRenderer {
     }
 
     private static char getBottomEdgeChar(int col, boolean isBottomLeft, boolean isBottomRight) {
-        if (col == 0) {
+        if (col == START_INDEX) {
             return isBottomLeft ? BoardTheme.get(BoardTheme.SEL_CORNER_BOTTOM_LEFT) : BoardTheme.get(BoardTheme.CORNER_BOTTOM_LEFT);
         }
         if (col == GameBoard.DIMENSION) {
@@ -161,12 +167,12 @@ public final class BoardRenderer {
     }
 
     private static char getHorizontalChar(int row, int col, int selectedRow, int selectedCol) {
-        boolean isHighlighted = (col == selectedCol) && (row == selectedRow || row == selectedRow + 1);
+        boolean isHighlighted = (col == selectedCol) && (row == selectedRow || row == selectedRow + OFFSET_ONE);
         return (isHighlighted ? BoardTheme.get(BoardTheme.SEL_HORIZONTAL) : BoardTheme.get(BoardTheme.HORIZONTAL));
     }
 
     private static char getVerticalChar(int row, int col, int selectedRow, int selectedCol) {
-        boolean isHighlighted = (row == selectedRow) && (col == selectedCol || col == selectedCol + 1);
+        boolean isHighlighted = (row == selectedRow) && (col == selectedCol || col == selectedCol + OFFSET_ONE);
         return (isHighlighted ? BoardTheme.get(BoardTheme.SEL_VERTICAL) : BoardTheme.get(BoardTheme.VERTICAL));
     }
 }

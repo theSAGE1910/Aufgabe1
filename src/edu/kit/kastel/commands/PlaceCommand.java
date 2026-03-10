@@ -21,12 +21,20 @@ import java.util.Set;
  */
 public class PlaceCommand implements Command {
 
-
     private static final String ERROR_NO_HAND_INDEX_PROVIDED = "ERROR: No hand index provided.";
     private static final String ERROR_DUPLICATE_INDEX_PROVIDED = "ERROR: Duplicate index provided.";
     private static final String ERROR_TARGET_SQUARE_ADJACENT_TO_FARMER_KING = "ERROR: Target square must be adjacent to the Farmer King.";
     private static final String ERROR_SQUARE_ALREADY_OCCUPIED = "ERROR: Square already occupied.";
     private static final String ERROR_ONE_UNIT_PER_TURN = "ERROR: You can only place one unit per turn.";
+    private static final String SPACE_DELIMITER = " ";
+
+    private static final int INVALID_INDEX_FLAG = -1;
+    private static final int MIN_CARD_INDEX = 1;
+    private static final int INDEX_OFFSET = 1;
+    private static final int MAX_BOARD_UNITS = 5;
+    private static final int ROW_INDEX = 0;
+    private static final int COL_INDEX = 1;
+    private static final int MAX_ADJACENT_DISTANCE = 1;
 
     @Override
     public void execute(String argument) {
@@ -39,7 +47,7 @@ public class PlaceCommand implements Command {
                 if (argument == null) {
                     System.err.println(ERROR_NO_HAND_INDEX_PROVIDED);
                 } else {
-                    String[] arguments = argument.trim().split(" ");
+                    String[] arguments = argument.trim().split(SPACE_DELIMITER);
                     Hand currentHand = GameEngine.getActiveTeam().getHand();
 
                     List<Unit> unitsToPlace = new ArrayList<>();
@@ -49,7 +57,7 @@ public class PlaceCommand implements Command {
 
                     for (String arg : arguments) {
                         int index = parseIndex(arg, currentHand);
-                        if (index == -1) {
+                        if (index == INVALID_INDEX_FLAG) {
                             parseSuccess = false;
                             break;
                         }
@@ -88,20 +96,20 @@ public class PlaceCommand implements Command {
     private static int parseIndex(String argument, Hand currentHand) {
         try {
             int index = Integer.parseInt(argument);
-            if (index < 1 || index > currentHand.getHand().size()) {
+            if (index < MIN_CARD_INDEX || index > currentHand.getHand().size()) {
                 System.err.println(GameMessages.ERROR_INVALID_CARD_INDEX);
-                return -1;
+                return INVALID_INDEX_FLAG;
             }
-            return index - 1;
+            return index - INDEX_OFFSET;
         } catch (NumberFormatException e) {
             System.err.println(GameMessages.ERROR_INVALID_CARD_INDEX);
-            return -1;
+            return INVALID_INDEX_FLAG;
         }
     }
 
     private static void executeStandardPlacement(Unit unitToPlace) {
         int boardCount = Output.getBoardCount(GameEngine.getActiveTeam());
-        if (boardCount >= 5) {
+        if (boardCount >= MAX_BOARD_UNITS) {
             GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
             Output.printElimination(unitToPlace.getUnitName());
         } else {
@@ -136,9 +144,9 @@ public class PlaceCommand implements Command {
                 ? GameBoard.getPlayerKingPosition()
                 : GameBoard.getEnemyKingPosition();
         if (kingPosition != null) {
-            int rowDiff = Math.abs(GameState.getSelectedRow() - kingPosition[0]);
-            int colDiff = Math.abs(GameState.getSelectedColumn() - kingPosition[1]);
-            if (rowDiff > 1 || colDiff > 1) {
+            int rowDiff = Math.abs(GameState.getSelectedRow() - kingPosition[ROW_INDEX]);
+            int colDiff = Math.abs(GameState.getSelectedColumn() - kingPosition[COL_INDEX]);
+            if (rowDiff > MAX_ADJACENT_DISTANCE || colDiff > MAX_ADJACENT_DISTANCE) {
                 System.err.println(ERROR_TARGET_SQUARE_ADJACENT_TO_FARMER_KING);
                 return false;
             }

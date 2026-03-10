@@ -26,6 +26,9 @@ public class Deck {
     private static final String ERROR_THE_NUMBER_OF_UNITS_AND_DECK_COUNTS_DO_NOT_MATCH
             = "ERROR: The number of units and deck counts do not match.";
 
+    private static final int INITIAL_VALUE = 0;
+    private static final int START_INDEX = 0;
+
     private final Map<Unit, Integer> deckInfo;
     private int[] allUnitCount;
 
@@ -43,8 +46,8 @@ public class Deck {
      */
     public boolean extractDeckSize(List<String> deckData) {
         this.allUnitCount = new int[deckData.size()];
-        int size = 0;
-        int sum = 0;
+        int size = INITIAL_VALUE;
+        int sum = INITIAL_VALUE;
         try {
             for (String line : deckData) {
                 int count = Integer.parseInt(line.trim());
@@ -78,7 +81,7 @@ public class Deck {
         }
 
         if (Unit.getUnitList().size() == this.allUnitCount.length) {
-            for (int i = 0; i < Unit.getUnitList().size(); i++) {
+            for (int i = START_INDEX; i < Unit.getUnitList().size(); i++) {
                 this.deckInfo.put(Unit.getUnitList().get(i), this.allUnitCount[i]);
             }
             return true;
@@ -101,7 +104,7 @@ public class Deck {
             Unit currentUnit = entry.getKey();
             int amountInDeck = entry.getValue();
 
-            for (int i = 0; i < amountInDeck; i++) {
+            for (int i = START_INDEX; i < amountInDeck; i++) {
                 Unit newCard = new Unit(currentUnit.getQualifier(),
                         currentUnit.getRole(),
                         currentUnit.getAtk(),
