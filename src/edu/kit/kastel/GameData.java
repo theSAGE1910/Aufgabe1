@@ -16,22 +16,6 @@ import java.util.Map;
  */
 public final class GameData {
 
-    private static final int MAX_UNITS = 80;
-
-    private static int seed = 0;
-    private static String boardData = null;
-    private static List<String> unitData = null;
-    private static List<String> deck1Data = null;
-    private static List<String> deck2Data = null;
-    private static String verbosity = null;
-
-    private static final String DEFAULT_PLAYER = "Player";
-    private static final String DEFAULT_ENEMY = "Enemy";
-
-    private static String team1Name = DEFAULT_PLAYER;
-
-    private static String team2Name = DEFAULT_ENEMY;
-
     private static final String SEED = "seed";
     private static final String TEAM_1 = "team1";
     private static final String TEAM_2 = "team2";
@@ -67,6 +51,22 @@ public final class GameData {
     private static final String ERROR_IO_EXCEPTION = "ERROR: Something went wrong in IO!";
     private static Map<String, String> argInfo = null;
 
+    private static final int MAX_UNITS = 80;
+
+    private static int seed = 0;
+    private static String boardData = null;
+    private static List<String> unitData = null;
+    private static List<String> deck1Data = null;
+    private static List<String> deck2Data = null;
+    private static String verbosity = GameMessages.ALL;
+
+    private static final String DEFAULT_PLAYER = "Player";
+    private static final String DEFAULT_ENEMY = "Enemy";
+
+    private static String team1Name = DEFAULT_PLAYER;
+
+    private static String team2Name = DEFAULT_ENEMY;
+
     private GameData() {
     }
 
@@ -77,7 +77,6 @@ public final class GameData {
      */
     public static boolean extractArgumentInfo(String[] args) {
         argInfo = new HashMap<>();
-
         boolean success = parseArguments(args);
 
         if (success) {
@@ -103,11 +102,11 @@ public final class GameData {
         for (String key : orderedKeys) {
             if (argInfo.containsKey(key)) {
                 if (!parseKeyValue(key)) {
-                    return true;
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     private static boolean validateArgKeys() {
@@ -115,10 +114,10 @@ public final class GameData {
         for (String key : argInfo.keySet()) {
             if (!validKeys.contains(key)) {
                 System.err.println(ERROR_UNKNOWN_PARAMETER_PROVIDED + key);
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     private static boolean parseArguments(String[] args) {
@@ -127,15 +126,15 @@ public final class GameData {
             if (keyValue.length == 2) {
                 if (argInfo.containsKey(keyValue[0])) {
                     System.err.println(ERROR_DUPLICATE_ARGUMENT_PROVIDED);
-                    return true;
+                    return false;
                 }
                 argInfo.put(keyValue[0], keyValue[1]);
             } else {
                 System.err.println(ERROR_INVALID_ARGUMENT_FORMAT + arg);
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     private static boolean parseKeyValue(String key) {

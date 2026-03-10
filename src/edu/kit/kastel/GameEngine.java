@@ -8,6 +8,7 @@ package edu.kit.kastel;
  */
 public final class GameEngine {
 
+    private static final String NO_MORE_CARDS_LEFT_IN_THE_DECK = "ERROR: %s has no more cards left in the deck!";
     private static Team team1 = null;
     private static Team team2 = null;
     private static Team activeTeam = null;
@@ -87,7 +88,7 @@ public final class GameEngine {
     public static boolean tryDrawCard(Team team) {
         boolean success = team.getHand().handLoader(team.getShuffledDeck());
         if (!success) {
-            System.err.println("ERROR: " + team.getName() + " has no more cards left in the deck!");
+            System.err.printf(NO_MORE_CARDS_LEFT_IN_THE_DECK, team.getName());
             Team winner = team.equals(getTeam1()) ? getTeam2() : getTeam1();
             System.out.println(winner.getName() + " wins!");
             GameState.setIsRunning(false);

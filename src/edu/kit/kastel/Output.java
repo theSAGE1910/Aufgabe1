@@ -9,14 +9,33 @@ package edu.kit.kastel;
  */
 public final class Output {
 
-    private static final String MOVEMENT_FORMAT = "%s moves to %s.";
-    private static final String DAMAGE_FORMAT = "%s takes %d damage!";
-    private static final String ELIMINATION_FORMAT = "%s was eliminated!";
-    private static final String BLOCK_FORMAT = "%s (%s) blocks!";
-    private static final String TURN_FORMAT = "It is %s's turn!";
-    private static final String NO_LONGER_BLOCKS_FORMAT = "%s no longer blocks.";
+    private static final String MOVEMENT_FORMAT = "%s moves to %s.%n";
+    private static final String DAMAGE_FORMAT = "%s takes %d damage!%n";
+    private static final String ELIMINATION_FORMAT = "%s was eliminated!%n";
+    private static final String BLOCK_FORMAT = "%s (%s) blocks!%n";
+    private static final String TURN_FORMAT = "It is %s's turn!%n";
+    private static final String NO_LONGER_BLOCKS_FORMAT = "%s no longer blocks.%n";
+    private static final String ATK_MOVE_FORMAT = "%s (%d/%d) attacks %s on %s!%n";
+    private static final String FLIP_FORMAT = "%s (%d/%d) was flipped on %s!%n";
+    private static final String MERGE_FORMAT = "%s and %s on %s join forces!%n";
+    private static final String MERGE_FAIL_FORMAT = "Union failed. %s was eliminated.%n";
+    private static final String ZERO_POINTS_FORMAT = "%s's life points dropped to 0!%n";
+    private static final String WIN_FORMAT = "%s wins!%n";
+    private static final String HAND_FORMAT = "[%d] %s (%d/%d)%n";
+    private static final String DISCARD_FORMAT = "%s discarded %s (%d/%d).%n";
+    private static final String PLACEMENT_FORMAT = "%s places %s on %s.%n";
+    private static final String FARMER_KING_FORMAT = "%s's Farmer King%n";
+    private static final String HIDDEN_UNIT_FORMAT = "??? (Team %s)%nATK: ???%nDEF: ???%n";
+    private static final String VISIBLE_UNIT_FORMAT = "%s %s (Team %s)%nATK: %d%nDEF: %d%n";
+
+    private static final String STATE_LINE_BASE_FORMAT = "  %s";
+    private static final String STATE_LINE_FORMAT = "%s%s%s%n";
+    private static final String LP_FORMAT = "%d/%d LP";
+    private static final String DC_FORMAT = "DC: %d/%d";
+    private static final String BC_FORMAT = "BC: %d/%d";
 
     private static final int MAX_STATE_LINE_LENGTH = 31;
+    private static final int MAX_BOARD_UNITS = 5;
 
     private Output() {
     }
@@ -56,8 +75,7 @@ public final class Output {
      * @param field the coordinate square where combat occurs
      */
     public static void printAtkMove(String mover, int atkMov, int defMov, String target, String field) {
-        System.out.println(mover + " (" + atkMov + "/" + defMov + ") attacks "
-                + target + " on " + field + "!");
+        System.out.printf(ATK_MOVE_FORMAT, mover, atkMov, defMov, target, field);
     }
 
     /**
@@ -68,7 +86,7 @@ public final class Output {
      * @param field the coordinate square where the flip occurred
      */
     public static void printFlip(String name, int atk, int def, String field) {
-        System.out.println(name + " (" + atk + "/" + def + ") was flipped on " + field + "!");
+        System.out.printf(FLIP_FORMAT, name, atk, def, field);
     }
 
     /**
@@ -95,7 +113,7 @@ public final class Output {
      * @param field the coordinate square of the merge
      */
     public static void printMerge(String unit1, String unit2, String field) {
-        System.out.println(unit1 + " and " + unit2 + " on " + field + " join forces!");
+        System.out.printf(MERGE_FORMAT, unit1, unit2, field);
     }
 
     /**
@@ -103,7 +121,7 @@ public final class Output {
      * @param name the name of the stationary unit that is eliminated
      */
     public static void printMergeFail(String name) {
-        System.out.println("Union failed. " + name + " was eliminated.");
+        System.out.printf(MERGE_FAIL_FORMAT, name);
     }
 
     /**
@@ -111,7 +129,7 @@ public final class Output {
      * @param team the name of the team whose points reached zero
      */
     public static void printZeroPoints(String team) {
-        System.out.println(team + "'s life points dropped to 0!");
+        System.out.printf(ZERO_POINTS_FORMAT, team);
     }
 
     /**
@@ -119,7 +137,7 @@ public final class Output {
      * @param team the name of the winning team
      */
     public static void printWin(String team) {
-        System.out.println(team + " wins!");
+        System.out.printf(WIN_FORMAT, team);
     }
 
     /**
@@ -137,9 +155,7 @@ public final class Output {
     public static void printHand(Hand teamHand) {
         int numbering = 1;
         for (Unit unit : teamHand.getHand()) {
-            System.out.print("[" + numbering + "]" + " " + unit.getUnitName() + " ");
-            printStat(unit.getAtk(), unit.getDef());
-            System.out.println();
+            System.out.printf(HAND_FORMAT, numbering, unit.getUnitName(), unit.getAtk(), unit.getDef());
             numbering++;
         }
     }
@@ -150,9 +166,7 @@ public final class Output {
      * @param unit the unit being discarded
      */
     public static void printDiscard(String team, Unit unit) {
-        System.out.print(team + " discarded " + unit.getUnitName() + " ");
-        printStat(unit.getAtk(), unit.getDef());
-        System.out.println(".");
+        System.out.printf(DISCARD_FORMAT, team, unit.getUnitName(), unit.getAtk(), unit.getDef());
     }
 
     /**
@@ -162,7 +176,7 @@ public final class Output {
      * @param field the target coordinate square
      */
     public static void printPlacement(String team, Unit unit, String field) {
-        System.out.println(team + " places " + unit.getUnitName() + " on " + field.toUpperCase() + ".");
+        System.out.printf(PLACEMENT_FORMAT, team, unit.getUnitName(), field.toUpperCase());
     }
 
     /**
@@ -170,7 +184,7 @@ public final class Output {
      * @param unit the Farmer King unit object
      */
     public static void printFarmerKing(Unit unit) {
-        System.out.println(unit.getTeam().getName() + "'s Farmer King");
+        System.out.printf(FARMER_KING_FORMAT, unit.getTeam().getName());
     }
 
     /**
@@ -178,9 +192,7 @@ public final class Output {
      * @param unit the face-down unit object
      */
     public static void printHiddenUnit(Unit unit) {
-        System.out.println("??? (Team " + unit.getTeam().getName() + ")");
-        System.out.println("ATK: ???");
-        System.out.println("DEF: ???");
+        System.out.printf(HIDDEN_UNIT_FORMAT, unit.getTeam().getName());
     }
 
     /**
@@ -188,8 +200,10 @@ public final class Output {
      * @param unit the face-up unit object
      */
     public static void printVisibleUnit(Unit unit) {
-        System.out.println(unit.getQualifier() + " " + unit.getRole() + " (Team " + unit.getTeam().getName() + ")");
-        printPlayerUnitStat(unit);
+        System.out.printf(VISIBLE_UNIT_FORMAT,
+                unit.getQualifier(), unit.getRole(),
+                unit.getTeam().getName(),
+                unit.getAtk(), unit.getDef());
     }
 
     /**
@@ -199,12 +213,12 @@ public final class Output {
      */
     public static void printState(Team team1, Team team2) {
         printStateLine(team1.getName(), team2.getName());
-        printStateLine(team1.getTeamHP() + "/" + Team.INITIAL_HP + " LP",
-                team2.getTeamHP() + "/" + Team.INITIAL_HP + " LP");
-        printStateLine("DC: " + team1.getShuffledDeck().size() + "/" + team1.getInitialDeckSize(),
-                "DC: " + team2.getShuffledDeck().size() + "/" + team2.getInitialDeckSize());
-        printStateLine("BC: " + getBoardCount(team1) + "/5",
-                "BC: " + getBoardCount(team2) + "/5");
+        printStateLine(String.format(LP_FORMAT, team1.getTeamHP(), Team.INITIAL_HP),
+                String.format(LP_FORMAT, team2.getTeamHP(), Team.INITIAL_HP));
+        printStateLine(String.format(DC_FORMAT, team1.getShuffledDeck().size(), team1.getInitialDeckSize()),
+                String.format(DC_FORMAT, team2.getShuffledDeck().size(), team2.getInitialDeckSize()));
+        printStateLine(String.format(BC_FORMAT, getBoardCount(team1), MAX_BOARD_UNITS),
+                String.format(BC_FORMAT, getBoardCount(team2), MAX_BOARD_UNITS));
     }
 
     /**
@@ -217,7 +231,7 @@ public final class Output {
         for (int row = 0; row < GameBoard.DIMENSION; row++) {
             for (int col = 0; col < GameBoard.DIMENSION; col++) {
                 Unit boardUnit = GameBoard.getUnitAt(row, col);
-                if (boardUnit != null && boardUnit.getTeam().equals(team) && !boardUnit.getRole().equals("King")) {
+                if (boardUnit != null && boardUnit.getTeam().equals(team) && !boardUnit.getRole().equals(GameMessages.KING)) {
                     count++;
                 }
             }
@@ -225,18 +239,9 @@ public final class Output {
         return count;
     }
 
-    private static void printPlayerUnitStat(Unit unit) {
-        System.out.println("ATK: " + unit.getAtk());
-        System.out.println("DEF: " + unit.getDef());
-    }
-
-    private static void printStat(int atk, int def) {
-        System.out.print("(" + atk + "/" + def + ")");
-    }
-
     private static void printStateLine(String left, String right) {
-        String base = "  " + left; // Exactly 2 spaces indentation
+        String base = String.format(STATE_LINE_BASE_FORMAT, left);
         int spacesNeeded = MAX_STATE_LINE_LENGTH - base.length() - right.length();
-        System.out.println(base + " ".repeat(Math.max(0, spacesNeeded)) + right);
+        System.out.printf(STATE_LINE_FORMAT, base, " ".repeat(Math.max(0, spacesNeeded)), right);
     }
 }

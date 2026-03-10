@@ -63,7 +63,6 @@ public class PlaceCommand implements Command {
 
                     if (parseSuccess) {
                         executePlacement(unitsToPlace, currentHand);
-                        System.out.println(GameMessages.SUCCESS_MESSAGE);
                         GameState.setHasPlacedThisTurn(true);
                         GameUI.updateDisplay();
                     }
@@ -118,7 +117,7 @@ public class PlaceCommand implements Command {
         if (mergedUnit != null) {
             GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), mergedUnit);
             mergedUnit.setHasMovedThisTurn(false);
-            System.out.println();
+            System.out.println(GameMessages.SUCCESS_MESSAGE);
         } else {
             GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), unitToPlace);
             unitToPlace.setHasMovedThisTurn(false);
