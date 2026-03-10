@@ -63,6 +63,7 @@ public class PlaceCommand implements Command {
 
                     if (parseSuccess) {
                         executePlacement(unitsToPlace, currentHand);
+                        System.out.println(GameMessages.SUCCESS_MESSAGE);
                         GameState.setHasPlacedThisTurn(true);
                         GameUI.updateDisplay();
                     }

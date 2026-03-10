@@ -15,49 +15,22 @@ import java.util.Map;
  * @version 0.9
  */
 public final class GameData {
-    public static final int MAX_UNITS = 80;
-    /**
-     * The random seed used for generating random numbers.
-     */
-    public static int seed;
 
-    /**
-     * The parsed theme string for the game board rendering.
-     */
-    public static String boardData;
+    private static final int MAX_UNITS = 80;
 
-    /**
-     * The list of raw string data representing all available units.
-     */
-    public static List<String> unitData;
-
-    /**
-     * The list of raw string data representing the player's deck.
-     */
-    public static List<String> deck1Data;
-
-    /**
-     * The list of raw string data representing the enemy's deck.
-     */
-    public static List<String> deck2Data;
-
-    /**
-     * The verbosity level for the game output.
-     */
-    public static String verbosity;
+    private static int seed = 0;
+    private static String boardData = null;
+    private static List<String> unitData = null;
+    private static List<String> deck1Data = null;
+    private static List<String> deck2Data = null;
+    private static String verbosity = null;
 
     private static final String DEFAULT_PLAYER = "Player";
     private static final String DEFAULT_ENEMY = "Enemy";
 
-    /**
-     * The display name of the first team (default: "Player").
-     */
-    public static String team1Name = DEFAULT_PLAYER;
+    private static String team1Name = DEFAULT_PLAYER;
 
-    /**
-     * The display name of the second team (default: "Enemy").
-     */
-    public static String team2Name = DEFAULT_ENEMY;
+    private static String team2Name = DEFAULT_ENEMY;
 
     private static final String SEED = "seed";
     private static final String TEAM_1 = "team1";
@@ -104,47 +77,72 @@ public final class GameData {
      */
     public static boolean extractArgumentInfo(String[] args) {
         argInfo = new HashMap<>();
+
+        boolean success = parseArguments(args);
+
+        if (success) {
+            success = validateArgKeys();
+        }
+
+        if (success) {
+            if (!containsMandatoryKeys(argInfo)) {
+                System.err.println(ERROR_MANDATORY_ARGUMENTS_MISSING_OR_INVALID);
+                success = false;
+            }
+        }
+
+        if (success) {
+            success = processOrderedKeys();
+        }
+
+        return success;
+    }
+
+    private static boolean processOrderedKeys() {
+        String[] orderedKeys = {SEED, GameMessages.BOARD, UNITS, DECK, DECK_1, DECK_2, TEAM_1, TEAM_2, VERBOSITY};
+        for (String key : orderedKeys) {
+            if (argInfo.containsKey(key)) {
+                if (!parseKeyValue(key)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean validateArgKeys() {
+        List<String> validKeys = Arrays.asList(SEED, TEAM_1, TEAM_2, VERBOSITY, GameMessages.BOARD, UNITS, DECK, DECK_1, DECK_2);
+        for (String key : argInfo.keySet()) {
+            if (!validKeys.contains(key)) {
+                System.err.println(ERROR_UNKNOWN_PARAMETER_PROVIDED + key);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean parseArguments(String[] args) {
         for (String arg : args) {
             String[] keyValue = arg.split(REGEX_EQUALS);
             if (keyValue.length == 2) {
                 if (argInfo.containsKey(keyValue[0])) {
                     System.err.println(ERROR_DUPLICATE_ARGUMENT_PROVIDED);
-                    return false;
+                    return true;
                 }
                 argInfo.put(keyValue[0], keyValue[1]);
             } else {
                 System.err.println(ERROR_INVALID_ARGUMENT_FORMAT + arg);
-                return false;
+                return true;
             }
         }
-
-        List<String> validKeys = Arrays.asList(SEED, TEAM_1, TEAM_2, VERBOSITY, GameMessages.BOARD, UNITS, DECK, DECK_1, DECK_2);
-        for (String key : argInfo.keySet()) {
-            if (!validKeys.contains(key)) {
-                System.err.println(ERROR_UNKNOWN_PARAMETER_PROVIDED + key);
-                return false;
-            }
-        }
-
-        if (!containsMandatoryKeys(argInfo)) {
-            System.err.println(ERROR_MANDATORY_ARGUMENTS_MISSING_OR_INVALID);
-            return false;
-        }
-
-        String[] orderedKeys = {SEED, GameMessages.BOARD, UNITS, DECK, DECK_1, DECK_2, TEAM_1, TEAM_2, VERBOSITY};
-        for (String key : orderedKeys) {
-            if (argInfo.containsKey(key)) {
-                if (!parseKeyValue(key)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return false;
     }
 
     private static boolean parseKeyValue(String key) {
         switch (key) {
-            case SEED, VERBOSITY -> parseSettings(key);
+            case SEED, VERBOSITY -> {
+                return parseSettings(key);
+            }
             case TEAM_1, TEAM_2 -> {
                 return parseTeams(key);
             }
@@ -159,7 +157,6 @@ public final class GameData {
                 return false;
             }
         }
-        return true;
     }
 
     private static boolean parseSettings(String key) {
@@ -167,7 +164,7 @@ public final class GameData {
             seed = Integer.parseInt(argInfo.get(key));
         } else if (key.equals(VERBOSITY)) {
             verbosity = argInfo.get(key);
-            if (!verbosity.equals(GameMessages.ALL) && !verbosity.equals(COMPACT)) {
+            if (!getVerbosity().equals(GameMessages.ALL) && !getVerbosity().equals(COMPACT)) {
                 System.err.println(ERROR_INVALID_VERBOSITY_VALID_OPTIONS_ARE_ALL_OR_COMPACT);
                 return false;
             }
@@ -178,10 +175,10 @@ public final class GameData {
     private static boolean parseTeams(String key) {
         if (key.equals(TEAM_1)) {
             team1Name = argInfo.get(key);
-            return checkTeamNameLength(team1Name);
+            return checkTeamNameLength(getTeam1Name());
         } else if (key.equals(TEAM_2)) {
             team2Name = argInfo.get(key);
-            return checkTeamNameLength(team2Name);
+            return checkTeamNameLength(getTeam2Name());
         }
         return false;
     }
@@ -216,17 +213,17 @@ public final class GameData {
     private static boolean handleUnitData() {
         boolean hasError = false;
 
-        if (unitData == null) {
+        if (getUnitData() == null) {
             hasError = true;
-        } else if (unitData.isEmpty()) {
+        } else if (getUnitData().isEmpty()) {
             System.err.println(ERROR_UNIT_FILE_IS_EMPTY);
             hasError = true;
-        } else if (!printData(unitData)) {
-            if (unitData.size() > MAX_UNITS) {
+        } else if (!printData(getUnitData())) {
+            if (getUnitData().size() > MAX_UNITS) {
                 System.err.println(ERROR_TOO_MANY_UNITS_DEFINED_A_MAXIMUM_OF_80_UNIT_TYPES_IS_ALLOWED);
                 hasError = true;
             } else {
-                for (String line : unitData) {
+                for (String line : getUnitData()) {
                     if (!line.matches(UNIT_DATA_REGEX)) {
                         System.err.println(ERROR_INVALID_UNIT_FORMAT_DETECTED);
                         hasError = true;
@@ -248,11 +245,11 @@ public final class GameData {
 
     private static boolean handleBoardData(String key) {
         boardData = extractBoardKeySet(argInfo.get(key));
-        if (boardData == null) {
+        if (getBoardData() == null) {
             return true;
         }
-        System.out.println(boardData);
-        if (boardData.length() != BoardTheme.MIN_KEYSET_LENGTH) {
+        System.out.println(getBoardData());
+        if (getBoardData().length() != BoardTheme.MIN_KEYSET_LENGTH) {
             System.err.println(ERROR_BOARD_KEY_SET_MUST_BE_EXACTLY_29_CHARACTERS_LONG);
             return true;
         }
@@ -315,5 +312,69 @@ public final class GameData {
         }
 
         return true;
+    }
+
+    /**
+     * The random seed used for generating random numbers.
+     * @return the integer seed value
+     */
+    public static int getSeed() {
+        return seed;
+    }
+
+    /**
+     * The parsed theme string for the game board rendering.
+     * @return the board key set string
+     */
+    public static String getBoardData() {
+        return boardData;
+    }
+
+    /**
+     * The list of raw string data representing all available units.
+     * @return the list of strings for the unit data
+     */
+    public static List<String> getUnitData() {
+        return unitData;
+    }
+
+    /**
+     * The list of raw string data representing the player's deck.
+     * @return the list of strings for the player's deck
+     */
+    public static List<String> getDeck1Data() {
+        return deck1Data;
+    }
+
+    /**
+     * The list of raw string data representing the enemy's deck.
+     * @return the list of strings for the enemy deck
+     */
+    public static List<String> getDeck2Data() {
+        return deck2Data;
+    }
+
+    /**
+     * The verbosity level for the game output.
+     * @return the verbosity level, either "all" or "compact"
+     */
+    public static String getVerbosity() {
+        return verbosity;
+    }
+
+    /**
+     * The display name of the first team (default: "Player").
+     * @return the name of the first team
+     */
+    public static String getTeam1Name() {
+        return team1Name;
+    }
+
+    /**
+     * The display name of the second team (default: "Enemy").
+     * @return the name of the second team
+     */
+    public static String getTeam2Name() {
+        return team2Name;
     }
 }

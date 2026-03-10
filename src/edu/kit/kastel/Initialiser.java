@@ -25,7 +25,7 @@ public final class Initialiser {
      * @return true if initialization was successful, false if there were errors in loading decks or configurations
      */
     public static boolean initialise() {
-        RandomGenerator.initialise(GameData.seed);
+        RandomGenerator.initialise(GameData.getSeed());
         initialiseGameBoard();
         BoardTheme.initialiseTheme();
         initialiseUnits();
@@ -53,17 +53,17 @@ public final class Initialiser {
     }
 
     private static void initialiseUnits() {
-        Unit.extractUnits(GameData.unitData);
+        Unit.extractUnits(GameData.getUnitData());
     }
 
     private static boolean initialiseDecks() {
         deck1 = new Deck();
         deck2 = new Deck();
 
-        if (!deck1.extractDeckSize(GameData.deck1Data)) {
+        if (!deck1.extractDeckSize(GameData.getDeck1Data())) {
             return false;
         }
-        if (!deck2.extractDeckSize(GameData.deck2Data)) {
+        if (!deck2.extractDeckSize(GameData.getDeck2Data())) {
             return false;
         }
         if (!deck1.assignDeck()) {
@@ -83,8 +83,8 @@ public final class Initialiser {
     }
 
     private static void initialiseTeams() {
-        GameEngine.setTeam1(new Team(GameData.team1Name, deck1, new Hand(), player1DrawPile));
-        GameEngine.setTeam2(new Team(GameData.team2Name, deck2, new Hand(), player2DrawPile));
+        GameEngine.setTeam1(new Team(GameData.getTeam1Name(), deck1, new Hand(), player1DrawPile));
+        GameEngine.setTeam2(new Team(GameData.getTeam2Name(), deck2, new Hand(), player2DrawPile));
     }
 
     private static void initialiseHands(Team team) {

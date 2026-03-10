@@ -149,7 +149,7 @@ public final class BoardTheme {
      * it falls back to the standard default character set.
      */
     public static void initialiseTheme() {
-        String keySet = GameData.boardData;
+        String keySet = GameData.getBoardData();
         if (keySet == null || keySet.length() < MIN_KEYSET_LENGTH) {
             currentTheme = STANDARD_CHARSET;
         } else {

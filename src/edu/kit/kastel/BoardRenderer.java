@@ -25,7 +25,7 @@ public final class BoardRenderer {
         int selectedCol = selCol - GameMessages.CHAR_BASE;
 
         for (int row = 0; row <= GameBoard.DIMENSION; row++) {
-            if (GameData.verbosity.equalsIgnoreCase(GameMessages.ALL)) {
+            if (GameData.getVerbosity().equalsIgnoreCase(GameMessages.ALL)) {
                 System.out.print("  ");
                 for (int col = 0; col <= GameBoard.DIMENSION; col++) {
                     System.out.print(getIntersectionChar(row, col, selectedRow, selectedCol));
