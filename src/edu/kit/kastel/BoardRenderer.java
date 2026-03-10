@@ -44,7 +44,7 @@ public final class BoardRenderer {
                         if (GameBoard.getUnitAt(row, col) == null) {
                             System.out.print(EMPTY);
                         } else {
-                            System.out.print(GameBoard.getUnitAt(row,col).toString());
+                            System.out.print(GameBoard.getUnitAt(row, col).toString());
                         }
                     }
                 }

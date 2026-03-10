@@ -15,7 +15,7 @@ import java.util.Map;
  * @version 0.9
  */
 public final class GameData {
-
+    public static final int MAX_UNITS = 80;
     /**
      * The random seed used for generating random numbers.
      */
@@ -46,6 +46,9 @@ public final class GameData {
      */
     public static String verbosity;
 
+    private static final String DEFAULT_PLAYER = "Player";
+    private static final String DEFAULT_ENEMY = "Enemy";
+
     /**
      * The display name of the first team (default: "Player").
      */
@@ -65,8 +68,8 @@ public final class GameData {
     private static final String DECK_1 = "deck1";
     private static final String DECK_2 = "deck2";
     private static final String COMPACT = "compact";
-    private static final String DEFAULT_PLAYER = "Player";
-    private static final String DEFAULT_ENEMY = "Enemy";
+
+    private static final int MAX_TEAM_NAME_CHAR = 15;
 
     private static final String ERROR_UNIT_FILE_IS_EMPTY = "ERROR: Unit file is empty.";
     private static final String ERROR_INVALID_UNIT_FORMAT_DETECTED = "ERROR: Invalid unit format detected.";
@@ -79,8 +82,8 @@ public final class GameData {
             = "ERROR: Mandatory arguments missing or invalid!";
     private static final String ERROR_INVALID_VERBOSITY_VALID_OPTIONS_ARE_ALL_OR_COMPACT
             = "ERROR: Invalid verbosity! Valid options are 'all' or 'compact'.";
-    private static final String ERROR_TOO_MANY_UNITS_DEFINED_A_MAXIMUM_OF_40_UNIT_TYPES_IS_ALLOWED
-            = "ERROR: Too many units defined! A maximum of 40 unit types is allowed.";
+    private static final String ERROR_TOO_MANY_UNITS_DEFINED_A_MAXIMUM_OF_80_UNIT_TYPES_IS_ALLOWED
+            = "ERROR: Too many units defined! A maximum of 80 unit types is allowed.";
     private static final String ERROR_TEAM_NAMES_MUST_BE_AT_MOST_14_CHARACTERS_LONG
             = "ERROR: Team names must be at most 14 characters long.";
     private static final String ERROR_BOARD_KEY_SET_MUST_BE_EXACTLY_29_CHARACTERS_LONG
@@ -141,99 +144,106 @@ public final class GameData {
 
     private static boolean parseKeyValue(String key) {
         switch (key) {
-            case SEED:
-                seed = Integer.parseInt(argInfo.get(key));
-                break;
-            case GameMessages.BOARD:
-                if (handleBoardData(key)) {
-                    return false;
-                }
-                break;
-            case UNITS:
-                unitData = extractFilePath(argInfo.get(key));
-                if (handleUnitData()) {
-                    return false;
-                }
-                break;
-            case DECK:
-                List<String> deckData = extractFilePath(argInfo.get(key));
-                if (printData(deckData)) {
-                    return false;
-                }
-                deck1Data = deckData;
-                deck2Data = deckData;
-                break;
-            case DECK_1:
-                deck1Data = extractFilePath(argInfo.get(key));
-                if (printData(deck1Data)) {
-                    return false;
-                }
-                break;
-            case DECK_2:
-                deck2Data = extractFilePath(argInfo.get(key));
-                if (printData(deck2Data)) {
-                    return false;
-                }
-                break;
-            case TEAM_1:
-                team1Name = argInfo.get(key);
-                if (checkTeamNameLength(team1Name)) {
-                    return false;
-                }
-                break;
-            case TEAM_2:
-                team2Name = argInfo.get(key);
-                if (checkTeamNameLength(team2Name)) {
-                    return false;
-                }
-                break;
-            case VERBOSITY:
-                verbosity = argInfo.get(key);
-                if (!verbosity.equals(GameMessages.ALL) && !verbosity.equals(COMPACT)) {
-                    System.err.println(ERROR_INVALID_VERBOSITY_VALID_OPTIONS_ARE_ALL_OR_COMPACT);
-                    return false;
-                }
-                break;
-            default:
-                break;
+            case SEED, VERBOSITY -> parseSettings(key);
+            case TEAM_1, TEAM_2 -> {
+                return parseTeams(key);
+            }
+            case DECK, DECK_1, DECK_2 -> {
+                return parseDecks(key);
+            }
+            case GameMessages.BOARD, UNITS -> {
+                return parseGameAssets(key);
+            }
+            default -> {
+                System.err.println(ERROR_UNKNOWN_PARAMETER_PROVIDED + key);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean parseSettings(String key) {
+        if (key.equals(SEED)) {
+            seed = Integer.parseInt(argInfo.get(key));
+        } else if (key.equals(VERBOSITY)) {
+            verbosity = argInfo.get(key);
+            if (!verbosity.equals(GameMessages.ALL) && !verbosity.equals(COMPACT)) {
+                System.err.println(ERROR_INVALID_VERBOSITY_VALID_OPTIONS_ARE_ALL_OR_COMPACT);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean parseTeams(String key) {
+        if (key.equals(TEAM_1)) {
+            team1Name = argInfo.get(key);
+            return checkTeamNameLength(team1Name);
+        } else if (key.equals(TEAM_2)) {
+            team2Name = argInfo.get(key);
+            return checkTeamNameLength(team2Name);
+        }
+        return false;
+    }
+
+    private static boolean parseDecks(String key) {
+        List<String> deckData = extractFilePath(argInfo.get(key));
+        if (printData(deckData)) {
+            return false;
+        }
+
+        if (key.equals(DECK)) {
+            deck1Data = deckData;
+            deck2Data = deckData;
+        } else if (key.equals(DECK_1)) {
+            deck1Data = deckData;
+        } else if (key.equals(DECK_2)) {
+            deck2Data = deckData;
+        }
+        return true;
+    }
+
+    private static boolean parseGameAssets(String key) {
+        if (key.equals(GameMessages.BOARD)) {
+            return !handleBoardData(key);
+        } else if (key.equals(UNITS)) {
+            unitData = extractFilePath(argInfo.get(key));
+            return !handleUnitData();
         }
         return true;
     }
 
     private static boolean handleUnitData() {
+        boolean hasError = false;
 
         if (unitData == null) {
-            return true;
-        }
-
-        if (unitData.isEmpty()) {
+            hasError = true;
+        } else if (unitData.isEmpty()) {
             System.err.println(ERROR_UNIT_FILE_IS_EMPTY);
-            return true;
-        }
-
-        if (printData(unitData)) {
-            return false;
-        } else if (unitData.size() > 80) {
-            System.err.println(ERROR_TOO_MANY_UNITS_DEFINED_A_MAXIMUM_OF_40_UNIT_TYPES_IS_ALLOWED);
-            return true;
-        }
-
-        for (String line : unitData) {
-            if (!line.matches(UNIT_DATA_REGEX)) {
-                System.err.println(ERROR_INVALID_UNIT_FORMAT_DETECTED);
-                return true;
+            hasError = true;
+        } else if (!printData(unitData)) {
+            if (unitData.size() > MAX_UNITS) {
+                System.err.println(ERROR_TOO_MANY_UNITS_DEFINED_A_MAXIMUM_OF_80_UNIT_TYPES_IS_ALLOWED);
+                hasError = true;
+            } else {
+                for (String line : unitData) {
+                    if (!line.matches(UNIT_DATA_REGEX)) {
+                        System.err.println(ERROR_INVALID_UNIT_FORMAT_DETECTED);
+                        hasError = true;
+                        break;
+                    }
+                }
             }
         }
-
-        return false;
+        return hasError;
     }
 
     private static boolean checkTeamNameLength(String teamName) {
-        if (teamName.length() > 15) {
+        if (teamName.length() > MAX_TEAM_NAME_CHAR) {
             System.err.println(ERROR_TEAM_NAMES_MUST_BE_AT_MOST_14_CHARACTERS_LONG);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private static boolean handleBoardData(String key) {

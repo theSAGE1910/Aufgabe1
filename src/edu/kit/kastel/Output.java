@@ -8,6 +8,16 @@ package edu.kit.kastel;
  * @version 0.9
  */
 public final class Output {
+
+    private static final String MOVEMENT_FORMAT = "%s moves to %s.";
+    private static final String DAMAGE_FORMAT = "%s takes %d damage!";
+    private static final String ELIMINATION_FORMAT = "%s was eliminated!";
+    private static final String BLOCK_FORMAT = "%s (%s) blocks!";
+    private static final String TURN_FORMAT = "It is %s's turn!";
+    private static final String NO_LONGER_BLOCKS_FORMAT = "%s no longer blocks.";
+
+    private static final int MAX_STATE_LINE_LENGTH = 31;
+
     private Output() {
     }
 
@@ -16,7 +26,7 @@ public final class Output {
      * @param name the name of the unit
      */
     public static void printNoBlock(String name) {
-        System.out.println(name + " no longer blocks.");
+        System.out.printf(NO_LONGER_BLOCKS_FORMAT, name);
     }
 
     /**
@@ -25,7 +35,7 @@ public final class Output {
      * @param field the coordinate square the unit is on
      */
     public static void printBlock(String name, String field) {
-        System.out.println(name + " (" + field + ") blocks!");
+        System.out.printf(BLOCK_FORMAT, name, field);
     }
 
     /**
@@ -34,7 +44,7 @@ public final class Output {
      * @param field the destination coordinate square
      */
     public static void printMovement(String name, String field) {
-        System.out.println(name + " moves to " + field + ".");
+        System.out.printf(MOVEMENT_FORMAT, name, field);
     }
 
     /**
@@ -66,7 +76,7 @@ public final class Output {
      * @param name the name of the eliminated unit
      */
     public static void printElimination(String name) {
-        System.out.println(name + " was eliminated!");
+        System.out.printf(ELIMINATION_FORMAT, name);
     }
 
     /**
@@ -75,7 +85,7 @@ public final class Output {
      * @param damage the amount of damage taken
      */
     public static void printDamage(String team, int damage) {
-        System.out.println(team + " takes " + damage + " damage!");
+        System.out.printf(DAMAGE_FORMAT, team, damage);
     }
 
     /**
@@ -117,7 +127,7 @@ public final class Output {
      * @param team the name of the team whose turn is starting
      */
     public static void printTurn(String team) {
-        System.out.println("It is " + team + "'s turn!");
+        System.out.printf(TURN_FORMAT, team);
     }
 
     /**
@@ -226,7 +236,7 @@ public final class Output {
 
     private static void printStateLine(String left, String right) {
         String base = "  " + left; // Exactly 2 spaces indentation
-        int spacesNeeded = 31 - base.length() - right.length();
+        int spacesNeeded = MAX_STATE_LINE_LENGTH - base.length() - right.length();
         System.out.println(base + " ".repeat(Math.max(0, spacesNeeded)) + right);
     }
 }

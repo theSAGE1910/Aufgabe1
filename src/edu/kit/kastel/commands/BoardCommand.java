@@ -1,7 +1,6 @@
 package edu.kit.kastel.commands;
 
 import edu.kit.kastel.BoardRenderer;
-import edu.kit.kastel.GameBoard;
 import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.GameState;
 

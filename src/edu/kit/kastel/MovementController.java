@@ -12,7 +12,8 @@ public final class MovementController {
     private static final String ERROR_FARMER_KING_CANNOT_MOVE_ONTO_AN_ENEMY_UNIT = "ERROR: Farmer King cannot move onto an enemy unit.";
     private static final String ERROR_UNIT_CANNOT_MOVE_ONTO_ITS_OWN_FARMER_KING = "ERROR: Unit cannot move onto its own Farmer King.";
     private static final String ERROR_INVALID_TARGET_SQUARE = "ERROR: Invalid target square.";
-    private static final String ERROR_MOVE_MUST_BE_EXACTLY_1_SQUARE_ORTHOGONALLY_OR_EN_PLACE = "ERROR: Move must be exactly 1 square orthogonally or en place.";
+    private static final String ERROR_MOVE_MUST_BE_EXACTLY_1_SQUARE_ORTHOGONALLY_OR_EN_PLACE
+            = "ERROR: Move must be exactly 1 square orthogonally or en place.";
     private static final String HIDDEN_TARGET = "???";
 
     private MovementController() {
