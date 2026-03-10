@@ -8,20 +8,9 @@ package edu.kit.kastel;
  */
 public final class GameEngine {
 
-    /**
-     * The first team participating in the game (typically the Player).
-     */
-    public static Team team1;
-
-    /**
-     * The second team participating in the game (typically the Enemy AI).
-     */
-    public static Team team2;
-
-    /**
-     * The team whose turn is currently taking place.
-     */
-    public static Team activeTeam;
+    private static Team team1 = null;
+    private static Team team2 = null;
+    private static Team activeTeam = null;
 
     private static final String HELPING_TEXT
             = "Use one of the following commands: select, board, move, flip, block, hand, place, show, yield, state, quit.";
@@ -53,10 +42,10 @@ public final class GameEngine {
      * If Team 1 is currently active, it hands the turn over to Team 2, and vice versa.
      */
     public static void switchTurn() {
-        if (activeTeam.equals(team1)) {
-            activeTeam = team2;
+        if (getActiveTeam().equals(getTeam1())) {
+            setActiveTeam(getTeam2());
         } else {
-            activeTeam = team1;
+            setActiveTeam(getTeam1());
         }
     }
 
@@ -99,10 +88,58 @@ public final class GameEngine {
         boolean success = team.getHand().handLoader(team.getShuffledDeck());
         if (!success) {
             System.err.println("ERROR: " + team.getName() + " has no more cards left in the deck!");
-            Team winner = team.equals(team1) ? team2 : team1;
+            Team winner = team.equals(getTeam1()) ? getTeam2() : getTeam1();
             System.out.println(winner.getName() + " wins!");
-            GameState.isRunning = false;
+            GameState.setIsRunning(false);
         }
         return success;
+    }
+
+    /**
+     * The team whose turn is currently taking place.
+     * @return the active team whose turn it currently is
+     */
+    public static Team getActiveTeam() {
+        return activeTeam;
+    }
+
+    /**
+     * Sets the active team to the specified team, indicating that it is now that team's turn.
+     * @param activeTeam the team to set as the active team for the current turn
+     */
+    public static void setActiveTeam(Team activeTeam) {
+        GameEngine.activeTeam = activeTeam;
+    }
+
+    /**
+     * The second team participating in the game (typically the Enemy AI).
+     * @return the second team participating in the game
+     */
+    public static Team getTeam2() {
+        return team2;
+    }
+
+    /**
+     * Sets the second team participating in the game to the specified team.
+     * @param team2 the team to set as the second team participating in the game
+     */
+    public static void setTeam2(Team team2) {
+        GameEngine.team2 = team2;
+    }
+
+    /**
+     * The first team participating in the game (typically the Player).
+     * @return the first team participating in the game
+     */
+    public static Team getTeam1() {
+        return team1;
+    }
+
+    /**
+     * Sets the first team participating in the game to the specified team.
+     * @param team1 the team to set as the first team participating in the game
+     */
+    public static void setTeam1(Team team1) {
+        GameEngine.team1 = team1;
     }
 }

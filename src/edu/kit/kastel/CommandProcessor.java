@@ -25,6 +25,19 @@ public final class CommandProcessor {
 
     private static final String REGEX_SPACE = " ";
     private static final Map<String, Command> COMMANDS = new HashMap<>();
+    private static final String ERROR_NO_CARD_INDEX_PROVIDED = "ERROR: No card index provided.";
+    private static final String ERROR_INVALID_COMMAND = "ERROR: Invalid command";
+    private static final String ERROR_INVALID_COMMAND_FORMAT = "ERROR: Invalid command format";
+    private static final String ERROR_NO_COMMAND_PROVIDED = "ERROR: No command provided";
+    private static final String SELECT = "select";
+    private static final String MOVE = "move";
+    private static final String FLIP = "flip";
+    private static final String BLOCK = "block";
+    private static final String HAND = "hand";
+    private static final String PLACE = "place";
+    private static final String YIELD = "yield";
+    private static final String STATE = "state";
+    private static final String QUIT = "quit";
 
     private CommandProcessor() {
     }
@@ -36,17 +49,17 @@ public final class CommandProcessor {
     public static void initialise() {
 
         if (COMMANDS.isEmpty()) {
-            COMMANDS.put("select", new SelectCommand());
-            COMMANDS.put("board", new BoardCommand());
-            COMMANDS.put("move", new MoveCommand());
-            COMMANDS.put("flip", new FlipCommand());
-            COMMANDS.put("block", new BlockCommand());
-            COMMANDS.put("hand", new HandCommand());
-            COMMANDS.put("place", new PlaceCommand());
-            COMMANDS.put("show", new ShowCommand());
-            COMMANDS.put("yield", new YieldCommand());
-            COMMANDS.put("state", new StateCommand());
-            COMMANDS.put("quit", new QuitCommand());
+            COMMANDS.put(SELECT, new SelectCommand());
+            COMMANDS.put(GameMessages.BOARD, new BoardCommand());
+            COMMANDS.put(MOVE, new MoveCommand());
+            COMMANDS.put(FLIP, new FlipCommand());
+            COMMANDS.put(BLOCK, new BlockCommand());
+            COMMANDS.put(HAND, new HandCommand());
+            COMMANDS.put(PLACE, new PlaceCommand());
+            COMMANDS.put(GameMessages.SHOW, new ShowCommand());
+            COMMANDS.put(YIELD, new YieldCommand());
+            COMMANDS.put(STATE, new StateCommand());
+            COMMANDS.put(QUIT, new QuitCommand());
         }
     }
 
@@ -57,7 +70,7 @@ public final class CommandProcessor {
     public static void processCommands(String input) {
         String[] words = input.split(REGEX_SPACE);
         if (words.length == 0) {
-            System.err.println("ERROR: No command provided");
+            System.err.println(ERROR_NO_COMMAND_PROVIDED);
             return;
         }
 
@@ -67,10 +80,10 @@ public final class CommandProcessor {
         if (words.length == 2) {
             argument = words[1].toUpperCase().trim();
         } else if (words.length > 2) {
-            if (key.equalsIgnoreCase("place")) {
+            if (key.equalsIgnoreCase(PLACE)) {
                 argument = input.trim().substring(key.length()).toUpperCase();
             } else {
-                System.err.println("ERROR: Invalid command format");
+                System.err.println(ERROR_INVALID_COMMAND_FORMAT);
                 return;
             }
         }
@@ -79,7 +92,7 @@ public final class CommandProcessor {
         if (command != null) {
             command.execute(argument);
         } else {
-            System.err.println("ERROR: Invalid command");
+            System.err.println(ERROR_INVALID_COMMAND);
         }
     }
 
@@ -91,19 +104,19 @@ public final class CommandProcessor {
      */
     public static int parseHandIndex(String argument, Hand currentHand) {
         if (argument == null) {
-            System.err.println("ERROR: No card index provided.");
+            System.err.println(ERROR_NO_CARD_INDEX_PROVIDED);
             return -1;
         }
 
         try {
             int index = Integer.parseInt(argument);
             if (index < 1 || index > currentHand.getHand().size()) {
-                System.err.println("ERROR: Invalid card index.");
+                System.err.println(GameMessages.ERROR_INVALID_CARD_INDEX);
                 return -1;
             }
             return index - 1;
         } catch (NumberFormatException e) {
-            System.err.println("ERROR: Invalid card index.");
+            System.err.println(GameMessages.ERROR_INVALID_CARD_INDEX);
             return -1;
         }
     }

@@ -17,6 +17,14 @@ import java.util.Map.Entry;
 public class Deck {
 
     private static final String ERROR_NUMERIC_EXCEPTION = "ERROR: File contains non-numeric data.";
+    private static final int DECK_SIZE = 40;
+
+    private static final String ERROR_DECK_MUST_CONTAIN_EXACTLY_40_CARDS
+            = "ERROR: Deck must contain exactly 40 cards.";
+    private static final String ERROR_YOU_MUST_EXTRACT_DECK_SIZES_BEFORE_ASSIGNING
+            = "ERROR: You must extract deck sizes before assigning.";
+    private static final String ERROR_THE_NUMBER_OF_UNITS_AND_DECK_COUNTS_DO_NOT_MATCH
+            = "ERROR: The number of units and deck counts do not match.";
 
     private final Map<Unit, Integer> deckInfo;
     private int[] allUnitCount;
@@ -49,8 +57,8 @@ public class Deck {
             return false;
         }
 
-        if (sum != 40) {
-            System.err.println("ERROR: Deck must contain exactly 40 cards.");
+        if (sum != DECK_SIZE) {
+            System.err.println(ERROR_DECK_MUST_CONTAIN_EXACTLY_40_CARDS);
             return false;
         }
 
@@ -65,7 +73,7 @@ public class Deck {
      */
     public boolean assignDeck() {
         if (this.allUnitCount == null) {
-            System.err.println("ERROR: You must extract deck sizes before assigning.");
+            System.err.println(ERROR_YOU_MUST_EXTRACT_DECK_SIZES_BEFORE_ASSIGNING);
             return false;
         }
 
@@ -75,7 +83,7 @@ public class Deck {
             }
             return true;
         } else {
-            System.err.println("ERROR: The number of units and deck counts do not match.");
+            System.err.println(ERROR_THE_NUMBER_OF_UNITS_AND_DECK_COUNTS_DO_NOT_MATCH);
             return false;
         }
     }

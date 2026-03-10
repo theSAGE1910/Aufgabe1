@@ -17,26 +17,6 @@ import java.util.Map;
 public final class GameData {
 
     /**
-     * The symbol representing a standard player unit on the board.
-     */
-    public static String playerUnitSymbol = " x ";
-
-    /**
-     * The symbol representing a standard enemy unit on the board.
-     */
-    public static String enemyUnitSymbol = " y ";
-
-    /**
-     * The symbol representing the player's Farmer King on the board.
-     */
-    public static String playerKingSymbol = " X ";
-
-    /**
-     * The symbol representing the enemy's Farmer King on the board.
-     */
-    public static String enemyKingSymbol = " Y ";
-
-    /**
      * The random seed used for generating random numbers.
      */
     public static int seed;
@@ -69,12 +49,42 @@ public final class GameData {
     /**
      * The display name of the first team (default: "Player").
      */
-    public static String team1Name = "Player";
+    public static String team1Name = DEFAULT_PLAYER;
 
     /**
      * The display name of the second team (default: "Enemy").
      */
-    public static String team2Name = "Enemy";
+    public static String team2Name = DEFAULT_ENEMY;
+
+    private static final String SEED = "seed";
+    private static final String TEAM_1 = "team1";
+    private static final String TEAM_2 = "team2";
+    private static final String VERBOSITY = "verbosity";
+    private static final String UNITS = "units";
+    private static final String DECK = "deck";
+    private static final String DECK_1 = "deck1";
+    private static final String DECK_2 = "deck2";
+    private static final String COMPACT = "compact";
+    private static final String DEFAULT_PLAYER = "Player";
+    private static final String DEFAULT_ENEMY = "Enemy";
+
+    private static final String ERROR_UNIT_FILE_IS_EMPTY = "ERROR: Unit file is empty.";
+    private static final String ERROR_INVALID_UNIT_FORMAT_DETECTED = "ERROR: Invalid unit format detected.";
+    private static final String ERROR_DUPLICATE_ARGUMENT_PROVIDED = "ERROR: Duplicate argument provided.";
+    private static final String ERROR_INVALID_ARGUMENT_FORMAT = "ERROR: Invalid argument format: ";
+    private static final String ERROR_UNKNOWN_PARAMETER_PROVIDED = "ERROR: Unknown parameter provided: ";
+    private static final String ERROR_BOARD_FILE_IS_EMPTY = "ERROR: Board file is empty.";
+
+    private static final String ERROR_MANDATORY_ARGUMENTS_MISSING_OR_INVALID
+            = "ERROR: Mandatory arguments missing or invalid!";
+    private static final String ERROR_INVALID_VERBOSITY_VALID_OPTIONS_ARE_ALL_OR_COMPACT
+            = "ERROR: Invalid verbosity! Valid options are 'all' or 'compact'.";
+    private static final String ERROR_TOO_MANY_UNITS_DEFINED_A_MAXIMUM_OF_40_UNIT_TYPES_IS_ALLOWED
+            = "ERROR: Too many units defined! A maximum of 40 unit types is allowed.";
+    private static final String ERROR_TEAM_NAMES_MUST_BE_AT_MOST_14_CHARACTERS_LONG
+            = "ERROR: Team names must be at most 14 characters long.";
+    private static final String ERROR_BOARD_KEY_SET_MUST_BE_EXACTLY_29_CHARACTERS_LONG
+            = "ERROR: Board key set must be exactly 29 characters long.";
 
     private static final String UNIT_DATA_REGEX = "^([^;]+);([^;]+);([0-9]+);([0-9]+)$";
     private static final String REGEX_EQUALS = "=";
@@ -95,30 +105,30 @@ public final class GameData {
             String[] keyValue = arg.split(REGEX_EQUALS);
             if (keyValue.length == 2) {
                 if (argInfo.containsKey(keyValue[0])) {
-                    System.err.println("ERROR: Duplicate argument provided.");
+                    System.err.println(ERROR_DUPLICATE_ARGUMENT_PROVIDED);
                     return false;
                 }
                 argInfo.put(keyValue[0], keyValue[1]);
             } else {
-                System.err.println("ERROR: Invalid argument format: " + arg);
+                System.err.println(ERROR_INVALID_ARGUMENT_FORMAT + arg);
                 return false;
             }
         }
 
-        List<String> validKeys = Arrays.asList("seed", "team1", "team2", "verbosity", "board", "units", "deck", "deck1", "deck2");
+        List<String> validKeys = Arrays.asList(SEED, TEAM_1, TEAM_2, VERBOSITY, GameMessages.BOARD, UNITS, DECK, DECK_1, DECK_2);
         for (String key : argInfo.keySet()) {
             if (!validKeys.contains(key)) {
-                System.err.println("ERROR: Unknown parameter provided: " + key);
+                System.err.println(ERROR_UNKNOWN_PARAMETER_PROVIDED + key);
                 return false;
             }
         }
 
         if (!containsMandatoryKeys(argInfo)) {
-            System.err.println("ERROR: Mandatory arguments missing or invalid!");
+            System.err.println(ERROR_MANDATORY_ARGUMENTS_MISSING_OR_INVALID);
             return false;
         }
 
-        String[] orderedKeys = {"seed", "board", "units", "deck", "deck1", "deck2", "team1", "team2", "verbosity"};
+        String[] orderedKeys = {SEED, GameMessages.BOARD, UNITS, DECK, DECK_1, DECK_2, TEAM_1, TEAM_2, VERBOSITY};
         for (String key : orderedKeys) {
             if (argInfo.containsKey(key)) {
                 if (!parseKeyValue(key)) {
@@ -131,21 +141,21 @@ public final class GameData {
 
     private static boolean parseKeyValue(String key) {
         switch (key) {
-            case "seed":
+            case SEED:
                 seed = Integer.parseInt(argInfo.get(key));
                 break;
-            case "board":
+            case GameMessages.BOARD:
                 if (handleBoardData(key)) {
                     return false;
                 }
                 break;
-            case "units":
+            case UNITS:
                 unitData = extractFilePath(argInfo.get(key));
                 if (handleUnitData()) {
                     return false;
                 }
                 break;
-            case "deck":
+            case DECK:
                 List<String> deckData = extractFilePath(argInfo.get(key));
                 if (printData(deckData)) {
                     return false;
@@ -153,34 +163,34 @@ public final class GameData {
                 deck1Data = deckData;
                 deck2Data = deckData;
                 break;
-            case "deck1":
+            case DECK_1:
                 deck1Data = extractFilePath(argInfo.get(key));
                 if (printData(deck1Data)) {
                     return false;
                 }
                 break;
-            case "deck2":
+            case DECK_2:
                 deck2Data = extractFilePath(argInfo.get(key));
                 if (printData(deck2Data)) {
                     return false;
                 }
                 break;
-            case "team1":
+            case TEAM_1:
                 team1Name = argInfo.get(key);
                 if (checkTeamNameLength(team1Name)) {
                     return false;
                 }
                 break;
-            case "team2":
+            case TEAM_2:
                 team2Name = argInfo.get(key);
                 if (checkTeamNameLength(team2Name)) {
                     return false;
                 }
                 break;
-            case "verbosity":
+            case VERBOSITY:
                 verbosity = argInfo.get(key);
-                if (!verbosity.equals("all") && !verbosity.equals("compact")) {
-                    System.err.println("ERROR: Invalid verbosity! Valid options are 'all' or 'compact'.");
+                if (!verbosity.equals(GameMessages.ALL) && !verbosity.equals(COMPACT)) {
+                    System.err.println(ERROR_INVALID_VERBOSITY_VALID_OPTIONS_ARE_ALL_OR_COMPACT);
                     return false;
                 }
                 break;
@@ -197,20 +207,20 @@ public final class GameData {
         }
 
         if (unitData.isEmpty()) {
-            System.err.println("ERROR: Unit file is empty.");
+            System.err.println(ERROR_UNIT_FILE_IS_EMPTY);
             return true;
         }
 
         if (printData(unitData)) {
             return false;
         } else if (unitData.size() > 80) {
-            System.err.println("ERROR: Too many units defined! A maximum of 40 unit types is allowed.");
+            System.err.println(ERROR_TOO_MANY_UNITS_DEFINED_A_MAXIMUM_OF_40_UNIT_TYPES_IS_ALLOWED);
             return true;
         }
 
         for (String line : unitData) {
             if (!line.matches(UNIT_DATA_REGEX)) {
-                System.err.println("ERROR: Invalid unit format detected.");
+                System.err.println(ERROR_INVALID_UNIT_FORMAT_DETECTED);
                 return true;
             }
         }
@@ -220,7 +230,7 @@ public final class GameData {
 
     private static boolean checkTeamNameLength(String teamName) {
         if (teamName.length() > 15) {
-            System.err.println("ERROR: Team names must be at most 14 characters long.");
+            System.err.println(ERROR_TEAM_NAMES_MUST_BE_AT_MOST_14_CHARACTERS_LONG);
             return true;
         }
         return false;
@@ -232,8 +242,8 @@ public final class GameData {
             return true;
         }
         System.out.println(boardData);
-        if (boardData.length() != 29) {
-            System.err.println("ERROR: Board key set must be exactly 29 characters long.");
+        if (boardData.length() != BoardTheme.MIN_KEYSET_LENGTH) {
+            System.err.println(ERROR_BOARD_KEY_SET_MUST_BE_EXACTLY_29_CHARACTERS_LONG);
             return true;
         }
         return false;
@@ -254,7 +264,7 @@ public final class GameData {
         try {
             List<String> lines = Files.readAllLines(Path.of(filePath));
             if (lines.isEmpty()) {
-                System.err.println("ERROR: Board file is empty.");
+                System.err.println(ERROR_BOARD_FILE_IS_EMPTY);
                 return null;
             }
             return lines.get(0);
@@ -276,12 +286,12 @@ public final class GameData {
     }
 
     private static boolean containsMandatoryKeys(Map<String, String> argInfo) {
-        if (!argInfo.containsKey("seed") || !argInfo.containsKey("units")) {
+        if (!argInfo.containsKey(SEED) || !argInfo.containsKey(UNITS)) {
             return false;
         }
 
-        boolean hasDeck = argInfo.containsKey("deck");
-        boolean hasDeck1And2 = argInfo.containsKey("deck1") && argInfo.containsKey("deck2");
+        boolean hasDeck = argInfo.containsKey(DECK);
+        boolean hasDeck1And2 = argInfo.containsKey(DECK_1) && argInfo.containsKey(DECK_2);
 
         if (hasDeck && hasDeck1And2) {
             return false;
@@ -290,8 +300,8 @@ public final class GameData {
             return false;
         }
 
-        if (!argInfo.containsKey("verbosity")) {
-            verbosity = "all";
+        if (!argInfo.containsKey(VERBOSITY)) {
+            verbosity = GameMessages.ALL;
         }
 
         return true;

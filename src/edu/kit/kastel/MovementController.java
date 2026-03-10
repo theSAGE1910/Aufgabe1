@@ -9,6 +9,12 @@ package edu.kit.kastel;
  */
 public final class MovementController {
 
+    private static final String ERROR_FARMER_KING_CANNOT_MOVE_ONTO_AN_ENEMY_UNIT = "ERROR: Farmer King cannot move onto an enemy unit.";
+    private static final String ERROR_UNIT_CANNOT_MOVE_ONTO_ITS_OWN_FARMER_KING = "ERROR: Unit cannot move onto its own Farmer King.";
+    private static final String ERROR_INVALID_TARGET_SQUARE = "ERROR: Invalid target square.";
+    private static final String ERROR_MOVE_MUST_BE_EXACTLY_1_SQUARE_ORTHOGONALLY_OR_EN_PLACE = "ERROR: Move must be exactly 1 square orthogonally or en place.";
+    private static final String HIDDEN_TARGET = "???";
+
     private MovementController() {
     }
 
@@ -28,12 +34,12 @@ public final class MovementController {
         boolean isSameTeam = movingUnit.getTeam().equals(targetUnit.getTeam());
 
         if (isMoverKing && !isSameTeam) {
-            System.err.println("ERROR: Farmer King cannot move onto an enemy unit.");
+            System.err.println(ERROR_FARMER_KING_CANNOT_MOVE_ONTO_AN_ENEMY_UNIT);
             return false;
         }
 
         if (!isMoverKing && isTargetKing && isSameTeam) {
-            System.err.println("ERROR: Unit cannot move onto its own Farmer King.");
+            System.err.println(ERROR_UNIT_CANNOT_MOVE_ONTO_ITS_OWN_FARMER_KING);
             return false;
         }
 
@@ -47,7 +53,7 @@ public final class MovementController {
      */
     public static boolean isArgumentValid(String argument) {
         if (argument == null || argument.length() != 2) {
-            System.err.println("ERROR: Invalid target square.");
+            System.err.println(ERROR_INVALID_TARGET_SQUARE);
             return false;
         }
         return true;
@@ -60,11 +66,11 @@ public final class MovementController {
      * @return true if the target square is within the allowed movement distance, false if it is too far away
      */
     public static boolean isDistanceValid(int targetRow, int targetCol) {
-        int rowDiff = Math.abs(targetRow - GameState.selectedRow);
-        int colDiff = Math.abs(targetCol - GameState.selectedColumn);
+        int rowDiff = Math.abs(targetRow - GameState.getSelectedRow());
+        int colDiff = Math.abs(targetCol - GameState.getSelectedColumn());
 
         if (rowDiff + colDiff > 1) {
-            System.err.println("ERROR: Move must be exactly 1 square orthogonally or en place.");
+            System.err.println(ERROR_MOVE_MUST_BE_EXACTLY_1_SQUARE_ORTHOGONALLY_OR_EN_PLACE);
             return false;
         }
         return true;
@@ -98,14 +104,14 @@ public final class MovementController {
     }
 
     private static void moveToEmptySquare(String argument, int targetRow, int targetCol, Unit movingUnit) {
-        GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
+        GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
         GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
         movingUnit.setHasMovedThisTurn(true);
         Output.printMovement(movingUnit.getUnitName(), argument);
 
-        GameState.selectedSquare = argument;
-        GameState.selectedRow = targetRow;
-        GameState.selectedColumn = targetCol;
+        GameState.setSelectedSquare(argument);
+        GameState.setSelectedRow(targetRow);
+        GameState.setSelectedColumn(targetCol);
         GameUI.updateDisplay();
     }
 
@@ -113,8 +119,8 @@ public final class MovementController {
         String targetDisplay;
         if (Unit.isKing(targetUnit)) {
             targetDisplay = targetUnit.getUnitName();
-        } else if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.activeTeam)) {
-            targetDisplay = "???";
+        } else if (!targetUnit.isFaceUp() && !targetUnit.getTeam().equals(GameEngine.getActiveTeam())) {
+            targetDisplay = HIDDEN_TARGET;
         } else {
             targetDisplay = targetUnit.getUnitName() + " (" + targetUnit.getAtk() + "/" + targetUnit.getDef() + ")";
         }
@@ -126,13 +132,13 @@ public final class MovementController {
         boolean attackerMovesToTargetSquare = resolveCombat(movingUnit, targetUnit, targetRow, targetCol);
 
         if (attackerMovesToTargetSquare) {
-            GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
+            GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
             GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
             Output.printMovement(movingUnit.getUnitName(), argument);
 
-            GameState.selectedSquare = argument;
-            GameState.selectedRow = targetRow;
-            GameState.selectedColumn = targetCol;
+            GameState.setSelectedSquare(argument);
+            GameState.setSelectedRow(targetRow);
+            GameState.setSelectedColumn(targetCol);
         }
 
         movingUnit.setHasMovedThisTurn(true);
@@ -147,27 +153,27 @@ public final class MovementController {
 
         Unit mergedUnit = movingUnit.mergeUnits(movingUnit, targetUnit);
 
-        GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
+        GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
         if (mergedUnit != null) {
             GameBoard.setUnitAt(targetRow, targetCol, mergedUnit);
             mergedUnit.setHasMovedThisTurn(false);
-            System.out.println("Success!");
+            System.out.println(GameMessages.SUCCESS_MESSAGE);
         } else {
             GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
             movingUnit.setHasMovedThisTurn(true);
             Output.printMergeFail(targetUnit.getUnitName());
         }
 
-        GameState.selectedSquare = argument;
-        GameState.selectedRow = targetRow;
-        GameState.selectedColumn = targetCol;
+        GameState.setSelectedSquare(argument);
+        GameState.setSelectedRow(targetRow);
+        GameState.setSelectedColumn(targetCol);
         GameUI.updateDisplay();
     }
 
     private static void revealCombatUnits(String argument, Unit movingUnit, Unit targetUnit) {
         if (!movingUnit.isFaceUp() && !Unit.isKing(movingUnit)) {
             movingUnit.setFaceUp(true);
-            Output.printFlip(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(), GameState.selectedSquare);
+            Output.printFlip(movingUnit.getUnitName(), movingUnit.getAtk(), movingUnit.getDef(), GameState.getSelectedSquare());
         }
         if (!targetUnit.isFaceUp() && !Unit.isKing(targetUnit)) {
             targetUnit.setFaceUp(true);
@@ -214,12 +220,12 @@ public final class MovementController {
         } else if (movingUnit.getAtk() < targetUnit.getAtk()) {
             int damage = targetUnit.getAtk() - movingUnit.getAtk();
             movingUnit.getTeam().takeDamage(damage);
-            GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
+            GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
             Output.printElimination(movingUnit.getUnitName());
             Output.printDamage(movingUnit.getTeam().getName(), damage);
             return false;
         } else {
-            GameBoard.setUnitAt(GameState.selectedRow, GameState.selectedColumn, null);
+            GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
             GameBoard.setUnitAt(targetRow, targetCol, null);
             Output.printElimination(targetUnit.getUnitName());
             Output.printElimination(movingUnit.getUnitName());
@@ -228,14 +234,14 @@ public final class MovementController {
     }
 
     private static void hpStatusCheck() {
-        if (GameEngine.team1.getTeamHP() <= 0) {
-            Output.printZeroPoints(GameEngine.team1.getName());
-            Output.printWin(GameEngine.team2.getName());
-            GameState.isRunning = false;
-        } else if (GameEngine.team2.getTeamHP() <= 0) {
-            Output.printZeroPoints(GameEngine.team2.getName());
-            Output.printWin(GameEngine.team1.getName());
-            GameState.isRunning = false;
+        if (GameEngine.getTeam1().getTeamHP() <= 0) {
+            Output.printZeroPoints(GameEngine.getTeam1().getName());
+            Output.printWin(GameEngine.getTeam2().getName());
+            GameState.setIsRunning(false);
+        } else if (GameEngine.getTeam2().getTeamHP() <= 0) {
+            Output.printZeroPoints(GameEngine.getTeam2().getName());
+            Output.printWin(GameEngine.getTeam1().getName());
+            GameState.setIsRunning(false);
         }
     }
 }

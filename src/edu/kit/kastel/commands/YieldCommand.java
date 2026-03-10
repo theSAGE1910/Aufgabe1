@@ -14,63 +14,81 @@ import edu.kit.kastel.ai.GameLogicAI;
  * @version 0.9
  */
 public class YieldCommand implements Command {
+
+    private static final String ERROR_HAND_IS_FULL_YOU_MUST_SPECIFY_A_CARD_TO_DISCARD
+            = "ERROR: Hand is full. You must specify a card to discard.";
+    private static final String ERROR_HAND_IS_NOT_FULL_YOU_CANNOT_DISCARD_A_CARD
+            = "ERROR: Hand is not full. You cannot discard a card.";
+
     @Override
     public void execute(String argument) {
-        Hand currentHand = GameEngine.activeTeam.getHand();
+        Hand currentHand = GameEngine.getActiveTeam().getHand();
+        
+        boolean validToProceed = validateDiscardState(argument, currentHand);
 
+        if (validToProceed && argument != null)  {
+            validToProceed = processDiscard(argument, currentHand);
+        }
+
+        if (validToProceed) {
+            executeTurn();
+        }
+    }
+
+    private static boolean validateDiscardState(String argument, Hand currentHand) {
         if (currentHand.getHand().size() == 5 && argument == null) {
-            System.err.println("ERROR: Hand is full. You must specify a card to discard.");
-            return;
+            System.err.println(ERROR_HAND_IS_FULL_YOU_MUST_SPECIFY_A_CARD_TO_DISCARD);
+            return false;
         } else if (currentHand.getHand().size() < 5 && argument != null) {
-            System.err.println("ERROR: Hand is not full. You cannot discard a card.");
-            return;
+            System.err.println(ERROR_HAND_IS_NOT_FULL_YOU_CANNOT_DISCARD_A_CARD);
+            return false;
         }
+        return true;
+    }
 
-        int discardIndex = 0;
-        if (argument != null)  {
-            discardIndex = CommandProcessor.parseHandIndex(argument, currentHand);
-            if (discardIndex == -1) {
-                return;
-            }
-
-            Unit unitToDiscard = currentHand.getHand().get(discardIndex);
-            currentHand.removeUnitFromHand(unitToDiscard);
-            Output.printDiscard(GameEngine.activeTeam.getName(), unitToDiscard);
+    private static boolean processDiscard(String argument, Hand currentHand) {
+        int discardIndex = CommandProcessor.parseHandIndex(argument, currentHand);
+        if (discardIndex == -1) {
+            return false;
         }
+        Unit unitToDiscard = currentHand.getHand().get(discardIndex);
+        currentHand.removeUnitFromHand(unitToDiscard);
+        Output.printDiscard(GameEngine.getActiveTeam().getName(), unitToDiscard);
+        return true;
+    }
 
-        GameEngine.resetTeamMovement(GameEngine.activeTeam);
+    private static void executeTurn() {
+        GameEngine.resetTeamMovement(GameEngine.getActiveTeam());
         GameEngine.switchTurn();
-        //GameEngine.resetTeamBlocks(GameEngine.activeTeam);
 
-        GameState.hasPlacedThisTurn = false;
-        GameState.selectedSquare = null;
+        GameState.setHasPlacedThisTurn(false);
+        GameState.setSelectedSquare(null);
 
-        if (GameEngine.activeTeam.equals(GameEngine.team1)) {
-            Output.printTurn(GameEngine.team1.getName());
+        if (GameEngine.getActiveTeam().equals(GameEngine.getTeam1())) {
+            Output.printTurn(GameEngine.getTeam1().getName());
         } else {
-            Output.printTurn(GameEngine.team2.getName());
+            Output.printTurn(GameEngine.getTeam2().getName());
         }
 
-        if (!GameEngine.tryDrawCard(GameEngine.activeTeam)) {
-            return;
-        }
-        if (GameEngine.activeTeam.equals(GameEngine.team2)) {
-            GameLogicAI.executeTurn();
-
-            if (!GameState.isRunning) {
-                return;
+        if (GameEngine.tryDrawCard(GameEngine.getActiveTeam())) {
+            if (GameEngine.getActiveTeam().equals(GameEngine.getTeam2())) {
+                executeAITurn();
             }
+        }
+    }
 
-            GameEngine.resetTeamMovement(GameEngine.team2);
+    private static void executeAITurn() {
+        GameLogicAI.executeTurn();
+
+        if (GameState.isIsRunning()) {
+            GameEngine.resetTeamMovement(GameEngine.getTeam2());
             GameEngine.switchTurn();
 
-            GameState.hasPlacedThisTurn = false;
-            Output.printTurn(GameEngine.team1.getName());
-            GameState.selectedSquare = null;
+            GameState.setHasPlacedThisTurn(false);
+            Output.printTurn(GameEngine.getTeam1().getName());
+            GameState.setSelectedSquare(null);
 
-            if (!GameEngine.tryDrawCard(GameEngine.team1)) {
-                return;
-            }
+            GameEngine.tryDrawCard(GameEngine.getTeam1());
         }
     }
 }

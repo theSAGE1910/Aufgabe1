@@ -26,7 +26,7 @@ public final class AIDiscard {
      * If all cards have the exact same weight, the first card in the hand is discarded.
      */
     public static void discardCard() {
-        List<Unit> hand = GameEngine.team2.getHand().getHand();
+        List<Unit> hand = GameEngine.getTeam2().getHand().getHand();
         if (hand.size() < 5) {
             return;
         }
@@ -64,6 +64,6 @@ public final class AIDiscard {
 
         Unit unitToDiscard = hand.get(selectedDiscardIndex);
         hand.remove(unitToDiscard);
-        Output.printDiscard(GameEngine.team2.getName(), unitToDiscard);
+        Output.printDiscard(GameEngine.getTeam2().getName(), unitToDiscard);
     }
 }

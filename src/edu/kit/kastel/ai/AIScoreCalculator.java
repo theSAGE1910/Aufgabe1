@@ -2,6 +2,7 @@ package edu.kit.kastel.ai;
 
 import edu.kit.kastel.GameBoard;
 import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.Unit;
 
 /**
@@ -13,6 +14,9 @@ import edu.kit.kastel.Unit;
  * @version 0.7
  */
 public final class AIScoreCalculator {
+
+    private static final int UNKNOWN_TARGET_PENALTY = 500;
+
     private AIScoreCalculator() {
     }
 
@@ -32,31 +36,29 @@ public final class AIScoreCalculator {
         int targetCol = col + colDir;
 
         if (targetRow < 0 || targetRow >= GameBoard.DIMENSION || targetCol < 0 || targetCol >= GameBoard.DIMENSION) {
-            return -9999999;
+            return GameMessages.MIN_INT;
         }
 
+        int score;
         Unit target = GameBoard.getUnitAt(targetRow, targetCol);
 
-        if (target != null) {
+        if (target == null) {
+            score = getEmptySquareScore(unit, targetRow, targetCol);
+        } else {
             boolean isMoverKing = Unit.isKing(unit);
             boolean isTargetKing = Unit.isKing(target);
             boolean isSameTeam = unit.getTeam().equals(target.getTeam());
 
-            if (isMoverKing && !isSameTeam) {
-                return -9999999;
+            if (isMoverKing && !isSameTeam || !isMoverKing && isTargetKing && isSameTeam) {
+                score = GameMessages.MIN_INT;
+            } else if (isSameTeam) {
+                score = getMergeScore(unit, target);
+            } else {
+                score = getCombatScore(unit, target);
             }
-            if (!isMoverKing && isTargetKing && isSameTeam) {
-                return -9999999;
-            }
-        } else {
-            return getEmptySquareScore(unit, targetRow, targetCol);
         }
 
-        if (target.getTeam().equals(unit.getTeam())) {
-            return getMergeScore(unit, target);
-        } else {
-            return getCombatScore(unit, target);
-        }
+        return score;
     }
 
     private static int getEmptySquareScore(Unit unit, int targetRow, int targetCol) {
@@ -73,7 +75,7 @@ public final class AIScoreCalculator {
 
             if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
                 Unit adjUnit = GameBoard.getUnitAt(adjRow, adjCol);
-                if (adjUnit != null && unit.getTeam().equals(GameEngine.team1)) {
+                if (adjUnit != null && unit.getTeam().equals(GameEngine.getTeam1())) {
                     enemies++;
                 }
             }
@@ -86,7 +88,7 @@ public final class AIScoreCalculator {
         if (Unit.isKing(unit)) {
             return unitAtk;
         } else if (!target.isFaceUp()) {
-            return unitAtk - 500;
+            return unitAtk - UNKNOWN_TARGET_PENALTY;
         } else if (target.isBlocking()) {
             return unitAtk - target.getDef();
         } else {
@@ -141,7 +143,7 @@ public final class AIScoreCalculator {
                 Unit target = GameBoard.getUnitAt(targetRow, targetCol);
 
                 if (target != null) {
-                    if (target.getTeam().equals(GameEngine.team1)) {
+                    if (target.getTeam().equals(GameEngine.getTeam1())) {
                         int perceivedAtk = target.isFaceUp() ? target.getAtk() : 0;
                         if (perceivedAtk > maxAtk) {
                             maxAtk = perceivedAtk;

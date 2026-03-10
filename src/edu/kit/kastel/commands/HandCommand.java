@@ -1,6 +1,7 @@
 package edu.kit.kastel.commands;
 
 import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.Output;
 
 /**
@@ -12,9 +13,9 @@ public class HandCommand implements Command {
     @Override
     public void execute(String argument) {
         if (argument != null) {
-            System.err.println("ERROR: Command does not take any arguments.");
+            System.err.println(GameMessages.ERROR_COMMAND_DOES_NOT_TAKE_ANY_ARGUMENTS);
             return;
         }
-        Output.printHand(GameEngine.activeTeam.getHand());
+        Output.printHand(GameEngine.getActiveTeam().getHand());
     }
 }

@@ -31,22 +31,22 @@ public final class GameLogicAI {
      * 4. Discard a card if the hand is full at the end of the turn.
      */
     public static void executeTurn() {
-        if (!GameState.isRunning) {
+        if (!GameState.isIsRunning()) {
             return;
         }
         AIMovement.moveFarmerKing();
 
-        if (!GameState.isRunning) {
+        if (!GameState.isIsRunning()) {
             return;
         }
         AIPlacement.placeUnit();
 
-        if (!GameState.isRunning) {
+        if (!GameState.isIsRunning()) {
             return;
         }
         AIMovement.moveUnits();
 
-        if (!GameState.isRunning) {
+        if (!GameState.isIsRunning()) {
             return;
         }
         AIDiscard.discardCard();

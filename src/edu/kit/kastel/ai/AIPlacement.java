@@ -2,6 +2,7 @@ package edu.kit.kastel.ai;
 
 import edu.kit.kastel.GameBoard;
 import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.GameState;
 import edu.kit.kastel.GameUI;
 import edu.kit.kastel.RandomGenerator;
@@ -47,7 +48,7 @@ public final class AIPlacement {
             targetSquare = validTargets.get(draw - 1);
         }
 
-        List<Unit> hand = GameEngine.team2.getHand().getHand();
+        List<Unit> hand = GameEngine.getTeam2().getHand().getHand();
         if (hand.isEmpty()) {
             return;
         }
@@ -55,9 +56,9 @@ public final class AIPlacement {
         Unit unitToPlace = selectCardToPlace(hand);
         String coord = AIMovement.getCoordinateString(targetSquare.getRow(), targetSquare.getCol());
 
-        Output.printPlacement(GameEngine.team2.getName(), unitToPlace, coord);
+        Output.printPlacement(GameEngine.getTeam2().getName(), unitToPlace, coord);
 
-        unitToPlace.setTeam(GameEngine.team2);
+        unitToPlace.setTeam(GameEngine.getTeam2());
         unitToPlace.setHasMovedThisTurn(false);
         hand.remove(unitToPlace);
 
@@ -69,14 +70,14 @@ public final class AIPlacement {
             if (mergedUnit != null) {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), mergedUnit);
                 mergedUnit.setHasMovedThisTurn(false);
-                System.out.println("Success!");
+                System.out.println(GameMessages.SUCCESS_MESSAGE);
             } else {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
                 unitToPlace.setHasMovedThisTurn(false);
                 Output.printMergeFail(targetSquareUnit.getUnitName());
             }
         } else {
-            int boardCount = getBoardCount(GameEngine.team2);
+            int boardCount = getBoardCount(GameEngine.getTeam2());
             if (boardCount >= 5) {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), null);
                 Output.printElimination(unitToPlace.getUnitName());
@@ -84,9 +85,9 @@ public final class AIPlacement {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
             }
         }
-        GameState.selectedSquare = coord;
-        GameState.selectedRow = targetSquare.getRow();
-        GameState.selectedColumn = targetSquare.getCol();
+        GameState.setSelectedSquare(coord);
+        GameState.setSelectedRow(targetSquare.getRow());
+        GameState.setSelectedColumn(targetSquare.getCol());
         GameUI.updateDisplay();
     }
 
@@ -132,7 +133,7 @@ public final class AIPlacement {
 
             Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
             if (targetUnit != null) {
-                if (targetUnit.getTeam().equals(GameEngine.team1) || targetUnit.getRole().equals("King")) {
+                if (targetUnit.getTeam().equals(GameEngine.getTeam1()) || targetUnit.getRole().equals(GameMessages.KING)) {
                     continue;
                 }
             }
@@ -168,9 +169,9 @@ public final class AIPlacement {
             if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
                 Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
                 if (adjacentUnit != null) {
-                    if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
+                    if (adjacentUnit.getTeam().equals(GameEngine.getTeam1())) {
                         enemies++;
-                    } else if (adjacentUnit.getTeam().equals(GameEngine.team2)) {
+                    } else if (adjacentUnit.getTeam().equals(GameEngine.getTeam2())) {
                         fellows++;
                     }
                 }

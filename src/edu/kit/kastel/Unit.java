@@ -17,11 +17,13 @@ public class Unit {
     private static final String REGEX = "^([^;]+);([^;]+);([0-9]+);([0-9]+)$";
 
     private static final List<Unit> UNIT_LIST = new ArrayList<>();
+    private static final String PREFIX_SYMBOL = "*";
+    private static final String BLOCK_SYMBOL = "b";
 
     private final String qualifier;
     private final String role;
-    private int atk;
-    private int def;
+    private final int atk;
+    private final int def;
     private final int weight;
 
     private Team team;
@@ -191,17 +193,17 @@ public class Unit {
 
     @Override
     public String toString() {
-        boolean isActiveTeam = this.getTeam() != null && this.getTeam().equals(GameEngine.activeTeam);
-        String prefix = (isActiveTeam && !this.hasMovedThisTurn()) ? "*" : " ";
+        boolean isActiveTeam = this.getTeam() != null && this.getTeam().equals(GameEngine.getActiveTeam());
+        String prefix = (isActiveTeam && !this.hasMovedThisTurn()) ? PREFIX_SYMBOL : " ";
 
         char symbol;
-        if (this.getTeam() != null && this.getTeam().equals(GameEngine.team1)) {
-            symbol = this.getRole().equals("King") ? 'X' : 'x';
+        if (this.getTeam() != null && this.getTeam().equals(GameEngine.getTeam1())) {
+            symbol = this.getRole().equals(GameMessages.KING) ? GameMessages.PLAYER_KING_SYMBOL : GameMessages.PLAYER_UNIT_SYMBOL;
         } else {
-            symbol = this.getRole().equals("King") ? 'Y' : 'y';
+            symbol = this.getRole().equals(GameMessages.KING) ? GameMessages.ENEMY_KING_SYMBOL : GameMessages.ENEMY_UNIT_SYMBOL;
         }
 
-        String suffix = this.isBlocking() ? "b" : " ";
+        String suffix = this.isBlocking() ? BLOCK_SYMBOL : " ";
 
         return prefix + symbol + suffix;
     }
@@ -316,6 +318,6 @@ public class Unit {
      * @return true if the unit is the Farmer King, false otherwise
      */
     public static boolean isKing(Unit unitToShow) {
-        return unitToShow.getQualifier().equals("Farmer") && unitToShow.getRole().equals("King");
+        return unitToShow.getQualifier().equals(GameMessages.FARMER) && unitToShow.getRole().equals(GameMessages.KING);
     }
 }

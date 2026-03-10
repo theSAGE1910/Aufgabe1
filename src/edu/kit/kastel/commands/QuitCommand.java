@@ -1,5 +1,6 @@
 package edu.kit.kastel.commands;
 
+import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.GameState;
 
 /**
@@ -11,9 +12,9 @@ public class QuitCommand implements Command {
     @Override
     public void execute(String argument) {
         if (argument != null) {
-            System.err.println("ERROR: Command does not take any arguments.");
+            System.err.println(GameMessages.ERROR_COMMAND_DOES_NOT_TAKE_ANY_ARGUMENTS);
             return;
         }
-        GameState.isRunning = false;
+        GameState.setIsRunning(false);
     }
 }

@@ -35,10 +35,10 @@ public final class Initialiser {
         }
 
         initialiseTeams();
-        initialiseHands(GameEngine.team1);
-        initialiseHands(GameEngine.team2);
+        initialiseHands(GameEngine.getTeam1());
+        initialiseHands(GameEngine.getTeam2());
 
-        GameEngine.activeTeam = GameEngine.team1;
+        GameEngine.setActiveTeam(GameEngine.getTeam1());
 
         initialiseKings();
         return true;
@@ -47,7 +47,7 @@ public final class Initialiser {
     private static void initialiseGameBoard() {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
-                GameBoard.GAME_BOARD[i][j] = null;
+                GameBoard.setUnitAt(i, j, null);
             }
         }
     }
@@ -83,8 +83,8 @@ public final class Initialiser {
     }
 
     private static void initialiseTeams() {
-        GameEngine.team1 = new Team(GameData.team1Name, deck1, new Hand(), player1DrawPile);
-        GameEngine.team2 = new Team(GameData.team2Name, deck2, new Hand(), player2DrawPile);
+        GameEngine.setTeam1(new Team(GameData.team1Name, deck1, new Hand(), player1DrawPile));
+        GameEngine.setTeam2(new Team(GameData.team2Name, deck2, new Hand(), player2DrawPile));
     }
 
     private static void initialiseHands(Team team) {
@@ -94,8 +94,8 @@ public final class Initialiser {
     }
 
     private static void initialiseKings() {
-        Unit team1King = new Unit("Farmer", "King", 0, 0, GameEngine.team1);
-        Unit team2King = new Unit("Farmer", "King", 0, 0, GameEngine.team2);
+        Unit team1King = new Unit(GameMessages.FARMER, GameMessages.KING, 0, 0, GameEngine.getTeam1());
+        Unit team2King = new Unit(GameMessages.FARMER, GameMessages.KING, 0, 0, GameEngine.getTeam2());
 
         GameBoard.setUnitAt(GameBoard.DIMENSION - 1, GameBoard.DIMENSION / 2, team1King);
         GameBoard.setUnitAt(0, GameBoard.DIMENSION / 2, team2King);

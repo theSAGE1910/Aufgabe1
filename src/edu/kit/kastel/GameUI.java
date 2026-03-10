@@ -22,7 +22,7 @@ public final class GameUI {
     public static void getInput() {
         String input;
         try (Scanner scanner = new Scanner(System.in)) {
-            while (GameState.isRunning) {
+            while (GameState.isIsRunning()) {
                 input = scanner.nextLine();
                 if (input == null || input.trim().isEmpty()) {
                     continue;
@@ -36,9 +36,9 @@ public final class GameUI {
      * Updates the terminal display by implicitly calling the board and show commands.
      */
     public static void updateDisplay() {
-        CommandProcessor.processCommands("board");
-        if (GameState.selectedSquare != null) {
-            CommandProcessor.processCommands("show");
+        CommandProcessor.processCommands(GameMessages.BOARD);
+        if (GameState.getSelectedSquare() != null) {
+            CommandProcessor.processCommands(GameMessages.SHOW);
         }
     }
 }

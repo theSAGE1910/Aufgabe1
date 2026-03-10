@@ -13,19 +13,21 @@ public class SelectCommand implements Command {
 
 
     private static final String REGEX = "^[A-G][1-7]$";
+    private static final String ERROR_COMMAND_REQUIRES_AN_ARGUMENT = "ERROR: Command requires an argument.";
+    private static final String ERROR_INVALID_SQUARE_SELECTED = "ERROR: Invalid square selected.";
 
     @Override
     public void execute(String argument) {
         if (argument == null) {
-            System.err.println("ERROR: Command requires an argument.");
+            System.err.println(ERROR_COMMAND_REQUIRES_AN_ARGUMENT);
         } else if (argument.length() == 2 && argument.toUpperCase().matches(REGEX)) {
-            GameState.selectedSquare = argument;
+            GameState.setSelectedSquare(argument);
             int[] coordinates = GameBoard.getCoordinates(argument);
-            GameState.selectedRow = coordinates[0];
-            GameState.selectedColumn = coordinates[1];
+            GameState.setSelectedRow(coordinates[0]);
+            GameState.setSelectedColumn(coordinates[1]);
             GameUI.updateDisplay();
         } else {
-            System.err.println("ERROR: Invalid square selected.");
+            System.err.println(ERROR_INVALID_SQUARE_SELECTED);
         }
     }
 }

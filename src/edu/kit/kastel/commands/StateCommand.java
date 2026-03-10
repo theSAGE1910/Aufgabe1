@@ -1,6 +1,7 @@
 package edu.kit.kastel.commands;
 
 import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.Output;
 import edu.kit.kastel.GameUI;
 
@@ -13,10 +14,10 @@ public class StateCommand implements Command {
     @Override
     public void execute(String argument) {
         if (argument != null) {
-            System.err.println("ERROR: Command does not take any arguments.");
+            System.err.println(GameMessages.ERROR_COMMAND_DOES_NOT_TAKE_ANY_ARGUMENTS);
             return;
         }
-        Output.printState(GameEngine.team1, GameEngine.team2);
+        Output.printState(GameEngine.getTeam1(), GameEngine.getTeam2());
         GameUI.updateDisplay();
     }
 }

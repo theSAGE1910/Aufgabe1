@@ -2,6 +2,7 @@ package edu.kit.kastel.ai;
 
 import edu.kit.kastel.GameBoard;
 import edu.kit.kastel.GameEngine;
+import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.GameState;
 import edu.kit.kastel.GameUI;
 import edu.kit.kastel.MovementController;
@@ -20,6 +21,7 @@ import java.util.List;
  * @version 0.7
  */
 public final class AIMovement {
+
     private AIMovement() {
     }
 
@@ -54,9 +56,9 @@ public final class AIMovement {
             int targetCol = targetSquare.getCol();
             String targetCoord = getCoordinateString(targetRow, targetCol);
 
-            GameState.selectedSquare = startCoord;
-            GameState.selectedRow = enemyKingRow;
-            GameState.selectedColumn = enemyKingCol;
+            GameState.setSelectedSquare(startCoord);
+            GameState.setSelectedRow(enemyKingRow);
+            GameState.setSelectedColumn(enemyKingCol);
 
             Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
             MovementController.executeMove(targetCoord, targetUnit, targetRow, targetCol, king);
@@ -70,7 +72,7 @@ public final class AIMovement {
      * unit that holds the highest weight.
      */
     public static void moveUnits() {
-        while (GameState.isRunning) {
+        while (GameState.isIsRunning()) {
             List<Unit> movableUnits = getMovableUnits();
 
             if (movableUnits.isEmpty()) {
@@ -90,7 +92,7 @@ public final class AIMovement {
                 List<Integer> scores = calculateUnitScores(unit, row, col);
 
                 for (int score : scores) {
-                    if (score > -999999) {
+                    if (score > GameMessages.MIN_INT) {
                         totalScore += score;
                     }
                 }
@@ -112,9 +114,9 @@ public final class AIMovement {
             int bestUnitCol = GameBoard.getUnitCol(bestUnit);
             String startCoord = getCoordinateString(bestUnitRow, bestUnitCol);
 
-            GameState.selectedSquare = startCoord;
-            GameState.selectedRow = bestUnitRow;
-            GameState.selectedColumn = bestUnitCol;
+            GameState.setSelectedSquare(startCoord);
+            GameState.setSelectedRow(bestUnitRow);
+            GameState.setSelectedColumn(bestUnitCol);
 
             executeUnitAction(selectedActionIndex, bestUnitRow, bestUnitCol, bestUnit, startCoord);
         }
@@ -135,11 +137,11 @@ public final class AIMovement {
 
             Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
 
-            if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team1)) {
+            if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.getTeam1())) {
                 continue;
             }
 
-            int score = getKingScore(i, targetUnit, king, targetRow, targetCol);
+            int score = getKingScore(targetUnit, king, targetRow, targetCol);
             if (score > maxScore) {
                 maxScore = score;
                 validTargets.clear();
@@ -151,12 +153,12 @@ public final class AIMovement {
         return validTargets;
     }
 
-    private static int getKingScore(int dirIndex, Unit targetUnit, Unit king, int targetRow, int targetCol) {
+    private static int getKingScore(Unit targetUnit, Unit king, int targetRow, int targetCol) {
         int[] aiKingPos = GameBoard.getEnemyKingPosition();
         int distance = (targetRow == aiKingPos[0] && targetCol == aiKingPos[1]) ? 0 : 1;
         int fellowsPresent = 0;
 
-        if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.team2) && targetUnit != king) {
+        if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.getTeam2()) && targetUnit != king) {
             fellowsPresent = 1;
         }
 
@@ -171,28 +173,31 @@ public final class AIMovement {
         int enemies = 0;
         int fellows = 0;
 
-        for (int row = -1; row <= 1; row++) {
-            for (int col = -1; col <= 1; col++) {
-                if (row == 0 && col == 0) {
-                    continue;
-                }
-                int adjRow = targetRow + row;
-                int adjCol = targetCol + col;
+        int[][] dirs = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
 
-                if (adjRow >= 0 && adjRow < GameBoard.DIMENSION && adjCol >= 0 && adjCol < GameBoard.DIMENSION) {
-                    Unit adjacentUnit = GameBoard.getUnitAt(adjRow, adjCol);
+        for (int[] dir : dirs) {
 
-                    if (adjacentUnit != null && adjacentUnit != king) {
-                        if (adjacentUnit.getTeam().equals(GameEngine.team1)) {
-                            enemies++;
-                        } else if (adjacentUnit.getTeam().equals(GameEngine.team2)) {
-                            fellows++;
-                        }
-                    }
+            Unit adjacentUnit = getValidAdjacentUnit(targetRow + dir[0], targetCol + dir[1], king);
+
+            if (adjacentUnit != null) {
+                if (adjacentUnit.getTeam().equals(GameEngine.getTeam1())) {
+                    enemies++;
+                } else if (adjacentUnit.getTeam().equals(GameEngine.getTeam2())) {
+                    fellows++;
                 }
             }
         }
         return new int[]{enemies, fellows};
+    }
+
+    private static Unit getValidAdjacentUnit(int row, int col, Unit king) {
+        if (row >= 0 && row < GameBoard.DIMENSION && col >= 0 && col < GameBoard.DIMENSION) {
+            Unit unit = GameBoard.getUnitAt(row, col);
+            if (unit != null && unit != king) {
+                return unit;
+            }
+        }
+        return null;
     }
 
     private static List<Unit> getMovableUnits() {
@@ -200,7 +205,8 @@ public final class AIMovement {
         for (int row = 0; row < GameBoard.DIMENSION; row++) {
             for (int col = 0; col < GameBoard.DIMENSION; col++) {
                 Unit unit = GameBoard.getUnitAt(row, col);
-                if (unit != null && unit.getTeam().equals(GameEngine.team2) && !unit.getRole().equals("King") && !unit.hasMovedThisTurn()) {
+                if (unit != null && unit.getTeam().equals(GameEngine.getTeam2())
+                        && !unit.getRole().equals(GameMessages.KING) && !unit.hasMovedThisTurn()) {
                     movableUnits.add(unit);
                 }
             }
@@ -215,7 +221,7 @@ public final class AIMovement {
      * @return the formatted coordinate string (e.g., "A7", "D4")
      */
     static String getCoordinateString(int row, int col) {
-        char colChar = (char) ('A' + col);
+        char colChar = (char) (GameMessages.CHAR_BASE + col);
         int rowNum = 7 - row;
 
         return "" + colChar + rowNum;
@@ -260,9 +266,6 @@ public final class AIMovement {
 
         for (int score : bestUnitScores) {
             int weight = Math.max(0, score);
-            if (score <= -999999) {
-                weight = 0;
-            }
             validWeights.add(weight);
             totalWeight += weight;
         }

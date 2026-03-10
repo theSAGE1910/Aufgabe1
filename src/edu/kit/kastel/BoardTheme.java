@@ -131,8 +131,14 @@ public final class BoardTheme {
      */
     public static final int SEL_INNER_BOTTOM_RIGHT = 28;
 
+    /**
+     * The minimum length of the theme string required to properly initialize the board theme.
+     */
+    public static final int MIN_KEYSET_LENGTH = 29;
+
     private static final String STANDARD_CHARSET = "++++++++-|+############=N####";
-    private static String currentTheme = STANDARD_CHARSET;
+
+    private static String currentTheme = null;
 
     private BoardTheme() {
     }
@@ -144,7 +150,7 @@ public final class BoardTheme {
      */
     public static void initialiseTheme() {
         String keySet = GameData.boardData;
-        if (keySet == null || keySet.length() < 29) {
+        if (keySet == null || keySet.length() < MIN_KEYSET_LENGTH) {
             currentTheme = STANDARD_CHARSET;
         } else {
             currentTheme = keySet;
