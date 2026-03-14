@@ -26,13 +26,7 @@ public class ShowCommand implements Command {
         if (unitToShow == null) {
             System.out.println(NO_UNIT);
         } else {
-            if (Unit.isKing(unitToShow)) {
-                Output.printFarmerKing(unitToShow);
-            } else if (!unitToShow.isFaceUp() && !unitToShow.getTeam().equals(GameEngine.getActiveTeam())) {
-                Output.printHiddenUnit(unitToShow);
-            } else {
-                Output.printVisibleUnit(unitToShow);
-            }
+            Output.printUnitDetails(unitToShow, GameEngine.getActiveTeam());
         }
     }
 }

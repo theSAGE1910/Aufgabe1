@@ -108,7 +108,7 @@ public class PlaceCommand implements Command {
     }
 
     private static void executeStandardPlacement(Unit unitToPlace) {
-        int boardCount = Output.getBoardCount(GameEngine.getActiveTeam());
+        int boardCount = GameBoard.getBoardCount(GameEngine.getActiveTeam());
         if (boardCount >= MAX_BOARD_UNITS) {
             GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
             Output.printElimination(unitToPlace.getUnitName());
@@ -124,18 +124,18 @@ public class PlaceCommand implements Command {
 
         if (mergedUnit != null) {
             GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), mergedUnit);
-            mergedUnit.setHasMovedThisTurn(false);
+            mergedUnit.setMovedThisTurn(false);
             System.out.println(GameMessages.SUCCESS_MESSAGE);
         } else {
             GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), unitToPlace);
-            unitToPlace.setHasMovedThisTurn(false);
+            unitToPlace.setMovedThisTurn(false);
             Output.printMergeFail(targetSquareUnit.getUnitName());
         }
     }
 
     private static void prepareUnitForPlacement(Unit unitToPlace, Hand currentHand) {
         unitToPlace.setTeam(GameEngine.getActiveTeam());
-        unitToPlace.setHasMovedThisTurn(false);
+        unitToPlace.setMovedThisTurn(false);
         currentHand.removeUnitFromHand(unitToPlace);
     }
 

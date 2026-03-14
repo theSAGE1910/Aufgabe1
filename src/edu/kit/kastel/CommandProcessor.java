@@ -13,9 +13,6 @@ import edu.kit.kastel.commands.ShowCommand;
 import edu.kit.kastel.commands.StateCommand;
 import edu.kit.kastel.commands.YieldCommand;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Responsible for processing user input commands and executing the corresponding actions in the game.
  * @author uxuwg
@@ -24,7 +21,6 @@ import java.util.Map;
 public final class CommandProcessor {
 
     private static final String REGEX_SPACE = " ";
-    private static final Map<String, Command> COMMANDS = new HashMap<>();
     private static final String ERROR_NO_CARD_INDEX_PROVIDED = "ERROR: No card index provided.";
     private static final String ERROR_INVALID_COMMAND = "ERROR: Invalid command";
     private static final String ERROR_INVALID_COMMAND_FORMAT = "ERROR: Invalid command format";
@@ -49,22 +45,9 @@ public final class CommandProcessor {
     }
 
     /**
-     * Initializes the command processor by populating the command map with available commands and their corresponding handlers.
+     * Intentionally left blank. Maintained for compatibility with GameEngine.
      */
     public static void initialise() {
-        if (COMMANDS.isEmpty()) {
-            COMMANDS.put(SELECT, new SelectCommand());
-            COMMANDS.put(GameMessages.BOARD, new BoardCommand());
-            COMMANDS.put(MOVE, new MoveCommand());
-            COMMANDS.put(FLIP, new FlipCommand());
-            COMMANDS.put(BLOCK, new BlockCommand());
-            COMMANDS.put(HAND, new HandCommand());
-            COMMANDS.put(PLACE, new PlaceCommand());
-            COMMANDS.put(GameMessages.SHOW, new ShowCommand());
-            COMMANDS.put(YIELD, new YieldCommand());
-            COMMANDS.put(STATE, new StateCommand());
-            COMMANDS.put(QUIT, new QuitCommand());
-        }
     }
 
     /**
@@ -92,12 +75,34 @@ public final class CommandProcessor {
             }
         }
 
-        Command command = COMMANDS.get(key);
+        Command command = getCommand(key);
         if (command != null) {
             command.execute(argument);
         } else {
             System.err.println(ERROR_INVALID_COMMAND);
         }
+    }
+
+    /**
+     * Retrieves the corresponding Command object based on the parsed key.
+     * @param key the command string typed by the user
+     * @return the newly instantiated Command, or null if the command doesn't exist
+     */
+    private static Command getCommand(String key) {
+        return switch (key) {
+            case SELECT -> new SelectCommand();
+            case GameMessages.BOARD -> new BoardCommand();
+            case MOVE -> new MoveCommand();
+            case FLIP -> new FlipCommand();
+            case BLOCK -> new BlockCommand();
+            case HAND -> new HandCommand();
+            case PLACE -> new PlaceCommand();
+            case GameMessages.SHOW -> new ShowCommand();
+            case YIELD -> new YieldCommand();
+            case STATE -> new StateCommand();
+            case QUIT -> new QuitCommand();
+            default -> null;
+        };
     }
 
     /**

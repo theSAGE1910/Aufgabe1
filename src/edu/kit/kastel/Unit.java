@@ -1,6 +1,8 @@
 package edu.kit.kastel;
 
 import java.util.ArrayList;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +18,6 @@ public class Unit {
 
     private static final String REGEX = "^([^;]+);([^;]+);([0-9]+);([0-9]+)$";
 
-    private static final List<Unit> UNIT_LIST = new ArrayList<>();
     private static final String PREFIX_SYMBOL = "*";
     private static final String BLOCK_SYMBOL = "b";
     private static final String SPACE = " ";
@@ -37,16 +38,17 @@ public class Unit {
     private static final int ONE = 1;
     private static final int TWO = 2;
 
+    private static Unit[] unitArray = null;
+
     private final String qualifier;
     private final String role;
     private final int atk;
     private final int def;
-    private final int weight;
 
     private Team team;
-    private boolean isFaceUp;
-    private boolean hasMovedThisTurn = false;
-    private boolean isBlocking = false;
+    private boolean faceUp;
+    private boolean movedThisTurn = false;
+    private boolean blocking = false;
 
     /**
      * Constructs a basic unit without an assigned team (used during initial file parsing).
@@ -60,7 +62,6 @@ public class Unit {
         this.role = role;
         this.atk = atk;
         this.def = def;
-        this.weight = atk + def;
     }
 
     /**
@@ -76,36 +77,38 @@ public class Unit {
         this.role = role;
         this.atk = atk;
         this.def = def;
-        this.weight = atk + def;
         this.team = team;
     }
 
     /**
-     * Retrieves the global list of all parsed units.
+     * Retrieves the list of available unit templates that were parsed from the configuration file.
      * @return the list of available unit templates
      */
     public static List<Unit> getUnitList() {
-        return UNIT_LIST;
+        if (unitArray == null) {
+            return new ArrayList<>();
+        }
+        // Converts the array back into a List for your other classes to use!
+        return new ArrayList<>(Arrays.asList(unitArray));
     }
 
     /**
      * Parses the raw string data from the units file.
      * @param unitData the list of raw string lines from the configuration file
-     * @return the populated list of unit templates
      */
-    public static List<Unit> extractUnits(List<String> unitData) {
-
+    public static void extractUnits(List<String> unitData) {
+        List<Unit> tempUnits = new ArrayList<>();
         Pattern pattern = Pattern.compile(REGEX);
         for (String unit : unitData) {
             Matcher matcher = pattern.matcher(unit);
             if (matcher.find()) {
-                getUnitList().add(new Unit(matcher.group(GROUP_QUALIFIER),
+                tempUnits.add(new Unit(matcher.group(GROUP_QUALIFIER),
                         matcher.group(GROUP_ROLE),
                         Integer.parseInt(matcher.group(GROUP_ATK)),
                         Integer.parseInt(matcher.group(GROUP_DEF)), null));
             }
         }
-        return getUnitList();
+        unitArray = tempUnits.toArray(new Unit[0]);
     }
 
     /**
@@ -129,7 +132,7 @@ public class Unit {
 
         Unit mergedUnit = new Unit(newQualifier, newRole, newAtk, newDef, moverUnit.getTeam());
 
-        mergedUnit.setFaceUp(moverUnit.isFaceUp && targetUnit.isFaceUp);
+        mergedUnit.setFaceUp(moverUnit.faceUp && targetUnit.faceUp);
 
         return mergedUnit;
     }
@@ -286,7 +289,7 @@ public class Unit {
      * @return true if the unit's stats are visible to the opponent, false if hidden
      */
     public boolean isFaceUp() {
-        return isFaceUp;
+        return faceUp;
     }
 
     /**
@@ -294,7 +297,7 @@ public class Unit {
      * @param faceUp the new visibility state of the unit
      */
     public void setFaceUp(boolean faceUp) {
-        this.isFaceUp = faceUp;
+        this.faceUp = faceUp;
     }
 
     /**
@@ -302,15 +305,15 @@ public class Unit {
      * @return true if the unit has already acted this turn, false otherwise
      */
     public boolean hasMovedThisTurn() {
-        return hasMovedThisTurn;
+        return movedThisTurn;
     }
 
     /**
      * Sets the movement state of the unit.
-     * @param hasMovedThisTurn the new movement state flag for the unit
+     * @param movedThisTurn the new movement state flag for the unit
      */
-    public void setHasMovedThisTurn(boolean hasMovedThisTurn) {
-        this.hasMovedThisTurn = hasMovedThisTurn;
+    public void setMovedThisTurn(boolean movedThisTurn) {
+        this.movedThisTurn = movedThisTurn;
     }
 
     /**
@@ -318,7 +321,7 @@ public class Unit {
      * @return true if the unit is currently in a defensive blocking stance
      */
     public boolean isBlocking() {
-        return isBlocking;
+        return blocking;
     }
 
     /**
@@ -326,7 +329,7 @@ public class Unit {
      * @param isBlocking the new blocking stance state for the unit
      */
     public void setBlocking(boolean isBlocking) {
-        this.isBlocking = isBlocking;
+        this.blocking = isBlocking;
     }
 
     /**

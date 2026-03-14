@@ -57,15 +57,15 @@ public class Deck {
             }
         } catch (NumberFormatException e) {
             System.err.println(ERROR_NUMERIC_EXCEPTION);
-            return false;
+            return true;
         }
 
         if (sum != DECK_SIZE) {
             System.err.println(ERROR_DECK_MUST_CONTAIN_EXACTLY_40_CARDS);
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -77,17 +77,17 @@ public class Deck {
     public boolean assignDeck() {
         if (this.allUnitCount == null) {
             System.err.println(ERROR_YOU_MUST_EXTRACT_DECK_SIZES_BEFORE_ASSIGNING);
-            return false;
+            return true;
         }
 
         if (Unit.getUnitList().size() == this.allUnitCount.length) {
             for (int i = START_INDEX; i < Unit.getUnitList().size(); i++) {
                 this.deckInfo.put(Unit.getUnitList().get(i), this.allUnitCount[i]);
             }
-            return true;
+            return false;
         } else {
             System.err.println(ERROR_THE_NUMBER_OF_UNITS_AND_DECK_COUNTS_DO_NOT_MATCH);
-            return false;
+            return true;
         }
     }
 
@@ -112,7 +112,6 @@ public class Deck {
                 playableDeck.add(newCard);
             }
         }
-
         return playableDeck;
     }
 }

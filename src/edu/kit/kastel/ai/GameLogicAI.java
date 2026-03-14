@@ -1,6 +1,7 @@
 package edu.kit.kastel.ai;
 
 import edu.kit.kastel.GameState;
+import edu.kit.kastel.Team;
 
 /**
  * A utility class that coordinates the overall sequence of actions for the AI's turn.
@@ -22,33 +23,29 @@ public final class GameLogicAI {
     }
 
     /**
-     * Executes the complete turn sequence for the AI player.
-     * The sequence halts immediately if the game ends during any of the steps.
-     * Order of operations:
-     * 1. Move the Farmer King.
-     * 2. Place a unit from the hand onto the board.
-     * 3. Move all eligible units on the board.
-     * 4. Discard a card if the hand is full at the end of the turn.
+     * Executes the AI's turn by following a structured sequence of actions.
+     * @param aiTeam the AI's team object, used to access the hand and update the board state after placement and discarding.
+     * @param playerTeam the player's team object, used to evaluate the board state and make informed decisions during the AI's turn.
      */
-    public static void executeTurn() {
+    public static void executeTurn(Team aiTeam, Team playerTeam) {
         if (!GameState.isIsRunning()) {
             return;
         }
-        AIMovement.moveFarmerKing();
+        AIMovement.moveFarmerKing(aiTeam, playerTeam);
 
         if (!GameState.isIsRunning()) {
             return;
         }
-        AIPlacement.placeUnit();
+        AIPlacement.placeUnit(aiTeam);
 
         if (!GameState.isIsRunning()) {
             return;
         }
-        AIMovement.moveUnits();
+        AIMovement.moveUnits(aiTeam);
 
         if (!GameState.isIsRunning()) {
             return;
         }
-        AIDiscard.discardCard();
+        AIDiscard.discardCard(aiTeam);
     }
 }

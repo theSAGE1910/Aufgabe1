@@ -61,22 +61,7 @@ public final class GameEngine {
             for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
                 Unit boardUnit = GameBoard.getUnitAt(row, col);
                 if (boardUnit != null && boardUnit.getTeam().equals(team)) {
-                    boardUnit.setHasMovedThisTurn(false);
-                }
-            }
-        }
-    }
-
-    /**
-     * Resets the block status of all units belonging to the specified team at the START of their turn.
-     * @param team the team for which to reset the block status
-     */
-    public static void resetTeamBlocks(Team team) {
-        for (int row = START_INDEX; row < GameBoard.DIMENSION; row++) {
-            for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
-                Unit boardUnit = GameBoard.getUnitAt(row, col);
-                if (boardUnit != null && boardUnit.getTeam().equals(team)) {
-                    boardUnit.setBlocking(false);
+                    boardUnit.setMovedThisTurn(false);
                 }
             }
         }
@@ -88,7 +73,8 @@ public final class GameEngine {
      * @return true if the card was successfully drawn and added to the team's hand, false if the deck is empty and the game has ended
      */
     public static boolean tryDrawCard(Team team) {
-        boolean success = team.getHand().handLoader(team.getShuffledDeck());
+        boolean success = team.getHand().handLoader(team);
+
         if (!success) {
             System.err.printf(NO_MORE_CARDS_LEFT_IN_THE_DECK, team.getName());
             Team winner = team.equals(getTeam1()) ? getTeam2() : getTeam1();

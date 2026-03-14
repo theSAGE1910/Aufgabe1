@@ -7,12 +7,11 @@ import edu.kit.kastel.GameState;
 import edu.kit.kastel.GameUI;
 import edu.kit.kastel.RandomGenerator;
 import edu.kit.kastel.Unit;
+import edu.kit.kastel.Team;
 import edu.kit.kastel.Output;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static edu.kit.kastel.Output.getBoardCount;
 
 /**
  * Utility class responsible for handling the AI's unit placement logic.
@@ -49,11 +48,10 @@ public final class AIPlacement {
     }
 
     /**
-     * Executes the unit placement phase for the AI.
-     * Identifies the best valid target squares around the AI's Farmer King,
-     * selects one, and places a weighted randomly chosen unit from the AI's hand.
+     * Evaluates valid placement squares around the AI's Farmer King, scores them based on proximity to the player's King.
+     * @param aiTeam the AI's team object, used to access the hand and update the board state after placement.
      */
-    public static void placeUnit() {
+    public static void placeUnit(Team aiTeam) {
         int[] aiKingPos = GameBoard.getEnemyKingPosition();
         int[] playerKingPos = GameBoard.getPlayerKingPosition();
         if (aiKingPos == null || playerKingPos == null) {
@@ -71,7 +69,7 @@ public final class AIPlacement {
             targetSquare = validTargets.get(draw - RANDOM_OFFSET);
         }
 
-        List<Unit> hand = GameEngine.getTeam2().getHand().getHand();
+        List<Unit> hand = aiTeam.getHand().getHand();
         if (hand.isEmpty()) {
             return;
         }
@@ -79,11 +77,11 @@ public final class AIPlacement {
         Unit unitToPlace = selectCardToPlace(hand);
         String coord = AIMovement.getCoordinateString(targetSquare.getRow(), targetSquare.getCol());
 
-        Output.printPlacement(GameEngine.getTeam2().getName(), unitToPlace, coord);
+        Output.printPlacement(aiTeam.getName(), unitToPlace, coord);
 
-        unitToPlace.setTeam(GameEngine.getTeam2());
-        unitToPlace.setHasMovedThisTurn(false);
-        hand.remove(unitToPlace);
+        unitToPlace.setTeam(aiTeam);
+        unitToPlace.setMovedThisTurn(false);
+        aiTeam.getHand().removeUnitFromHand(unitToPlace);
 
         Unit targetSquareUnit = GameBoard.getUnitAt(targetSquare.getRow(), targetSquare.getCol());
 
@@ -92,15 +90,15 @@ public final class AIPlacement {
             Unit mergedUnit = unitToPlace.mergeUnits(unitToPlace, targetSquareUnit);
             if (mergedUnit != null) {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), mergedUnit);
-                mergedUnit.setHasMovedThisTurn(false);
+                mergedUnit.setMovedThisTurn(false);
                 System.out.println(GameMessages.SUCCESS_MESSAGE);
             } else {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), unitToPlace);
-                unitToPlace.setHasMovedThisTurn(false);
+                unitToPlace.setMovedThisTurn(false);
                 Output.printMergeFail(targetSquareUnit.getUnitName());
             }
         } else {
-            int boardCount = getBoardCount(GameEngine.getTeam2());
+            int boardCount = GameBoard.getBoardCount(aiTeam);
             if (boardCount >= MAX_BOARD_UNITS) {
                 GameBoard.setUnitAt(targetSquare.getRow(), targetSquare.getCol(), null);
                 Output.printElimination(unitToPlace.getUnitName());

@@ -16,12 +16,12 @@ public final class MovementController {
             = "ERROR: Move must be exactly 1 square orthogonally or en place.";
     private static final String HIDDEN_TARGET = "???";
 
-    private static final int START_INDEX = 0;
     private static final int DISTANCE_ONE = 1;
     private static final int DISTANCE_TWO = 2;
     private static final String FORMAT_PAREN_OPEN = " (";
     private static final String FORMAT_SLASH = "/";
     private static final String FORMAT_PAREN_CLOSE = ")";
+    private static final int ZERO_HP = 0;
 
     private MovementController() {
     }
@@ -95,11 +95,11 @@ public final class MovementController {
     public static void executeMove(String argument, Unit targetUnit, int targetRow, int targetCol, Unit movingUnit) {
         if (movingUnit.isBlocking()) {
             movingUnit.setBlocking(false);
-            Output.printNoBlock(movingUnit.getUnitName());
+            Output.printBlockStatus(movingUnit.getUnitName(), null, false);
         }
 
         if (movingUnit == targetUnit) {
-            movingUnit.setHasMovedThisTurn(true);
+            movingUnit.setMovedThisTurn(true);
             Output.printMovement(movingUnit.getUnitName(), argument);
             GameUI.updateDisplay();
         } else if (targetUnit == null) {
@@ -114,7 +114,7 @@ public final class MovementController {
     private static void moveToEmptySquare(String argument, int targetRow, int targetCol, Unit movingUnit) {
         GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
         GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
-        movingUnit.setHasMovedThisTurn(true);
+        movingUnit.setMovedThisTurn(true);
         Output.printMovement(movingUnit.getUnitName(), argument);
 
         GameState.setSelectedSquare(argument);
@@ -150,7 +150,7 @@ public final class MovementController {
             GameState.setSelectedColumn(targetCol);
         }
 
-        movingUnit.setHasMovedThisTurn(true);
+        movingUnit.setMovedThisTurn(true);
         hpStatusCheck();
 
         GameUI.updateDisplay();
@@ -165,11 +165,11 @@ public final class MovementController {
         GameBoard.setUnitAt(GameState.getSelectedRow(), GameState.getSelectedColumn(), null);
         if (mergedUnit != null) {
             GameBoard.setUnitAt(targetRow, targetCol, mergedUnit);
-            mergedUnit.setHasMovedThisTurn(false);
+            mergedUnit.setMovedThisTurn(false);
             System.out.println(GameMessages.SUCCESS_MESSAGE);
         } else {
             GameBoard.setUnitAt(targetRow, targetCol, movingUnit);
-            movingUnit.setHasMovedThisTurn(true);
+            movingUnit.setMovedThisTurn(true);
             Output.printMergeFail(targetUnit.getUnitName());
         }
 
@@ -243,13 +243,11 @@ public final class MovementController {
     }
 
     private static void hpStatusCheck() {
-        if (GameEngine.getTeam1().getTeamHP() <= START_INDEX) {
-            Output.printZeroPoints(GameEngine.getTeam1().getName());
-            Output.printWin(GameEngine.getTeam2().getName());
+        if (GameEngine.getTeam1().getTeamHP() <= ZERO_HP) {
+            Output.printGameOver(GameEngine.getTeam1().getName(), GameEngine.getTeam2().getName());
             GameState.setIsRunning(false);
-        } else if (GameEngine.getTeam2().getTeamHP() <= START_INDEX) {
-            Output.printZeroPoints(GameEngine.getTeam2().getName());
-            Output.printWin(GameEngine.getTeam1().getName());
+        } else if (GameEngine.getTeam2().getTeamHP() <= ZERO_HP) {
+            Output.printGameOver(GameEngine.getTeam2().getName(), GameEngine.getTeam1().getName());
             GameState.setIsRunning(false);
         }
     }

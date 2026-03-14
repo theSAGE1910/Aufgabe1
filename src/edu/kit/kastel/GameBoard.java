@@ -25,6 +25,7 @@ public final class GameBoard {
     private static final int COORD_LENGTH = 2;
     private static final int RADIX_TEN = 10;
     private static final int NOT_FOUND = -1;
+    private static final int START_COUNT = 0;
 
     private GameBoard() {
     }
@@ -118,5 +119,23 @@ public final class GameBoard {
         coords[COL_INDEX] = Character.getNumericValue(coordinate.toUpperCase().charAt(ROW_INDEX)) - RADIX_TEN;
 
         return coords;
+    }
+
+    /**
+     * Counts the total number of standard units (excluding the Farmer King) a team has on the board.
+     * @param team the team whose units are being counted
+     * @return the number of units the team currently has on the board
+     */
+    public static int getBoardCount(Team team) {
+        int count = START_COUNT;
+        for (int row = START_INDEX; row < DIMENSION; row++) {
+            for (int col = START_INDEX; col < DIMENSION; col++) {
+                Unit boardUnit = getUnitAt(row, col);
+                if (boardUnit != null && boardUnit.getTeam().equals(team) && !boardUnit.getRole().equals(GameMessages.KING)) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

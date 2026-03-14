@@ -1,12 +1,12 @@
 package edu.kit.kastel.ai;
 
 import edu.kit.kastel.GameBoard;
-import edu.kit.kastel.GameEngine;
 import edu.kit.kastel.GameMessages;
 import edu.kit.kastel.GameState;
 import edu.kit.kastel.GameUI;
 import edu.kit.kastel.MovementController;
 import edu.kit.kastel.RandomGenerator;
+import edu.kit.kastel.Team;
 import edu.kit.kastel.Unit;
 import edu.kit.kastel.Output;
 
@@ -66,11 +66,11 @@ public final class AIMovement {
     }
 
     /**
-     * Executes the movement of the AI's Farmer King.
-     * Evaluates valid adjacent squares based on scoring and moves the King.
-     * If multiple squares share the highest score, one is chosen randomly.
+     * Evaluates the optimal move for the AI's Farmer King based on the current board state.
+     * @param aiTeam the AI's team object, used to evaluate the board state and make informed decisions during the AI's turn.
+     * @param playerTeam the player's team object, used to evaluate the board state and make informed decisions during the AI's turn.
      */
-    public static void moveFarmerKing() {
+    public static void moveFarmerKing(Team aiTeam, Team playerTeam) {
         int[] enemyKingPos = GameBoard.getEnemyKingPosition();
         if (enemyKingPos == null) {
             return;
@@ -80,7 +80,7 @@ public final class AIMovement {
         int enemyKingCol = enemyKingPos[COL_INDEX];
         Unit king = GameBoard.getUnitAt(enemyKingRow, enemyKingCol);
 
-        List<TargetSquare> validTargets = getBestKingTargets(enemyKingRow, enemyKingCol, king);
+        List<TargetSquare> validTargets = getBestKingTargets(enemyKingRow, enemyKingCol, king, aiTeam, playerTeam);
 
         TargetSquare targetSquare = null;
         if (validTargets.size() == SINGLE_TARGET) {
@@ -106,14 +106,13 @@ public final class AIMovement {
     }
 
     /**
-     * Executes the action phase for all standard AI units.
-     * Iteratively evaluates all movable AI units, calculates their possible action
-     * scores (Move, Block, or stay En Place), and executes the action for the
-     * unit that holds the highest weight.
+     * Evaluates and executes the optimal moves for all active AI units (excluding the Farmer King) based on the current board state.
+     * The method iteratively selects the best move for each unit until there are no more movable units or the game ends.
+      * @param aiTeam the AI's team object, used to evaluate the board state and make informed decisions during the AI's turn.
      */
-    public static void moveUnits() {
+    public static void moveUnits(Team aiTeam) {
         while (GameState.isIsRunning()) {
-            List<Unit> movableUnits = getMovableUnits();
+            List<Unit> movableUnits = getMovableUnits(aiTeam);
 
             if (movableUnits.isEmpty()) {
                 break;
@@ -162,7 +161,7 @@ public final class AIMovement {
         }
     }
 
-    private static List<TargetSquare> getBestKingTargets(int enemyKingRow, int enemyKingCol, Unit king) {
+    private static List<TargetSquare> getBestKingTargets(int enemyKingRow, int enemyKingCol, Unit king, Team aiTeam, Team playerTeam) {
         List<TargetSquare> validTargets = new ArrayList<>();
         int maxScore = Integer.MIN_VALUE;
 
@@ -178,11 +177,11 @@ public final class AIMovement {
 
             Unit targetUnit = GameBoard.getUnitAt(targetRow, targetCol);
 
-            if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.getTeam1())) {
+            if (targetUnit != null && targetUnit.getTeam().equals(playerTeam)) {
                 continue;
             }
 
-            int score = getKingScore(targetUnit, king, targetRow, targetCol);
+            int score = getKingScore(targetUnit, king, targetRow, targetCol, aiTeam, playerTeam);
             if (score > maxScore) {
                 maxScore = score;
                 validTargets.clear();
@@ -194,24 +193,24 @@ public final class AIMovement {
         return validTargets;
     }
 
-    private static int getKingScore(Unit targetUnit, Unit king, int targetRow, int targetCol) {
+    private static int getKingScore(Unit targetUnit, Unit king, int targetRow, int targetCol, Team aiTeam, Team playerTeam) {
         int[] aiKingPos = GameBoard.getEnemyKingPosition();
         int distance = (targetRow == aiKingPos[ROW_INDEX] && targetCol == aiKingPos[COL_INDEX])
                 ? SAME_SQUARE_DISTANCE : ADJACENT_DISTANCE;
         int fellowsPresent = INITIAL_VALUE;
 
-        if (targetUnit != null && targetUnit.getTeam().equals(GameEngine.getTeam2()) && targetUnit != king) {
+        if (targetUnit != null && targetUnit.getTeam().equals(aiTeam) && targetUnit != king) {
             fellowsPresent = FELLOW_PRESENT_VALUE;
         }
 
-        int[] counts = countKingNeighbours(targetRow, targetCol, king);
+        int[] counts = countKingNeighbours(targetRow, targetCol, king, aiTeam, playerTeam);
         int enemies = counts[ENEMIES_INDEX];
         int fellows = counts[FELLOWS_INDEX];
 
         return fellows - (ENEMY_PENALTY_MULTIPLIER * enemies) - distance - (FELLOW_KING_PRESENCE_PENALTY * fellowsPresent);
     }
 
-    private static int[] countKingNeighbours(int targetRow, int targetCol, Unit king) {
+    private static int[] countKingNeighbours(int targetRow, int targetCol, Unit king, Team aiTeam, Team playerTeam) {
         int enemies = INITIAL_VALUE;
         int fellows = INITIAL_VALUE;
 
@@ -220,9 +219,9 @@ public final class AIMovement {
             Unit adjacentUnit = getValidAdjacentUnit(targetRow + dir[ROW_INDEX], targetCol + dir[COL_INDEX], king);
 
             if (adjacentUnit != null) {
-                if (adjacentUnit.getTeam().equals(GameEngine.getTeam1())) {
+                if (adjacentUnit.getTeam().equals(playerTeam)) {
                     enemies++;
-                } else if (adjacentUnit.getTeam().equals(GameEngine.getTeam2())) {
+                } else if (adjacentUnit.getTeam().equals(aiTeam)) {
                     fellows++;
                 }
             }
@@ -240,12 +239,12 @@ public final class AIMovement {
         return null;
     }
 
-    private static List<Unit> getMovableUnits() {
+    private static List<Unit> getMovableUnits(Team aiTeam) {
         List<Unit> movableUnits = new ArrayList<>();
         for (int row = START_INDEX; row < GameBoard.DIMENSION; row++) {
             for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
                 Unit unit = GameBoard.getUnitAt(row, col);
-                if (unit != null && unit.getTeam().equals(GameEngine.getTeam2())
+                if (unit != null && unit.getTeam().equals(aiTeam)
                         && !unit.getRole().equals(GameMessages.KING) && !unit.hasMovedThisTurn()) {
                     movableUnits.add(unit);
                 }
@@ -277,8 +276,8 @@ public final class AIMovement {
             MovementController.executeMove(targetCoord, targetUnit, targetRow, targetCol, bestUnit);
         } else if (selectedActionIndex == BLOCK_ACTION_INDEX) {
             bestUnit.setBlocking(true);
-            bestUnit.setHasMovedThisTurn(true);
-            Output.printBlock(bestUnit.getUnitName(), startCoord);
+            bestUnit.setMovedThisTurn(true);
+            Output.printBlockStatus(bestUnit.getUnitName(), startCoord, true);
             GameUI.updateDisplay();
         } else if (selectedActionIndex == STAY_ACTION_INDEX) {
             Unit targetUnit = GameBoard.getUnitAt(bestUnitRow, bestUnitCol);

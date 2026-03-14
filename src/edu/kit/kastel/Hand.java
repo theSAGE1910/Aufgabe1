@@ -16,7 +16,6 @@ public class Hand {
      * The maximum number of cards a player can hold in their hand.
      */
     public static final int MAX_HAND_SIZE = 5;
-    private static final int FIRST_CARD_INDEX = 0;
 
     private final List<Unit> hand;
 
@@ -30,16 +29,16 @@ public class Hand {
     /**
      * Attempts to draw a card from the deck and add it to the hand.
      * The hand will only draw a card if it currently contains fewer than the maximum allowed cards.
-     * @param shuffledDeck the player's deck to draw from
+     * @param team the team from which to draw the card, used to access the deck
      * @return boolean value of the success of the draw action; returns false if the hand is full or the deck is empty, true otherwise
      */
-    public boolean handLoader(List<Unit> shuffledDeck) {
-        if (this.getHand().size() < MAX_HAND_SIZE) {
-            if (shuffledDeck.isEmpty()) {
+    public boolean handLoader(Team team) {
+        if (this.hand.size() < MAX_HAND_SIZE) {
+            Unit drawnCard = team.drawTopCard();
+            if (drawnCard == null) {
                 return false;
             } else {
-                Unit drawnCard = shuffledDeck.remove(FIRST_CARD_INDEX);
-                this.getHand().add(drawnCard);
+                this.hand.add(drawnCard);
             }
         }
         return true;
@@ -50,7 +49,7 @@ public class Hand {
      * @param unit the unit to remove
      */
     public void removeUnitFromHand(Unit unit) {
-        this.getHand().remove(unit);
+        this.hand.remove(unit);
     }
 
     /**
@@ -58,6 +57,6 @@ public class Hand {
      * @return the list of units
      */
     public List<Unit> getHand() {
-        return this.hand;
+        return new ArrayList<>(this.hand);
     }
 }

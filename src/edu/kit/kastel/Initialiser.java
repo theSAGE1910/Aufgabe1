@@ -10,24 +10,19 @@ import java.util.List;
  * @version 0.9
  */
 public final class Initialiser {
-    private static Deck deck1 = null;
-    private static Deck deck2 = null;
-    private static List<Unit> player1DrawPile = null;
-    private static List<Unit> player2DrawPile = null;
 
     private static final int START_INDEX = 0;
     private static final int MAX_DIMENSION = 7;
     private static final int OFFSET_ONE = 1;
     private static final int OFFSET_TWO = 2;
+    private static final int INITIAL_STAT = 0;
 
     private Initialiser() {
     }
 
     /**
      * Executes the complete initialization sequence for the game.
-     * Sets the RNG seed, prepares the board, loads configurations, builds teams,
-     * and prepares the first turn.
-     * @return true if initialization was successful, false if there were errors in loading decks or configurations
+     * @return true if initialization was successful, false if there were errors
      */
     public static boolean initialise() {
         RandomGenerator.initialise(GameData.getSeed());
@@ -35,11 +30,10 @@ public final class Initialiser {
         BoardTheme.initialiseTheme();
         initialiseUnits();
 
-        if (!initialiseDecks()) {
+        if (!initialiseDecksAndTeams()) {
             return false;
         }
 
-        initialiseTeams();
         initialiseHands(GameEngine.getTeam1());
         initialiseHands(GameEngine.getTeam2());
 
@@ -61,9 +55,9 @@ public final class Initialiser {
         Unit.extractUnits(GameData.getUnitData());
     }
 
-    private static boolean initialiseDecks() {
-        deck1 = new Deck();
-        deck2 = new Deck();
+    private static boolean initialiseDecksAndTeams() {
+        Deck deck1 = new Deck();
+        Deck deck2 = new Deck();
 
         if (!deck1.extractDeckSize(GameData.getDeck1Data())) {
             return false;
@@ -78,29 +72,27 @@ public final class Initialiser {
             return false;
         }
 
-        player1DrawPile = deck1.generatePlayableDeck();
-        player2DrawPile = deck2.generatePlayableDeck();
+        List<Unit> player1DrawPile = deck1.generatePlayableDeck();
+        List<Unit> player2DrawPile = deck2.generatePlayableDeck();
 
         RandomGenerator.shuffleDeck(player1DrawPile);
         RandomGenerator.shuffleDeck(player2DrawPile);
 
-        return true;
-    }
+        GameEngine.setTeam1(new Team(GameData.getTeam1Name(), new Hand(), player1DrawPile));
+        GameEngine.setTeam2(new Team(GameData.getTeam2Name(), new Hand(), player2DrawPile));
 
-    private static void initialiseTeams() {
-        GameEngine.setTeam1(new Team(GameData.getTeam1Name(), deck1, new Hand(), player1DrawPile));
-        GameEngine.setTeam2(new Team(GameData.getTeam2Name(), deck2, new Hand(), player2DrawPile));
+        return true;
     }
 
     private static void initialiseHands(Team team) {
         for (int i = START_INDEX; i < Hand.MAX_HAND_SIZE; i++) {
-            team.getHand().handLoader(team.getShuffledDeck());
+            team.getHand().handLoader(team);
         }
     }
 
     private static void initialiseKings() {
-        Unit team1King = new Unit(GameMessages.FARMER, GameMessages.KING, START_INDEX, START_INDEX, GameEngine.getTeam1());
-        Unit team2King = new Unit(GameMessages.FARMER, GameMessages.KING, START_INDEX, START_INDEX, GameEngine.getTeam2());
+        Unit team1King = new Unit(GameMessages.FARMER, GameMessages.KING, INITIAL_STAT, INITIAL_STAT, GameEngine.getTeam1());
+        Unit team2King = new Unit(GameMessages.FARMER, GameMessages.KING, INITIAL_STAT, INITIAL_STAT, GameEngine.getTeam2());
 
         GameBoard.setUnitAt(GameBoard.DIMENSION - OFFSET_ONE, GameBoard.DIMENSION / OFFSET_TWO, team1King);
         GameBoard.setUnitAt(START_INDEX, GameBoard.DIMENSION / OFFSET_TWO, team2King);

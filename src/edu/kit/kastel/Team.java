@@ -1,5 +1,6 @@
 package edu.kit.kastel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +20,6 @@ public class Team {
     private static final int INITIAL_VALUE = 0;
 
     private final String name;
-    private final Deck deck;
     private final Hand hand;
     private final List<Unit> shuffledDeck;
     private final int initialDeckSize;
@@ -29,16 +29,14 @@ public class Team {
     /**
      * Constructs a new Team with the specified name and deck configurations.
      * @param name the display name of the team
-     * @param deck the full deck configuration assigned to the team
      * @param hand the team's active hand of drawn cards
      * @param shuffledDeck the list of units representing the team's drawable pile
      */
-    public Team(String name, Deck deck, Hand hand, List<Unit> shuffledDeck) {
+    public Team(String name, Hand hand, List<Unit> shuffledDeck) {
         this.name = name;
         this.teamHP = INITIAL_HP;
-        this.deck = deck;
         this.hand = hand;
-        this.shuffledDeck = shuffledDeck;
+        this.shuffledDeck = new ArrayList<>(shuffledDeck);
         this.initialDeckSize = shuffledDeck.size();
     }
 
@@ -49,6 +47,17 @@ public class Team {
      */
     public void takeDamage(int amount) {
         this.teamHP = Math.max(INITIAL_VALUE, this.teamHP - amount);
+    }
+
+    /**
+     * Draws the top card from the team's shuffled deck and adds it to their hand.
+     * @return the Unit drawn from the top of the deck, or null if the deck is empty
+     */
+    public Unit drawTopCard() {
+        if (this.shuffledDeck.isEmpty()) {
+            return null;
+        }
+        return this.shuffledDeck.remove(INITIAL_VALUE);
     }
 
     /**
@@ -88,7 +97,7 @@ public class Team {
      * @return the list of playable units in the draw pile
      */
     public List<Unit> getShuffledDeck() {
-        return this.shuffledDeck;
+        return new ArrayList<>(this.shuffledDeck);
     }
 
 }

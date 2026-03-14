@@ -36,8 +36,8 @@ public class BlockCommand implements Command {
             return;
         }
         unitToBlock.setBlocking(true);
-        unitToBlock.setHasMovedThisTurn(true);
-        Output.printBlock(unitToBlock.getUnitName(), GameState.getSelectedSquare());
+        unitToBlock.setMovedThisTurn(true);
+        Output.printBlockStatus(unitToBlock.getUnitName(), GameState.getSelectedSquare(), true);
         GameUI.updateDisplay();
     }
 }

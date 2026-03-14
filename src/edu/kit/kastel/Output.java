@@ -35,7 +35,6 @@ public final class Output {
     private static final int MAX_STATE_LINE_LENGTH = 31;
     private static final int MAX_BOARD_UNITS = 5;
 
-    private static final int START_COUNT = 0;
     private static final int START_INDEX = 0;
     private static final int START_NUMBERING = 1;
     private static final String SPACE = " ";
@@ -45,20 +44,17 @@ public final class Output {
     }
 
     /**
-     * Prints the message for when a unit stops blocking.
-     * @param name the name of the unit
+     * Prints the message for when a unit starts blocking or stops blocking.
+     * @param name the name of the unit that is blocking or no longer blocking
+     * @param field the coordinate square where the block or unblock action is occurring
+     * @param isBlocking true if the unit is blocking, false if the unit is no longer blocking
      */
-    public static void printNoBlock(String name) {
-        System.out.printf(NO_LONGER_BLOCKS_FORMAT, name);
-    }
-
-    /**
-     * Prints the message for when a unit assumes a blocking stance.
-     * @param name the name of the unit
-     * @param field the coordinate square the unit is on
-     */
-    public static void printBlock(String name, String field) {
-        System.out.printf(BLOCK_FORMAT, name, field);
+    public static void printBlockStatus(String name, String field, boolean isBlocking) {
+        if (isBlocking) {
+            System.out.printf(BLOCK_FORMAT, name, field);
+        } else {
+            System.out.printf(NO_LONGER_BLOCKS_FORMAT, name);
+        }
     }
 
     /**
@@ -129,19 +125,13 @@ public final class Output {
     }
 
     /**
-     * Prints the critical message indicating a team's life points have been depleted.
-     * @param team the name of the team whose points reached zero
+     * Prints the message for when a team's life points drop to zero, indicating their defeat and the opponent's victory.
+     * @param loser the name of the team whose life points have dropped to zero
+     * @param winner the name of the team that wins as a result of the opponent's life points dropping to zero
      */
-    public static void printZeroPoints(String team) {
-        System.out.printf(ZERO_POINTS_FORMAT, team);
-    }
-
-    /**
-     * Prints the final victory message.
-     * @param team the name of the winning team
-     */
-    public static void printWin(String team) {
-        System.out.printf(WIN_FORMAT, team);
+    public static void printGameOver(String loser, String winner) {
+        System.out.printf(ZERO_POINTS_FORMAT, loser);
+        System.out.printf(WIN_FORMAT, winner);
     }
 
     /**
@@ -184,30 +174,21 @@ public final class Output {
     }
 
     /**
-     * Prints the identifier for the Farmer King unit.
-     * @param unit the Farmer King unit object
+     * Prints the details of a unit on the board, based on whether the unit is a Farmer King, face-down, or face-up.
+     * @param unit the unit whose details are being printed
+     * @param activeTeam the team currently taking their turn, used to determine whether to reveal details of face-down units
      */
-    public static void printFarmerKing(Unit unit) {
-        System.out.printf(FARMER_KING_FORMAT, unit.getTeam().getName());
-    }
-
-    /**
-     * Prints the concealed information format for a face-down enemy unit.
-     * @param unit the face-down unit object
-     */
-    public static void printHiddenUnit(Unit unit) {
-        System.out.printf(HIDDEN_UNIT_FORMAT, unit.getTeam().getName());
-    }
-
-    /**
-     * Prints the full identification and stats of a face-up unit on the board.
-     * @param unit the face-up unit object
-     */
-    public static void printVisibleUnit(Unit unit) {
-        System.out.printf(VISIBLE_UNIT_FORMAT,
-                unit.getQualifier(), unit.getRole(),
-                unit.getTeam().getName(),
-                unit.getAtk(), unit.getDef());
+    public static void printUnitDetails(Unit unit, Team activeTeam) {
+        if (unit.getRole().equals(GameMessages.KING)) {
+            System.out.printf(FARMER_KING_FORMAT, unit.getTeam().getName());
+        } else if (!unit.isFaceUp() && !unit.getTeam().equals(activeTeam)) {
+            System.out.printf(HIDDEN_UNIT_FORMAT, unit.getTeam().getName());
+        } else {
+            System.out.printf(VISIBLE_UNIT_FORMAT,
+                    unit.getQualifier(), unit.getRole(),
+                    unit.getTeam().getName(),
+                    unit.getAtk(), unit.getDef());
+        }
     }
 
     /**
@@ -216,36 +197,23 @@ public final class Output {
      * @param team2 the second team object
      */
     public static void printState(Team team1, Team team2) {
-        printStateLine(team1.getName(), team2.getName());
-        printStateLine(String.format(LP_FORMAT, team1.getTeamHP(), Team.INITIAL_HP),
-                String.format(LP_FORMAT, team2.getTeamHP(), Team.INITIAL_HP));
-        printStateLine(String.format(DC_FORMAT, team1.getShuffledDeck().size(), team1.getInitialDeckSize()),
-                String.format(DC_FORMAT, team2.getShuffledDeck().size(), team2.getInitialDeckSize()));
-        printStateLine(String.format(BC_FORMAT, getBoardCount(team1), MAX_BOARD_UNITS),
-                String.format(BC_FORMAT, getBoardCount(team2), MAX_BOARD_UNITS));
-    }
-
-    /**
-     * Counts the total number of standard units (excluding the Farmer King) a team has on the board.
-     * @param team the team whose units are being counted
-     * @return the number of units the team currently has on the board
-     */
-    public static int getBoardCount(Team team) {
-        int count = START_COUNT;
-        for (int row = START_INDEX; row < GameBoard.DIMENSION; row++) {
-            for (int col = START_INDEX; col < GameBoard.DIMENSION; col++) {
-                Unit boardUnit = GameBoard.getUnitAt(row, col);
-                if (boardUnit != null && boardUnit.getTeam().equals(team) && !boardUnit.getRole().equals(GameMessages.KING)) {
-                    count++;
-                }
-            }
+        String[] lefts = {
+                team1.getName(),
+                String.format(LP_FORMAT, team1.getTeamHP(), Team.INITIAL_HP),
+                String.format(DC_FORMAT, team1.getShuffledDeck().size(), team1.getInitialDeckSize()),
+                String.format(BC_FORMAT, GameBoard.getBoardCount(team1), MAX_BOARD_UNITS)
+        };
+        String[] rights = {
+                team2.getName(),
+                String.format(LP_FORMAT, team2.getTeamHP(), Team.INITIAL_HP),
+                String.format(DC_FORMAT, team2.getShuffledDeck().size(), team2.getInitialDeckSize()),
+                String.format(BC_FORMAT, GameBoard.getBoardCount(team2), MAX_BOARD_UNITS)
+        };
+        for (int i = START_INDEX; i < lefts.length; i++) {
+            String base = INDENT + lefts[i];
+            int spacesNeeded = MAX_STATE_LINE_LENGTH - base.length() - rights[i].length();
+            System.out.print(base + SPACE.repeat(Math.max(START_INDEX, spacesNeeded)) + rights[i]);
+            System.out.println();
         }
-        return count;
-    }
-
-    private static void printStateLine(String left, String right) {
-        String base = INDENT + left;
-        int spacesNeeded = MAX_STATE_LINE_LENGTH - base.length() - right.length();
-        System.out.println(base + SPACE.repeat(Math.max(START_INDEX, spacesNeeded)) + right);
     }
 }

@@ -81,7 +81,7 @@ public class YieldCommand implements Command {
     }
 
     private static void executeAITurn() {
-        GameLogicAI.executeTurn();
+        GameLogicAI.executeTurn(GameEngine.getTeam2(), GameEngine.getTeam1());
 
         if (GameState.isIsRunning()) {
             GameEngine.resetTeamMovement(GameEngine.getTeam2());
