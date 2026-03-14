@@ -59,16 +59,16 @@ public final class Initialiser {
         Deck deck1 = new Deck();
         Deck deck2 = new Deck();
 
-        if (!deck1.extractDeckSize(GameData.getDeck1Data())) {
+        if (deck1.extractDeckSize(GameData.getDeck1Data())) {
             return false;
         }
-        if (!deck2.extractDeckSize(GameData.getDeck2Data())) {
+        if (deck2.extractDeckSize(GameData.getDeck2Data())) {
             return false;
         }
-        if (!deck1.assignDeck()) {
+        if (deck1.assignDeck()) {
             return false;
         }
-        if (!deck2.assignDeck()) {
+        if (deck2.assignDeck()) {
             return false;
         }
 
